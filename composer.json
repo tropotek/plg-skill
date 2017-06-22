@@ -1,0 +1,36 @@
+{
+  "name": "ttek-plg/ems-skill",
+  "type": "ttek-plugin",
+  "description": "EMS III Skills and self assessment plugin (GOALS)",
+  "keywords": [
+    "tropotek",
+    "plugin",
+    "skills",
+    "goals",
+    "EMS III"
+  ],
+  "homepage": "http://www.tropotek.com/",
+  "time": "2017-02-01",
+  "access": "admin, course",
+  "license": "MIT",
+  "version": "1.0.0",
+  "authors": [
+    {
+      "name": "Michael Mifsud",
+      "homepage": "http://www.tropotek.com/"
+    }
+  ],
+  "autoload": {
+    "psr-0": {
+      "Skill\\": ""
+    }
+  },
+  "extra": {
+    "branch-alias": {
+      "dev-master": "1.0.x-dev"
+    }
+  },
+  "require": {
+    "ttek/tk-installers": "~2.0"
+  }
+}
