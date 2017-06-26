@@ -22,8 +22,9 @@
 CREATE TABLE IF NOT EXISTS skill_set (
   id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   course_id int(10) UNSIGNED NOT NULL DEFAULT 0,
-  uid VARCHAR(16) NOT NULL DEFAULT '',                 -- The uid can be used to link similar skills_groups across courses for historic reporting
-  name VARCHAR(255) NOT NULL DEFAULT '',
+  placement_type_id int(10) UNSIGNED NOT NULL DEFAULT 0,    -- TODO: Looks like we will be attaching them to the placement type now
+  uid VARCHAR(16) NOT NULL DEFAULT '',                      -- The uid can be used to link similar skills_groups across courses for historic reporting
+  name VARCHAR(255) NOT NULL DEFAULT '',                    --
   description TEXT,
   
   -- TODO: These can be plugin settings
