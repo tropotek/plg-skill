@@ -14,7 +14,7 @@ use App\Controller\Iface;
  * @link http://www.tropotek.com/
  * @license Copyright 2015 Michael Mifsud
  */
-class CourseProfileSettings extends Iface
+class ProfileSettings extends Iface
 {
 
     /**
@@ -125,19 +125,19 @@ class CourseProfileSettings extends Iface
         $xhtml = <<<XHTML
 <div var="content">
 
-    <div class="panel panel-default">
-      <div class="panel-heading"><i class="fa fa-cogs fa-fw"></i> Actions</div>
-      <div class="panel-body " var="action-panel">
-        <a href="javascript: window.history.back();" class="btn btn-default"><i class="fa fa-arrow-left"></i> <span>Back</span></a>
-      </div>
+  <div class="panel panel-default">
+    <div class="panel-heading"><i class="fa fa-cogs fa-fw"></i> Actions</div>
+    <div class="panel-body " var="action-panel">
+      <a href="javascript: window.history.back();" class="btn btn-default"><i class="fa fa-arrow-left"></i> <span>Back</span></a>
     </div>
+  </div>
   
-    <div class="panel panel-default">
-      <div class="panel-heading"><i class="fa fa-cog"></i> Settings</div>
-      <div class="panel-body">
-        <div var="formEdit"></div>
-      </div>
+  <div class="panel panel-default">
+    <div class="panel-heading"><i class="fa fa-cog"></i> Settings</div>
+    <div class="panel-body">
+      <div var="formEdit"></div>
     </div>
+  </div>
   
 </div>
 XHTML;
