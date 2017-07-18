@@ -95,7 +95,7 @@ class ProfileSettings extends Iface
         
         \Tk\Alert::addSuccess('Settings saved.');
         if ($form->getTriggeredEvent()->getName() == 'update') {
-            \App\Uri::createHomeUrl('/course/profilePlugins.html')->set('courseProfileId', $this->profile->getId())->redirect();
+            \App\Uri::createHomeUrl('/course/profilePlugins.html')->set('profileId', $this->profile->getId())->redirect();
         }
         \Tk\Uri::create()->redirect();
     }

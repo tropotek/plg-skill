@@ -131,7 +131,7 @@ class Plugin extends \Tk\Plugin\Iface
             case self::ZONE_INSTITUTION:
                 return \Tk\Uri::create('/skill/institutionSettings.html');
             case self::ZONE_COURSE_PROFILE:
-                return \Tk\Uri::create('/skill/courseProfileSettings.html');
+                return \Tk\Uri::create('/skill/profileSettings.html');
             case self::ZONE_COURSE:
                 return \Tk\Uri::create('/skill/courseSettings.html');
         }
