@@ -94,7 +94,7 @@ class ExampleHandler implements Subscriber
         return array(
             KernelEvents::REQUEST => array('onSystemInit', -10),
             KernelEvents::CONTROLLER => array('onControllerAccess', 0),
-            AppEvents::SHOW => array('onControllerShow', 0)
+            \Tk\PageEvents::CONTROLLER_SHOW => array('onControllerShow', 0)
         );
     }
     
