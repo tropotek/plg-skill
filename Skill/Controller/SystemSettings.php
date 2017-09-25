@@ -33,7 +33,6 @@ class SystemSettings extends Iface
      */
     public function __construct()
     {
-        parent::__construct();
         $this->setPageTitle('Example Plugin Settings');
 
         /** @var \Skill\Plugin $plugin */
@@ -119,14 +118,14 @@ class SystemSettings extends Iface
 <div var="content">
 
     <div class="panel panel-default">
-      <div class="panel-heading"><i class="fa fa-cogs fa-fw"></i> Actions</div>
+      <div class="panel-heading"><h4 class="panel-title"><i class="fa fa-cogs fa-fw"></i> Actions</h4></div>
       <div class="panel-body " var="action-panel">
         <a href="javascript: window.history.back();" class="btn btn-default"><i class="fa fa-arrow-left"></i> <span>Back</span></a>
       </div>
     </div>
   
     <div class="panel panel-default">
-      <div class="panel-heading"><i class="fa fa-cog"></i> Site Settings</div>
+      <div class="panel-heading"><h4 class="panel-title"><i class="fa fa-cog"></i> Site Settings</h4></div>
       <div class="panel-body">
         <div var="formEdit"></div>
       </div>
