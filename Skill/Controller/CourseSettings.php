@@ -38,7 +38,7 @@ class CourseSettings extends Iface
      */
     public function __construct()
     {
-        $this->setPageTitle('Sample Plugin - Course Settings');
+        $this->setPageTitle('Skills Plugin - Course Settings');
     }
 
     /**
@@ -52,15 +52,17 @@ class CourseSettings extends Iface
         $plugin = \Skill\Plugin::getInstance();
 
         $this->course = \App\Db\CourseMap::create()->find($request->get('zoneId'));
-        //$this->course = \App\Factory::getCourse();
         $this->data = \Tk\Db\Data::create($plugin->getName() . '.course', $this->course->getId());
 
         $this->form = \App\Factory::createForm('formEdit');
         $this->form->setParam('renderer', \App\Factory::createFormRenderer($this->form));
 
-        $this->form->addField(new Field\Input('plugin.title'))->setLabel('Site Title')->setRequired(true);
-        $this->form->addField(new Field\Input('plugin.email'))->setLabel('Site Email')->setRequired(true);
-        
+        $this->form->addField(new Field\Checkbox('plugin.enableSa'))->setCheckboxLabel('Enable Self Assessment');
+        $this->form->addField(new Field\Checkbox('plugin.enableResults'))->setCheckboxLabel('Enable Students View Results');
+        $this->form->addField(new Field\Input('plugin.confirm'))->setLabel('Confirmation Text');
+        $this->form->addField(new Field\Textarea('plugin.instructions'))->setLabel('Instructions')->addCss('mce');
+
+
         $this->form->addField(new Event\Button('update', array($this, 'doSubmit')));
         $this->form->addField(new Event\Button('save', array($this, 'doSubmit')));
         $this->form->addField(new Event\LinkButton('cancel', \App\Factory::getCrumbs()->getBackUrl()));

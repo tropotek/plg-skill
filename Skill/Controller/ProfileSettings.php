@@ -5,7 +5,6 @@ use Tk\Request;
 use Tk\Form;
 use Tk\Form\Event;
 use Tk\Form\Field;
-use App\Controller\Iface;
 
 /**
  * Class Contact
@@ -14,7 +13,7 @@ use App\Controller\Iface;
  * @link http://www.tropotek.com/
  * @license Copyright 2015 Michael Mifsud
  */
-class ProfileSettings extends Iface
+class ProfileSettings extends \App\Controller\AdminIface
 {
 
     /**
@@ -38,6 +37,7 @@ class ProfileSettings extends Iface
      */
     public function __construct()
     {
+        parent::__construct();
         $this->setPageTitle('Sample Plugin - Course Profile Settings');
     }
 
@@ -48,8 +48,8 @@ class ProfileSettings extends Iface
      */
     public function doDefault(Request $request)
     {
-        /** @var \sample\Plugin $plugin */
-        $plugin = \sample\Plugin::getInstance();
+        /** @var \Skill\Plugin $plugin */
+        $plugin = \Skill\Plugin::getInstance();
 
         $this->profile = \App\Db\ProfileMap::create()->find($request->get('zoneId'));
         $this->data = \Tk\Db\Data::create($plugin->getName() . '.course.profile', $this->profile->getId());
@@ -57,8 +57,10 @@ class ProfileSettings extends Iface
         $this->form = \App\Factory::createForm('formEdit');
         $this->form->setParam('renderer', \App\Factory::createFormRenderer($this->form));
 
-        $this->form->addField(new Field\Input('plugin.title'))->setLabel('Site Title')->setRequired(true);
-        $this->form->addField(new Field\Input('plugin.email'))->setLabel('Site Email')->setRequired(true);
+        $this->form->addField(new Field\Checkbox('plugin.enableSa'))->setCheckboxLabel('Enable Self Assessment');
+        $this->form->addField(new Field\Checkbox('plugin.enableResults'))->setCheckboxLabel('Enable Students View Results');
+        $this->form->addField(new Field\Input('plugin.confirm'))->setLabel('Confirmation Text');
+        $this->form->addField(new Field\Textarea('plugin.instructions'))->setLabel('Instructions')->addCss('mce');
         
         $this->form->addField(new Event\Button('update', array($this, 'doSubmit')));
         $this->form->addField(new Event\Button('save', array($this, 'doSubmit')));
@@ -79,12 +81,12 @@ class ProfileSettings extends Iface
         $values = $form->getValues();
         $this->data->replace($values);
         
-        if (empty($values['plugin.title']) || strlen($values['plugin.title']) < 3) {
-            $form->addFieldError('plugin.title', 'Please enter your name');
-        }
-        if (empty($values['plugin.email']) || !filter_var($values['plugin.email'], \FILTER_VALIDATE_EMAIL)) {
-            $form->addFieldError('plugin.email', 'Please enter a valid email address');
-        }
+//        if (empty($values['plugin.title']) || strlen($values['plugin.title']) < 3) {
+//            $form->addFieldError('plugin.title', 'Please enter your name');
+//        }
+//        if (empty($values['plugin.email']) || !filter_var($values['plugin.email'], \FILTER_VALIDATE_EMAIL)) {
+//            $form->addFieldError('plugin.email', 'Please enter a valid email address');
+//        }
         
         if ($this->form->hasErrors()) {
             return;
@@ -123,13 +125,6 @@ class ProfileSettings extends Iface
     {
         $xhtml = <<<XHTML
 <div var="content">
-
-  <div class="panel panel-default">
-    <div class="panel-heading"><h4 class="panel-title"><i class="fa fa-cogs fa-fw"></i> Actions</h4></div>
-    <div class="panel-body " var="action-panel">
-      <a href="javascript: window.history.back();" class="btn btn-default"><i class="fa fa-arrow-left"></i> <span>Back</span></a>
-    </div>
-  </div>
   
   <div class="panel panel-default">
     <div class="panel-heading"><h4 class="panel-title"><i class="fa fa-cog"></i> Settings</h4></div>

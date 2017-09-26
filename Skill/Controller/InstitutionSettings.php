@@ -40,8 +40,8 @@ class InstitutionSettings extends Iface
     {
         $this->setPageTitle('Sample Plugin - Institution Settings');
 
-        /** @var \sample\Plugin $plugin */
-        $plugin = \sample\Plugin::getInstance();
+        /** @var \Skill\Plugin $plugin */
+        $plugin = \Skill\Plugin::getInstance();
         $this->institution = $this->getUser()->getInstitution();
         $this->data = \Tk\Db\Data::create($plugin->getName() . '.institution', $this->institution->getId());
 

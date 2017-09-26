@@ -3,10 +3,7 @@ namespace Skill;
 
 use Tk\Event\Dispatcher;
 
-
 /**
- * Class Plugin
- *
  * @author Michael Mifsud <info@tropotek.com>
  * @link http://www.tropotek.com/
  * @license Copyright 2016 Michael Mifsud
@@ -17,6 +14,7 @@ class Plugin extends \Tk\Plugin\Iface
     const ZONE_INSTITUTION = 'institution';
     const ZONE_COURSE_PROFILE = 'profile';
     const ZONE_COURSE = 'course';
+
 
     /**
      * A helper method to get the Plugin instance globally
@@ -53,8 +51,8 @@ class Plugin extends \Tk\Plugin\Iface
 
         // Register the plugin for the different client areas if they are to be enabled/disabled/configured by those roles.
         //$this->getPluginFactory()->registerZonePlugin($this, self::ZONE_INSTITUTION);
-        //$this->getPluginFactory()->registerZonePlugin($this, self::ZONE_COURSE_PROFILE);
-        $this->getPluginFactory()->registerZonePlugin($this, self::ZONE_COURSE);
+        $this->getPluginFactory()->registerZonePlugin($this, self::ZONE_COURSE_PROFILE);
+        //$this->getPluginFactory()->registerZonePlugin($this, self::ZONE_COURSE);
 
         /** @var Dispatcher $dispatcher */
         $dispatcher = \Tk\Config::getInstance()->getEventDispatcher();
@@ -98,21 +96,24 @@ class Plugin extends \Tk\Plugin\Iface
         // TODO: Implement doDeactivate() method.
         $db = \App\Factory::getDb();
 
+        // TODO: are we sure we want to remove data, preserve for historic access, this will need an archive strategy
+
+
         // Clear the data table of all plugin data
-        $sql = sprintf('DELETE FROM %s WHERE %s LIKE %s', $db->quoteParameter(\Tk\Db\Data::$DB_TABLE), $db->quoteParameter('fkey'),
-            $db->quote($this->getName().'%'));
-        $db->query($sql);
+//        $sql = sprintf('DELETE FROM %s WHERE %s LIKE %s', $db->quoteParameter(\Tk\Db\Data::$DB_TABLE), $db->quoteParameter('fkey'),
+//            $db->quote($this->getName().'%'));
+//        $db->query($sql);
 
         // Delete all tables.
-        $tables = array('skill', 'skill_bundle', 'skill_bundle_has_placement', 'skill_group', 'skill_score', 'skill_set');
-        foreach ($tables as $name) {
-            $db->dropTable($name);
-        }
+//        $tables = array('skill', 'skill_bundle', 'skill_bundle_has_placement', 'skill_group', 'skill_score', 'skill_set');
+//        foreach ($tables as $name) {
+//            $db->dropTable($name);
+//        }
 
         // Remove migration track
-        $sql = sprintf('DELETE FROM %s WHERE %s LIKE %s', $db->quoteParameter(\Tk\Util\SqlMigrate::$DB_TABLE), $db->quoteParameter('path'),
-            $db->quote('/plugin/' . $this->getName().'/%'));
-        $db->query($sql);
+//        $sql = sprintf('DELETE FROM %s WHERE %s LIKE %s', $db->quoteParameter(\Tk\Util\SqlMigrate::$DB_TABLE), $db->quoteParameter('path'),
+//            $db->quote('/plugin/' . $this->getName().'/%'));
+//        $db->query($sql);
         
         // Delete any setting in the DB
 //        $data = \Tk\Db\Data::create($this->getName());
@@ -123,17 +124,18 @@ class Plugin extends \Tk\Plugin\Iface
     /**
      * Get the course settings URL, if null then there is none
      *
-     * @return string|\Tk\Uri|null
+     * @param string $zoneName
+     * @return null|string|\Tk\Uri
      */
     public function getZoneSettingsUrl($zoneName)
     {
         switch ($zoneName) {
-            case self::ZONE_INSTITUTION:
-                return \Tk\Uri::create('/skill/institutionSettings.html');
+//            case self::ZONE_INSTITUTION:
+//                return \Tk\Uri::create('/skill/institutionSettings.html');
             case self::ZONE_COURSE_PROFILE:
                 return \Tk\Uri::create('/skill/profileSettings.html');
-            case self::ZONE_COURSE:
-                return \Tk\Uri::create('/skill/courseSettings.html');
+//            case self::ZONE_COURSE:
+//                return \Tk\Uri::create('/skill/courseSettings.html');
         }
         return null;
     }
