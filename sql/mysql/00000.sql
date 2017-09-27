@@ -1,6 +1,4 @@
 -- ---------------------------------
--- common.js
--- 
 -- Author: Michael Mifsud <info@tropotek.com>
 -- ---------------------------------
 --
@@ -35,17 +33,6 @@ CREATE TABLE IF NOT EXISTS skill_domain (
   KEY (profile_id),
   KEY del (del)
 ) ENGINE=InnoDB;
-TRUNCATE skill_domain;
-
-INSERT INTO skill_domain (profile_id, name, description, modified, created)
-  VALUES
-    (2, 'Clinical Skills', '', NOW(), NOW()),
-    (2, 'Scientific basis of clinical practice', '', NOW(), NOW()),
-    (2, 'Biosecurity and population health', '', NOW(), NOW()),
-    (2, 'Ethics and Animal welfare', '', NOW(), NOW()),
-    (2, 'Personal and Professional Development', '', NOW(), NOW())
-;
-UPDATE skill_domain SET order_by = id;
 
 CREATE TABLE IF NOT EXISTS skill_scale (
   id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -60,18 +47,6 @@ CREATE TABLE IF NOT EXISTS skill_scale (
   KEY (profile_id),
   KEY del (del)
 ) ENGINE=InnoDB;
-TRUNCATE skill_scale;
-
-INSERT INTO skill_scale (profile_id, name, description, value, modified, created)
-VALUES
-  (2, 'Not Assessed', 'The student may have observed the task, but not taken part in the completion of the task, or the task may not be applicable to the type of placement', 0, NOW(), NOW()),                       -- 0%
-  (2, 'Unable', 'The student attempted the task, but did not successfully complete the task due to lack of knowledge or skill.', 20, NOW(), NOW()),
-  (2, 'Developing', 'The student attempted the task and successfully completed most of the task.', 40, NOW(), NOW()),
-  (2, 'Acceptable', 'The student attempted the task and usually succeeded in fully completing the task. “Day one” skill level.', 60, NOW(), NOW()),
-  (2, 'Good', 'The student completed the task and was very able.', 80, NOW(), NOW()),
-  (2, 'Exceptional', 'The student demonstrated the task with exceptionally well honed skills.', 100, NOW(), NOW())           -- 100%
-;
-UPDATE skill_scale SET order_by = id;
 
 
 

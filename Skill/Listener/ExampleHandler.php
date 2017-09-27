@@ -5,7 +5,6 @@ use Tk\Event\Subscriber;
 use Tk\Kernel\KernelEvents;
 use Tk\Event\ControllerEvent;
 use Tk\Event\GetResponseEvent;
-use App\AppEvents;
 use Tk\Event\Event;
 
 /**
@@ -28,7 +27,6 @@ class ExampleHandler implements Subscriber
         $this->zoneId = (int)$zoneId;
     }
 
-
     /**
      *
      * @param GetResponseEvent $event
@@ -40,7 +38,6 @@ class ExampleHandler implements Subscriber
 
         //vd($event->getRequest()->getAttribute('courseCode'));
         //vd(\Tk\Config::getInstance()->getCourse());
-
     }
 
     /**

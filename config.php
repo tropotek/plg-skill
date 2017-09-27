@@ -18,6 +18,5 @@ $params = array('role' => array('admin', 'client'));
 $params = array('role' => array('client', 'staff'));
 $routes->add('Skill Profile Settings', new \Tk\Routing\Route('/skill/profileSettings.html', 'Skill\Controller\ProfileSettings::doDefault', $params));
 
-$params = array('role' => array('client', 'staff'));
 //$routes->add('Skill Course Settings', new \Tk\Routing\Route('/skill/courseSettings.html', 'Skill\Controller\CourseSettings::doDefault', $params));
 
