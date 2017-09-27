@@ -14,13 +14,6 @@ class Entry extends \Tk\Db\Map\Model
     const STATUS_APPROVED = 'approved';
     const STATUS_NOT_APPROVED = 'not approved';
 
-    const TYPE_SELF_ASSESSMENT = 'Self Assessment';
-    const TYPE_BASIC = 'Basic';
-    const TYPE_CASE_WORKUP = 'Case Work-up';
-    const TYPE_CRITICAL_MOMENT = 'Critical Moment';
-    const TYPE_PLACEMENT_PLAN = 'Placement Plan';
-    const TYPE_PLACEMENT_REVIEW = 'Placement Review';
-
     
     /**
      * @var int
@@ -30,7 +23,12 @@ class Entry extends \Tk\Db\Map\Model
     /**
      * @var int
      */
-    public $profileId = 0;
+    public $courseId = 0;
+
+    /**
+     * @var int
+     */
+    public $placementId = 0;
 
     /**
      * @var int
@@ -45,41 +43,18 @@ class Entry extends \Tk\Db\Map\Model
     /**
      * @var string
      */
-    public $type = self::TYPE_BASIC;
+    public $assessor = '';
+
+    /**
+     * The number of days the student was absent for this placement
+     * @var int
+     */
+    public $absent = 0;
 
     /**
      * @var string
      */
     public $status = self::STATUS_PENDING;
-
-
-
-
-    /**
-     * @var string
-     */
-    public $location = '';
-
-    /**
-     * @var string
-     */
-    public $praiseComment = '';
-
-    /**
-     * @var string
-     */
-    public $highlightComment = '';
-
-    /**
-     * @var string
-     */
-    public $improveComment = '';
-
-    /**
-     * @var string
-     */
-    public $differentComment = '';
-
 
     /**
      * @var string
@@ -98,9 +73,14 @@ class Entry extends \Tk\Db\Map\Model
 
 
     /**
-     * @var \App\Db\Profile
+     * @var \App\Db\Course
      */
-    private $profile = null;
+    private $course = null;
+
+    /**
+     * @var \App\Db\Placement
+     */
+    private $placement = null;
 
     /**
      * @var \App\Db\User
@@ -120,14 +100,25 @@ class Entry extends \Tk\Db\Map\Model
 
 
     /**
-     * @return \App\Db\Profile|null|\Tk\Db\Map\Model|\Tk\Db\ModelInterface
+     * @return \App\Db\Course|null|\Tk\Db\Map\Model|\Tk\Db\ModelInterface
      */
-    public function getProfile()
+    public function getCourse()
     {
-        if (!$this->profile) {
-            $this->profile = \App\Db\ProfileMap::create()->find($this->profileId);
+        if (!$this->course) {
+            $this->course = \App\Db\CourseMap::create()->find($this->courseId);
         }
-        return $this->profile;
+        return $this->course;
+    }
+
+    /**
+     * @return \App\Db\Placement|null|\Tk\Db\Map\Model|\Tk\Db\ModelInterface
+     */
+    public function getPlacement()
+    {
+        if (!$this->placement) {
+            $this->placement = \App\Db\PlacementMap::create()->find($this->placementId);
+        }
+        return $this->placement;
     }
 
     /**
@@ -148,8 +139,11 @@ class Entry extends \Tk\Db\Map\Model
     {
         $errors = array();
 
-        if ((int)$this->profileId <= 0) {
-            $errors['profileId'] = 'Invalid Profile ID';
+        if ((int)$this->courseId <= 0) {
+            $errors['courseId'] = 'Invalid Course ID';
+        }
+        if ((int)$this->placementId <= 0) {
+            $errors['placementId'] = 'Invalid Placement ID';
         }
         if ((int)$this->userId <= 0) {
             $errors['userId'] = 'Invalid user ID';
@@ -157,12 +151,13 @@ class Entry extends \Tk\Db\Map\Model
         if (!$this->title) {
             $errors['title'] = 'Please enter a valid title';
         }
-        if (!$this->type) {
-            $errors['type'] = 'Please enter a valid type';
+        if (!$this->assessor) {
+            $errors['assessor'] = 'Please enter a valid assessors name';
         }
-        if (!$this->status) {
-            $errors['status'] = 'Please enter a valid status';
-        }
+
+//        if (!$this->status) {
+//            $errors['status'] = 'Please enter a valid status';
+//        }
         
         return $errors;
     }

@@ -24,19 +24,13 @@ class EntryMap extends \App\Db\Mapper
             $this->setTable('skill_entry');
             $this->dbMap = new \Tk\DataMap\DataMap();
             $this->dbMap->addPropertyMap(new Db\Integer('id'), 'key');
-            $this->dbMap->addPropertyMap(new Db\Integer('profileId', 'profile_id'));
+            $this->dbMap->addPropertyMap(new Db\Integer('courseId', 'course_id'));
+            $this->dbMap->addPropertyMap(new Db\Integer('placementId', 'placement_id'));
             $this->dbMap->addPropertyMap(new Db\Integer('userId', 'user_id'));
             $this->dbMap->addPropertyMap(new Db\Text('title'));
-            $this->dbMap->addPropertyMap(new Db\Text('type'));
-
+            $this->dbMap->addPropertyMap(new Db\Text('assessor'));
+            $this->dbMap->addPropertyMap(new Db\Integer('absent'));
             $this->dbMap->addPropertyMap(new Db\Text('status'));
-
-            $this->dbMap->addPropertyMap(new Db\Text('location'));
-            $this->dbMap->addPropertyMap(new Db\Text('praiseComment', 'praise_comment'));
-            $this->dbMap->addPropertyMap(new Db\Text('highlightComment', 'highlight_comment'));
-            $this->dbMap->addPropertyMap(new Db\Text('improveComment', 'improve_comment'));
-            $this->dbMap->addPropertyMap(new Db\Text('differentComment', 'different_comment'));
-
             $this->dbMap->addPropertyMap(new Db\Text('notes'));
             $this->dbMap->addPropertyMap(new Db\Date('modified'));
             $this->dbMap->addPropertyMap(new Db\Date('created'));
@@ -52,19 +46,13 @@ class EntryMap extends \App\Db\Mapper
         if (!$this->formMap) {
             $this->formMap = new \Tk\DataMap\DataMap();
             $this->formMap->addPropertyMap(new Form\Integer('id'), 'key');
-            $this->formMap->addPropertyMap(new Form\Integer('institutionId'));
+            $this->formMap->addPropertyMap(new Form\Integer('courseId'));
+            $this->formMap->addPropertyMap(new Form\Integer('placementId'));
             $this->formMap->addPropertyMap(new Form\Integer('userId'));
             $this->formMap->addPropertyMap(new Form\Text('title'));
-            $this->formMap->addPropertyMap(new Form\Text('type'));
-
+            $this->formMap->addPropertyMap(new Form\Text('assessor'));
+            $this->formMap->addPropertyMap(new Form\Text('absent'));
             $this->formMap->addPropertyMap(new Form\Text('status'));
-
-            $this->formMap->addPropertyMap(new Form\Text('location'));
-            $this->formMap->addPropertyMap(new Form\Text('praiseComment'));
-            $this->formMap->addPropertyMap(new Form\Text('highlightComment'));
-            $this->formMap->addPropertyMap(new Form\Text('improveComment'));
-            $this->formMap->addPropertyMap(new Form\Text('differentComment'));
-
             $this->formMap->addPropertyMap(new Form\Text('notes'));
         }
         return $this->formMap;
@@ -108,6 +96,10 @@ class EntryMap extends \App\Db\Mapper
             $where .= sprintf('a.profile_id = %s AND ', (int)$filter['profileId']);
         }
 
+        if (!empty($filter['placementId'])) {
+            $where .= sprintf('a.placement_id = %s AND ', (int)$filter['placementId']);
+        }
+
         if (!empty($filter['userId'])) {
             $where .= sprintf('a.user_id = %s AND ', (int)$filter['userId']);
         }
@@ -118,20 +110,6 @@ class EntryMap extends \App\Db\Mapper
 
         if (!empty($filter['status'])) {
             $w = $this->makeMultiQuery($filter['status'], 'a.status');
-            if ($w) {
-                $where .= '('. $w . ') AND ';
-            }
-        }
-
-        if (!empty($filter['type'])) {
-            $w = $this->makeMultiQuery($filter['type'], 'a.type');
-            if ($w) {
-                $where .= '('. $w . ') AND ';
-            }
-        }
-
-        if (!empty($filter['notType'])) {
-            $w = $this->makeMultiQuery($filter['notType'], 'a.type', 'AND', '!=');
             if ($w) {
                 $where .= '('. $w . ') AND ';
             }
@@ -151,6 +129,9 @@ class EntryMap extends \App\Db\Mapper
         $res = $this->selectFrom($from, $where, $tool);
         return $res;
     }
+
+
+
 
     /**
      * @param int $entryId

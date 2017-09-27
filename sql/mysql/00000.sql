@@ -109,6 +109,7 @@ CREATE TABLE IF NOT EXISTS skill_type (
   id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   uid VARCHAR(128) NOT NULL DEFAULT '',
   profile_id INT(10) UNSIGNED NOT NULL DEFAULT 0,
+  placement_type_id INT(10) UNSIGNED NOT NULL DEFAULT 0,
   type_group VARCHAR(190) NOT NULL DEFAULT '',
   name VARCHAR(190) NOT NULL DEFAULT '',
   order_by INT(11) UNSIGNED NOT NULL DEFAULT 0,
@@ -116,6 +117,7 @@ CREATE TABLE IF NOT EXISTS skill_type (
   modified DATETIME NOT NULL,
   created DATETIME NOT NULL,
   KEY (profile_id),
+  KEY (placement_type_id),
   UNIQUE KEY (`profile_id`, `type_group`, `name`),
   KEY (del)
 ) ENGINE=InnoDB;
@@ -138,23 +140,19 @@ CREATE TABLE IF NOT EXISTS `skill_item_has_type` (
 CREATE TABLE IF NOT EXISTS skill_entry (
   id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   course_id INT(10) UNSIGNED NOT NULL DEFAULT 0,            -- The entry is connected to a course
+  placement_id INT(10) UNSIGNED NOT NULL DEFAULT 0,         -- The placement this entry is linked to if 0 then assume self-assessment
   user_id INT(10) UNSIGNED NOT NULL DEFAULT 0,              -- The student user id the bundle belongs to
   title VARCHAR(255) NOT NULL DEFAULT '',                   -- A title for the assessment instance
-  type VARCHAR(255) NOT NULL DEFAULT '',                    -- A type tag, Basic, Case Work-up, Critical Moment, Placement Plan, Placement Review.
+  assessor VARCHAR(128) DEFAULT '' NOT NULL,                -- Name of person assessing the student if not supervisor.
+  absent INT(4) DEFAULT '0' NOT NULL,                       -- Number of days absent from placement.
   status VARCHAR(64) NOT NULL DEFAULT '',                   -- pending, approved, not-approved
-
-  -- TODO: thse fields should be in a skills_entry_data table. Dynamic fields based on the profile setup.
-  location VARCHAR(255) NOT NULL DEFAULT '',                -- Where did the placement/task occur
-  praise_comment TEXT,                                      -- What went well in this placement?
-  highlight_comment TEXT,                                   -- What one thing stood out?
-  improve_comment TEXT,                                     -- What could you have done to improve your experience?
-  different_comment TEXT,                                   -- What are you planning to do differently for your next placement?
 
   notes TEXT,                                               -- Staff only notes
   del TINYINT(1) NOT NULL DEFAULT 0,
   modified DATETIME NOT NULL,
   created DATETIME NOT NULL,
   KEY (course_id),
+  KEY (placement_id),
   KEY (user_id),
   KEY (del)
 ) ENGINE=InnoDB;

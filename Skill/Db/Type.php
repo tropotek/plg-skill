@@ -21,6 +21,11 @@ class Type extends \Tk\Db\Map\Model
     public $profileId = 0;
 
     /**
+     * @var int
+     */
+    public $placementTypeId = 0;
+
+    /**
      * @var string
      */
     public $typeGroup = '';
@@ -45,10 +50,16 @@ class Type extends \Tk\Db\Map\Model
      */
     public $created = null;
 
+
     /**
      * @var \App\Db\Profile
      */
     private $profile = null;
+
+    /**
+     * @var \App\Db\PlacementType
+     */
+    private $placementType = null;
 
 
 
@@ -79,6 +90,17 @@ class Type extends \Tk\Db\Map\Model
         }
         return $this->profile;
     }
+
+    /**
+     * @return \App\Db\PlacementType|null|\Tk\Db\Map\Model|\Tk\Db\ModelInterface
+     */
+    public function getPlacementType()
+    {
+        if (!$this->placementType) {
+            $this->placementType = \App\Db\PlacementTypeMap::create()->find($this->placementTypeId);
+        }
+        return $this->placementType;
+    }
     
     /**
      *
@@ -90,6 +112,9 @@ class Type extends \Tk\Db\Map\Model
         if ((int)$this->profileId <= 0) {
             $errors['profileId'] = 'Invalid Profile ID';
         }
+//        if ((int)$this->placementTypeId <= 0) {
+//            $errors['placementTypeId'] = 'Invalid Placement Type';
+//        }
         if (!$this->typeGroup) {
             $errors['typeGroup'] = 'Please enter a valid group';
         }

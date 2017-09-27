@@ -25,6 +25,7 @@ class TypeMap extends \App\Db\Mapper
             $this->dbMap = new \Tk\DataMap\DataMap();
             $this->dbMap->addPropertyMap(new Db\Integer('id'), 'key');
             $this->dbMap->addPropertyMap(new Db\Integer('profileId', 'profile_id'));
+            $this->dbMap->addPropertyMap(new Db\Integer('placementTypeId', 'placement_type_id'));
             $this->dbMap->addPropertyMap(new Db\Text('typeGroup', 'type_group'));
             $this->dbMap->addPropertyMap(new Db\Text('name'));
             $this->dbMap->addPropertyMap(new Db\Integer('orderBy', 'order_by'));
@@ -43,6 +44,7 @@ class TypeMap extends \App\Db\Mapper
             $this->formMap = new \Tk\DataMap\DataMap();
             $this->formMap->addPropertyMap(new Form\Integer('id'), 'key');
             $this->formMap->addPropertyMap(new Form\Integer('profileId'));
+            $this->formMap->addPropertyMap(new Form\Integer('placementTypeId'));
             $this->formMap->addPropertyMap(new Form\Text('typeGroup'));
             $this->formMap->addPropertyMap(new Form\Text('name'));
         }
@@ -65,8 +67,11 @@ class TypeMap extends \App\Db\Mapper
      */
     public function findTypeGroups($profileId)
     {
-        $sql = sprintf('SELECT DISTINCT type_group FROM skill_type WHERE institution_id = %d ORDER BY type_group', (int)$profileId);
-        $st = $this->getDb()->query($sql);
+        $st = $this->getDb()->prepare('SELECT DISTINCT type_group FROM skill_type WHERE profile_id = ? ORDER BY type_group');
+        $st->execute(array($profileId));
+
+        //$sql = sprintf('SELECT DISTINCT type_group FROM skill_type WHERE profile_id = %d ORDER BY type_group', (int)$profileId);
+        //$st = $this->getDb()->query($sql);
         $arr = $st->fetchAll(\PDO::FETCH_COLUMN, 'type_group');
         return array_combine($arr, $arr);
     }
@@ -98,6 +103,10 @@ class TypeMap extends \App\Db\Mapper
 
         if (!empty($filter['profileId'])) {
             $where .= sprintf('a.profile_id = %s AND ', (int)$filter['profileId']);
+        }
+
+        if (!empty($filter['placementTypeId'])) {
+            $where .= sprintf('a.placement_type_id = %s AND ', (int)$filter['placementTypeId']);
         }
 
         if (!empty($filter['typeGroup'])) {
