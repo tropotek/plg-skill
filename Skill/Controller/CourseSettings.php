@@ -57,6 +57,8 @@ class CourseSettings extends Iface
         $this->form = \App\Factory::createForm('formEdit');
         $this->form->setParam('renderer', \App\Factory::createFormRenderer($this->form));
 
+
+        // TODO: Should these be date ranges so we can set and forget when setting up the course
         $this->form->addField(new Field\Checkbox('plugin.enableSa'))->setCheckboxLabel('Enable Self Assessment');
         $this->form->addField(new Field\Checkbox('plugin.enableResults'))->setCheckboxLabel('Enable Students View Results');
         $this->form->addField(new Field\Input('plugin.confirm'))->setLabel('Confirmation Text');
