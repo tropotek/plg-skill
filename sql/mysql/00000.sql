@@ -21,12 +21,17 @@
 --  Skill and Entry Tables
 -- ----------------------------
 
-CREATE TABLE IF NOT EXISTS skill_domain (
-  id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  profile_id INT(10) UNSIGNED NOT NULL DEFAULT 0,
-  name VARCHAR(255) NOT NULL DEFAULT '',
-  description TEXT,
-  order_by INT(11) UNSIGNED NOT NULL DEFAULT 0,
+CREATE TABLE IF NOT EXISTS skill_collection (
+  id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  profile_id INT UNSIGNED DEFAULT 0 NOT NULL,
+
+  name VARCHAR(255) DEFAULT '' NOT NULL,
+  instructions TEXT,
+  confirm TEXT,
+  enable_self_assessment TINYINT(1) DEFAULT 0 NOT NULL,
+  enable_view_results TINYINT(1) DEFAULT 0 NOT NULL,
+  notes TEXT,
+
   del TINYINT(1) NOT NULL DEFAULT 0,
   modified DATETIME NOT NULL,
   created DATETIME NOT NULL,
@@ -34,9 +39,25 @@ CREATE TABLE IF NOT EXISTS skill_domain (
   KEY del (del)
 ) ENGINE=InnoDB;
 
+
+CREATE TABLE IF NOT EXISTS skill_domain (
+  id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  collection_id INT(10) UNSIGNED NOT NULL DEFAULT 0,
+  name VARCHAR(255) NOT NULL DEFAULT '',
+  description TEXT,
+  label VARCHAR(10) NOT NULL,                                 -- abbreviated label, parent will be used if none
+  weight FLOAT DEFAULT '1' NOT NULL,                          -- grade weight as a ratio, parent will be used if none
+  order_by INT(11) UNSIGNED NOT NULL DEFAULT 0,
+  del TINYINT(1) NOT NULL DEFAULT 0,
+  modified DATETIME NOT NULL,
+  created DATETIME NOT NULL,
+  KEY (collection_id),
+  KEY del (del)
+) ENGINE=InnoDB;
+
 CREATE TABLE IF NOT EXISTS skill_scale (
   id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  profile_id INT(10) UNSIGNED NOT NULL DEFAULT 0,
+  collection_id INT(10) UNSIGNED NOT NULL DEFAULT 0,
   name VARCHAR(255) NOT NULL DEFAULT '',
   description TEXT,
   value DECIMAL(6,3) NOT NULL DEFAULT 0.0,              -- TODO: may not be needed. just divide total scale items-1
@@ -44,7 +65,7 @@ CREATE TABLE IF NOT EXISTS skill_scale (
   del TINYINT(1) NOT NULL DEFAULT 0,
   modified DATETIME NOT NULL,
   created DATETIME NOT NULL,
-  KEY (profile_id),
+  KEY (collection_id),
   KEY del (del)
 ) ENGINE=InnoDB;
 
@@ -59,7 +80,7 @@ CREATE TABLE IF NOT EXISTS skill_scale (
 CREATE TABLE IF NOT EXISTS skill_category (
   id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   uid VARCHAR(128) NOT NULL DEFAULT '',
-  profile_id INT(10) UNSIGNED NOT NULL DEFAULT 0,
+  collection_id INT(10) UNSIGNED NOT NULL DEFAULT 0,
   parent_id INT(10) UNSIGNED NOT NULL DEFAULT 0,              -- parent skill_group.id
   name VARCHAR(255) NOT NULL DEFAULT '',
   description TEXT,
@@ -68,7 +89,7 @@ CREATE TABLE IF NOT EXISTS skill_category (
   del TINYINT(1) NOT NULL DEFAULT 0,
   modified DATETIME NOT NULL,
   created DATETIME NOT NULL,
-  KEY (profile_id),
+  KEY (collection_id),
   KEY (parent_id),
   KEY (del)
 ) ENGINE=InnoDB;
@@ -76,7 +97,7 @@ CREATE TABLE IF NOT EXISTS skill_category (
 CREATE TABLE IF NOT EXISTS skill_item (
   id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   uid VARCHAR(128) NOT NULL DEFAULT '',                       -- TODO: Use to create unique/updateable data
-  profile_id INT(10) UNSIGNED NOT NULL DEFAULT 0,
+  collection_id INT(10) UNSIGNED NOT NULL DEFAULT 0,
   category_id INT(10) UNSIGNED NOT NULL DEFAULT 0,
   domain_id INT(10) UNSIGNED NOT NULL DEFAULT 0,
   name VARCHAR(255) NOT NULL DEFAULT '',
@@ -87,7 +108,7 @@ CREATE TABLE IF NOT EXISTS skill_item (
   modified DATETIME NOT NULL,
   created DATETIME NOT NULL,
   -- KEY (category_id),
-  KEY (profile_id),
+  KEY (collection_id),
   KEY (del)
 ) ENGINE=InnoDB;
 
@@ -108,7 +129,7 @@ CREATE TABLE IF NOT EXISTS skill_tag (
 CREATE TABLE IF NOT EXISTS skill_type (
   id INT(10) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   uid VARCHAR(128) NOT NULL DEFAULT '',
-  profile_id INT(10) UNSIGNED NOT NULL DEFAULT 0,
+  collection_id INT(10) UNSIGNED NOT NULL DEFAULT 0,
   placement_type_id INT(10) UNSIGNED NOT NULL DEFAULT 0,
   type_group VARCHAR(190) NOT NULL DEFAULT '',
   name VARCHAR(190) NOT NULL DEFAULT '',
@@ -116,9 +137,9 @@ CREATE TABLE IF NOT EXISTS skill_type (
   del TINYINT(1) NOT NULL DEFAULT 0,
   modified DATETIME NOT NULL,
   created DATETIME NOT NULL,
-  KEY (profile_id),
+  KEY (collection_id),
   KEY (placement_type_id),
-  UNIQUE KEY (`profile_id`, `type_group`, `name`),
+  UNIQUE KEY (`collection_id`, `type_group`, `name`),
   KEY (del)
 ) ENGINE=InnoDB;
 
@@ -139,7 +160,7 @@ CREATE TABLE IF NOT EXISTS `skill_item_has_type` (
 --
 CREATE TABLE IF NOT EXISTS skill_entry (
   id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  course_id INT(10) UNSIGNED NOT NULL DEFAULT 0,            -- The entry is connected to a course
+  collection_id INT(10) UNSIGNED NOT NULL DEFAULT 0,
   placement_id INT(10) UNSIGNED NOT NULL DEFAULT 0,         -- The placement this entry is linked to if 0 then assume self-assessment
   user_id INT(10) UNSIGNED NOT NULL DEFAULT 0,              -- The student user id the bundle belongs to
   title VARCHAR(255) NOT NULL DEFAULT '',                   -- A title for the assessment instance
@@ -151,7 +172,7 @@ CREATE TABLE IF NOT EXISTS skill_entry (
   del TINYINT(1) NOT NULL DEFAULT 0,
   modified DATETIME NOT NULL,
   created DATETIME NOT NULL,
-  KEY (course_id),
+  KEY (collection_id),
   KEY (placement_id),
   KEY (user_id),
   KEY (del)
