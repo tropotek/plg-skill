@@ -24,7 +24,7 @@ class ItemMap extends \App\Db\Mapper
             $this->setTable('skill_item');
             $this->dbMap = new \Tk\DataMap\DataMap();
             $this->dbMap->addPropertyMap(new Db\Integer('id'), 'key');
-            $this->dbMap->addPropertyMap(new Db\Integer('profileId', 'profile_id'));
+            $this->dbMap->addPropertyMap(new Db\Integer('collectionId', 'collection_id'));
             $this->dbMap->addPropertyMap(new Db\Integer('categoryId', 'category_id'));
             $this->dbMap->addPropertyMap(new Db\Integer('domainId', 'domain_id'));
             $this->dbMap->addPropertyMap(new Db\Text('name'));
@@ -45,7 +45,7 @@ class ItemMap extends \App\Db\Mapper
         if (!$this->formMap) {
             $this->formMap = new \Tk\DataMap\DataMap();
             $this->formMap->addPropertyMap(new Form\Integer('id'), 'key');
-            $this->formMap->addPropertyMap(new Form\Integer('profileId'));
+            $this->formMap->addPropertyMap(new Form\Integer('collectionId'));
             $this->formMap->addPropertyMap(new Form\Integer('categoryId'));
             $this->formMap->addPropertyMap(new Form\Integer('domainId'));
             $this->formMap->addPropertyMap(new Form\Text('name'));
@@ -95,8 +95,8 @@ class ItemMap extends \App\Db\Mapper
             }
         }
 
-        if (!empty($filter['profileId'])) {
-            $where .= sprintf('a.profile_id = %s AND ', (int)$filter['profileId']);
+        if (!empty($filter['collectionId'])) {
+            $where .= sprintf('a.collection_id = %s AND ', (int)$filter['collectionId']);
         }
 
         if (!empty($filter['categoryId'])) {
@@ -160,42 +160,6 @@ class ItemMap extends \App\Db\Mapper
         return $res;
     }
 
-
-    /**
-     * @param int $itemId
-     * @param int $typeId
-     * @return boolean
-     */
-    public function hasType($itemId, $typeId)
-    {
-        $sql = sprintf('SELECT * FROM item_has_type WHERE item_id = %d AND type_id = %d', (int)$itemId, (int)$typeId);
-        return ($this->getDb()->query($sql)->rowCount() > 0);
-    }
-
-    /**
-     * @param int $itemId
-     * @param int $typeId
-     */
-    public function removeType($itemId, $typeId = null)
-    {
-        if ($typeId !== null) {
-            $query = sprintf('DELETE FROM item_has_type WHERE item_id = %d AND type_id = %d', (int)$itemId, (int)$typeId);
-        } else {
-            $query = sprintf('DELETE FROM item_has_type WHERE item_id = %d ', (int)$itemId);
-        }
-        $this->getDb()->exec($query);
-    }
-
-    /**
-     * @param int $itemId
-     * @param int $typeId
-     */
-    public function addType($itemId, $typeId)
-    {
-        if ($this->hasType($itemId, $typeId)) return;
-        $query = sprintf('INSERT INTO item_has_type (item_id, type_id)  VALUES (%d, %d) ', (int)$itemId, (int)$typeId);
-        $this->getDb()->exec($query);
-    }
 
 
 

@@ -7,7 +7,7 @@ namespace Skill\Db;
  * @link http://www.tropotek.com/
  * @license Copyright 2015 Michael Mifsud
  */
-class Type extends \Tk\Db\Map\Model
+class Collection extends \Tk\Db\Map\Model
 {
     
     /**
@@ -21,24 +21,48 @@ class Type extends \Tk\Db\Map\Model
     public $profileId = 0;
 
     /**
-     * @var int
-     */
-    public $placementTypeId = 0;
-
-    /**
-     * @var string
-     */
-    public $typeGroup = '';
-
-    /**
      * @var string
      */
     public $name = '';
 
     /**
-     * @var int
+     * @var string
      */
-    public $orderBy = 0;
+    public $role = '';
+
+    /**
+     * @var string
+     */
+    public $icon = '';
+
+    /**
+     * @var string
+     */
+    public $enabled = '';
+
+    /**
+     * @var string
+     */
+    public $confirm = '';
+
+    /**
+     * Enable students to view their final results of all compiled entry grades
+     *
+     * @var boolean
+     */
+    public $viewGrade = false;
+
+    /**
+     * @var string
+     */
+    public $instructions = '';
+
+    /**
+     * staff only notes
+     *
+     * @var string
+     */
+    public $notes = '';
 
     /**
      * @var \DateTime
@@ -56,10 +80,6 @@ class Type extends \Tk\Db\Map\Model
      */
     private $profile = null;
 
-    /**
-     * @var \App\Db\PlacementType
-     */
-    private $placementType = null;
 
 
 
@@ -92,17 +112,6 @@ class Type extends \Tk\Db\Map\Model
     }
 
     /**
-     * @return \App\Db\PlacementType|null|\Tk\Db\Map\Model|\Tk\Db\ModelInterface
-     */
-    public function getPlacementType()
-    {
-        if (!$this->placementType) {
-            $this->placementType = \App\Db\PlacementTypeMap::create()->find($this->placementTypeId);
-        }
-        return $this->placementType;
-    }
-    
-    /**
      *
      */
     public function validate()
@@ -110,16 +119,16 @@ class Type extends \Tk\Db\Map\Model
         $errors = array();
 
         if ((int)$this->profileId <= 0) {
-            $errors['profileId'] = 'Invalid Profile ID';
-        }
-//        if ((int)$this->placementTypeId <= 0) {
-//            $errors['placementTypeId'] = 'Invalid Placement Type';
-//        }
-        if (!$this->typeGroup) {
-            $errors['typeGroup'] = 'Please enter a valid group';
+            $errors['profileId'] = 'Invalid profile ID';
         }
         if (!$this->name) {
-            $errors['name'] = 'Please enter a valid name';
+            $errors['name'] = 'Please enter a valid name for this collection';
+        }
+        if (!$this->role) {
+            $errors['role'] = 'Please enter a valid role for this collection';
+        }
+        if (!$this->enabled) {
+            $errors['enabled'] = 'Please select at least one valid status for this collection to be enabled for.';
         }
         
         return $errors;

@@ -18,7 +18,7 @@ class Domain extends \Tk\Db\Map\Model
     /**
      * @var int
      */
-    public $profileId = 0;
+    public $collectionId = 0;
 
     /**
      * @var string
@@ -29,6 +29,16 @@ class Domain extends \Tk\Db\Map\Model
      * @var string
      */
     public $description = '';
+
+    /**
+     * @var string
+     */
+    public $label = '';
+
+    /**
+     * @var float
+     */
+    public $weight = 0.0;
 
     /**
      * @var int
@@ -46,9 +56,9 @@ class Domain extends \Tk\Db\Map\Model
     public $created = null;
 
     /**
-     * @var \App\Db\Profile
+     * @var Collection
      */
-    private $profile = null;
+    private $collection = null;
 
 
 
@@ -72,12 +82,12 @@ class Domain extends \Tk\Db\Map\Model
     /**
      * Get the institution related to this user
      */
-    public function getProfile()
+    public function getCollection()
     {
-        if (!$this->profile) {
-            $this->profile = \App\Db\ProfileMap::create()->find($this->profileId);
+        if (!$this->collection) {
+            $this->collection = CollectionMap::create()->find($this->collectionId);
         }
-        return $this->profile;
+        return $this->collection;
     }
 
 
@@ -88,8 +98,8 @@ class Domain extends \Tk\Db\Map\Model
     {
         $errors = array();
 
-        if ((int)$this->profileId <= 0) {
-            $errors['profileId'] = 'Invalid Profile ID';
+        if ((int)$this->collectionId <= 0) {
+            $errors['collectionId'] = 'Invalid Collection ID';
         }
         if (!$this->name) {
             $errors['name'] = 'Please enter a valid course name';

@@ -18,7 +18,7 @@ class Item extends \Tk\Db\Map\Model
     /**
      * @var int
      */
-    public $profileId = 0;
+    public $collectionId = 0;
 
     /**
      * @var int
@@ -61,9 +61,9 @@ class Item extends \Tk\Db\Map\Model
     public $created = null;
 
     /**
-     * @var \App\Db\Profile
+     * @var Collection
      */
-    private $profile = null;
+    private $collection = null;
 
     /**
      * @var Category
@@ -95,14 +95,14 @@ class Item extends \Tk\Db\Map\Model
     }
 
     /**
-     * @return \App\Db\Profile|null|\Tk\Db\Map\Model|\Tk\Db\ModelInterface
+     * @return null|Collection|\Tk\Db\Map\Model|\Tk\Db\ModelInterface
      */
-    public function getProfile()
+    public function getCollection()
     {
-        if (!$this->profile) {
-            $this->profile = \App\Db\ProfileMap::create()->find($this->profileId);
+        if (!$this->collection) {
+            $this->collection = CollectionMap::create()->find($this->collectionId);
         }
-        return $this->profile;
+        return $this->collection;
     }
 
     /**
@@ -135,12 +135,14 @@ class Item extends \Tk\Db\Map\Model
     {
         $errors = array();
 
-        if ((int)$this->profileId <= 0) {
-            $errors['profileId'] = 'Invalid Profile ID';
+        if ((int)$this->collectionId <= 0) {
+            $errors['collectionId'] = 'Invalid Collection ID';
         }
-
         if ((int)$this->categoryId <= 0) {
-            $errors['categoryId'] = 'Invalid category ID';
+            $errors['categoryId'] = 'Invalid Category ID';
+        }
+        if ((int)$this->domainId <= 0) {
+            $errors['domainId'] = 'Invalid Domain ID';
         }
         if (!$this->name) {
             $errors['name'] = 'Please enter a valid name';

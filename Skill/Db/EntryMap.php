@@ -24,7 +24,7 @@ class EntryMap extends \App\Db\Mapper
             $this->setTable('skill_entry');
             $this->dbMap = new \Tk\DataMap\DataMap();
             $this->dbMap->addPropertyMap(new Db\Integer('id'), 'key');
-            $this->dbMap->addPropertyMap(new Db\Integer('courseId', 'course_id'));
+            $this->dbMap->addPropertyMap(new Db\Integer('collectionId', 'collection_id'));
             $this->dbMap->addPropertyMap(new Db\Integer('placementId', 'placement_id'));
             $this->dbMap->addPropertyMap(new Db\Integer('userId', 'user_id'));
             $this->dbMap->addPropertyMap(new Db\Text('title'));
@@ -46,7 +46,7 @@ class EntryMap extends \App\Db\Mapper
         if (!$this->formMap) {
             $this->formMap = new \Tk\DataMap\DataMap();
             $this->formMap->addPropertyMap(new Form\Integer('id'), 'key');
-            $this->formMap->addPropertyMap(new Form\Integer('courseId'));
+            $this->formMap->addPropertyMap(new Form\Integer('collectionId'));
             $this->formMap->addPropertyMap(new Form\Integer('placementId'));
             $this->formMap->addPropertyMap(new Form\Integer('userId'));
             $this->formMap->addPropertyMap(new Form\Text('title'));
@@ -92,8 +92,15 @@ class EntryMap extends \App\Db\Mapper
             }
         }
 
-        if (!empty($filter['profileId'])) {
-            $where .= sprintf('a.profile_id = %s AND ', (int)$filter['profileId']);
+
+        if (!empty($filter['courseId'])) {
+            // TODO: link query to the placement courseId
+
+            //$where .= sprintf('a.collection_id = %s AND ', (int)$filter['courseId']);
+        }
+
+        if (!empty($filter['collectionId'])) {
+            $where .= sprintf('a.collection_id = %s AND ', (int)$filter['collectionId']);
         }
 
         if (!empty($filter['placementId'])) {
@@ -140,16 +147,17 @@ class EntryMap extends \App\Db\Mapper
      */
     public function findValue($entryId, $itemId = 0)
     {
-        $where = '';
+        $st = null;
         if ($itemId) {
-            $where .= sprintf(' AND a.item_id = %s ', (int)$itemId);
+            $st = $this->getDb()->prepare('SELECT * FROM skill_value a WHERE a.entry_id = ? AND a.item_id = ?');
+            $st->bindParam(1, $entryId);
+            $st->bindParam(2, $itemId);
+        } else {
+            $st = $this->getDb()->prepare('SELECT * FROM skill_value a WHERE a.entry_id = ?');
+            $st->bindParam(1, $entryId);
         }
-
-        $sql = sprintf('SELECT * FROM %s a WHERE a.entry_id = %d %s',
-            $this->quoteTable('skill_value'), (int)$entryId, $where);
-
-        $res = $this->getDb()->query($sql);
-        $arr = $res->fetchAll();
+        $st->execute();
+        $arr = $st->fetchAll();
         if($itemId) return current($arr);
         return $arr;
     }
@@ -162,13 +170,19 @@ class EntryMap extends \App\Db\Mapper
     public function saveValue($entryId, $itemId, $value)
     {
         if ($this->hasValue($entryId, $itemId)) {
-            $sql = sprintf('UPDATE %s SET value = %s WHERE entry_id = %s AND item_id = %s ',
-                $this->quoteTable('skill_value'), $this->quote($value), (int)$entryId, (int)$itemId);
+            $st = $this->getDb()->prepare('UPDATE skill_value SET value = ? WHERE entry_id = ? AND item_id = ? ');
+//            $sql = sprintf('UPDATE %s SET value = %s WHERE entry_id = %s AND item_id = %s ',
+//                $this->quoteTable('skill_value'), $this->quote($value), (int)$entryId, (int)$itemId);
+//            $this->getDb()->query($sql);
         } else {
-            $sql = sprintf('INSERT INTO %s (entry_id, item_id, value) VALUES (%s, %s, %s)',
-                $this->quoteTable('skill_value'), (int)$entryId, (int)$itemId, $this->quote($value));
+            $st = $this->getDb()->prepare('INSERT INTO skill_value (value, entry_id, item_id) VALUES (%s, %s, %s)');
+//            $sql = sprintf('INSERT INTO %s (entry_id, item_id, value) VALUES (%s, %s, %s)',
+//                $this->quoteTable('skill_value'), (int)$entryId, (int)$itemId, $this->quote($value));
         }
-        $this->getDb()->query($sql);
+        $st->bindParam(1, $value);
+        $st->bindParam(2, $entryId);
+        $st->bindParam(3, $itemId);
+        $st->execute();
     }
 
     /**
@@ -177,8 +191,13 @@ class EntryMap extends \App\Db\Mapper
      */
     public function removeValue($entryId, $itemId)
     {
-        $query = sprintf('DELETE FROM %s WHERE entry_id = %d AND item_id = %d', $this->quoteTable('skill_value'), (int)$entryId, (int)$itemId);
-        $this->getDb()->exec($query);
+        $st = $this->getDb()->prepare('DELETE FROM skill_value WHERE entry_id = ? AND item_id = ?');
+        $st->bindParam(1, $entryId);
+        $st->bindParam(2, $itemId);
+        $st->execute();
+
+//        $query = sprintf('DELETE FROM %s WHERE entry_id = %d AND item_id = %d', $this->quoteTable('skill_value'), (int)$entryId, (int)$itemId);
+//        $this->getDb()->exec($query);
     }
 
     /**
@@ -194,43 +213,5 @@ class EntryMap extends \App\Db\Mapper
         return $val != null;
     }
 
-    // /////////////////// Selected Items ///////////////////
-    // TODO: Should these be renamed to hasSelectedItem(), etc...
-
-    /**
-     * @param int $entryId
-     * @param int $itemId
-     * @return boolean
-     */
-    public function hasItem($entryId, $itemId)
-    {
-        $sql = sprintf('SELECT * FROM %s WHERE entry_id = %d AND item_id = %d', $this->quoteTable('skill_selected'), (int)$entryId, (int)$itemId);
-        return ($this->getDb()->query($sql)->rowCount() > 0);
-    }
-
-    /**
-     * @param int $entryId
-     * @param int $itemId
-     */
-    public function removeItem($entryId, $itemId = null)
-    {
-        if ($itemId !== null) {
-            $query = sprintf('DELETE FROM %s WHERE entry_id = %d AND item_id = %d', $this->quoteTable('skill_selected'), (int)$entryId, (int)$itemId);
-        } else {
-            $query = sprintf('DELETE FROM %s WHERE entry_id = %d ', $this->quoteTable('skill_selected'), (int)$entryId);
-        }
-        $this->getDb()->exec($query);
-    }
-
-    /**
-     * @param int $entryId
-     * @param int $itemId
-     */
-    public function addItem($entryId, $itemId)
-    {
-        if ($this->hasItem($entryId, $itemId)) return;
-        $query = sprintf('INSERT INTO %s (entry_id, item_id)  VALUES (%d, %d) ', $this->quoteTable('skill_selected'), (int)$entryId, (int)$itemId);
-        $this->getDb()->exec($query);
-    }
 
 }

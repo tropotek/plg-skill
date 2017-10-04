@@ -24,9 +24,11 @@ class DomainMap extends \App\Db\Mapper
             $this->setTable('skill_domain');
             $this->dbMap = new \Tk\DataMap\DataMap();
             $this->dbMap->addPropertyMap(new Db\Integer('id'), 'key');
-            $this->dbMap->addPropertyMap(new Db\Integer('profileId', 'profile_id'));
+            $this->dbMap->addPropertyMap(new Db\Integer('collectionId', 'collection_id'));
             $this->dbMap->addPropertyMap(new Db\Text('name'));
             $this->dbMap->addPropertyMap(new Db\Text('description'));
+            $this->dbMap->addPropertyMap(new Db\Text('label'));
+            $this->dbMap->addPropertyMap(new Db\Decimal('weight'));
             $this->dbMap->addPropertyMap(new Db\Integer('orderBy', 'order_by'));
             $this->dbMap->addPropertyMap(new Db\Date('modified'));
             $this->dbMap->addPropertyMap(new Db\Date('created'));
@@ -42,9 +44,11 @@ class DomainMap extends \App\Db\Mapper
         if (!$this->formMap) {
             $this->formMap = new \Tk\DataMap\DataMap();
             $this->formMap->addPropertyMap(new Form\Integer('id'), 'key');
-            $this->formMap->addPropertyMap(new Form\Integer('profileId'));
+            $this->formMap->addPropertyMap(new Form\Integer('collectionId'));
             $this->formMap->addPropertyMap(new Form\Text('name'));
             $this->formMap->addPropertyMap(new Form\Text('description'));
+            $this->formMap->addPropertyMap(new Form\Text('label'));
+            $this->formMap->addPropertyMap(new Form\Decimal('weight'));
         }
         return $this->formMap;
     }
@@ -75,8 +79,8 @@ class DomainMap extends \App\Db\Mapper
             }
         }
 
-        if (!empty($filter['profileId'])) {
-            $where .= sprintf('a.profile_id = %s AND ', (int)$filter['profileId']);
+        if (!empty($filter['collectionId'])) {
+            $where .= sprintf('a.collection_id = %s AND ', (int)$filter['collectionId']);
         }
 
         if (!empty($filter['exclude'])) {

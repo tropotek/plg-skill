@@ -18,7 +18,7 @@ class Scale extends \Tk\Db\Map\Model
     /**
      * @var int
      */
-    public $profileId = 0;
+    public $collectionId = 0;
 
     /**
      * @var string
@@ -52,9 +52,9 @@ class Scale extends \Tk\Db\Map\Model
     public $created = null;
 
     /**
-     * @var \App\Db\Profile
+     * @var Collection
      */
-    private $profile = null;
+    private $collection = null;
 
 
 
@@ -78,12 +78,12 @@ class Scale extends \Tk\Db\Map\Model
     /**
      * Get the institution related to this user
      */
-    public function getProfile()
+    public function getCollection()
     {
-        if (!$this->profile) {
-            $this->profile = \App\Db\ProfileMap::create()->find($this->profileId);
+        if (!$this->collection) {
+            $this->collection = CollectionMap::create()->find($this->collectionId);
         }
-        return $this->profile;
+        return $this->collection;
     }
 
     /**
@@ -94,7 +94,7 @@ class Scale extends \Tk\Db\Map\Model
      */
     public function getValue()
     {
-        $list = ScaleMap::create()->findFiltered(array('profileId' => $this->profileId), \Tk\Db\Tool::create('order_by'));
+        $list = ScaleMap::create()->findFiltered(array('profileId' => $this->collectionId), \Tk\Db\Tool::create('order_by'));
         $cnt = count($list)-1;
         $pos = 0;
         $val = 0;
@@ -118,8 +118,8 @@ class Scale extends \Tk\Db\Map\Model
     {
         $errors = array();
 
-        if ((int)$this->profileId <= 0) {
-            $errors['profileId'] = 'Invalid Profile ID';
+        if ((int)$this->collectionId <= 0) {
+            $errors['collectionId'] = 'Invalid Collection ID';
         }
         if (!$this->name) {
             $errors['name'] = 'Please enter a valid course name';

@@ -23,7 +23,7 @@ class Entry extends \Tk\Db\Map\Model
     /**
      * @var int
      */
-    public $courseId = 0;
+    public $collectionId = 0;
 
     /**
      * @var int
@@ -73,9 +73,9 @@ class Entry extends \Tk\Db\Map\Model
 
 
     /**
-     * @var \App\Db\Course
+     * @var Collection
      */
-    private $course = null;
+    private $collection = null;
 
     /**
      * @var \App\Db\Placement
@@ -102,12 +102,12 @@ class Entry extends \Tk\Db\Map\Model
     /**
      * @return \App\Db\Course|null|\Tk\Db\Map\Model|\Tk\Db\ModelInterface
      */
-    public function getCourse()
+    public function getCollection()
     {
-        if (!$this->course) {
-            $this->course = \App\Db\CourseMap::create()->find($this->courseId);
+        if (!$this->collection) {
+            $this->collection = CollectionMap::create()->find($this->collectionId);
         }
-        return $this->course;
+        return $this->collection;
     }
 
     /**
@@ -139,14 +139,14 @@ class Entry extends \Tk\Db\Map\Model
     {
         $errors = array();
 
-        if ((int)$this->courseId <= 0) {
-            $errors['courseId'] = 'Invalid Course ID';
+        if ((int)$this->collectionId <= 0) {
+            $errors['collectionId'] = 'Invalid Collection ID';
         }
         if ((int)$this->placementId <= 0) {
             $errors['placementId'] = 'Invalid Placement ID';
         }
         if ((int)$this->userId <= 0) {
-            $errors['userId'] = 'Invalid user ID';
+            $errors['userId'] = 'Invalid User ID';
         }
         if (!$this->title) {
             $errors['title'] = 'Please enter a valid title';

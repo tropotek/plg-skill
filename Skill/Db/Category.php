@@ -18,12 +18,7 @@ class Category extends \Tk\Db\Map\Model
     /**
      * @var int
      */
-    public $profileId = 0;
-
-    /**
-     * @var int
-     */
-    public $parentId = 0;
+    public $collectionId = 0;
 
     /**
      * @var string
@@ -56,14 +51,9 @@ class Category extends \Tk\Db\Map\Model
     public $created = null;
 
     /**
-     * @var \App\Db\Profile
+     * @var Collection
      */
-    private $profile = null;
-
-    /**
-     * @var Category
-     */
-    private $parent = null;
+    private $collection = null;
 
 
 
@@ -88,25 +78,14 @@ class Category extends \Tk\Db\Map\Model
     /**
      * @return \App\Db\Profile|null|\Tk\Db\Map\Model|\Tk\Db\ModelInterface
      */
-    public function getProfile()
+    public function getCollection()
     {
-        if (!$this->profile) {
-            $this->profile = \App\Db\ProfileMap::create()->find($this->profileId);
+        if (!$this->collection) {
+            $this->collection = CollectionMap::create()->find($this->collectionId);
         }
-        return $this->profile;
+        return $this->collection;
     }
 
-    /**
-     * @return null|Category
-     */
-    public function getParent()
-    {
-        if (!$this->parent && $this->parentId) {
-            $this->parent = CategoryMap::create()->find($this->parentId);
-        }
-        return $this->parent;
-    }
-    
     /**
      *
      */
@@ -114,12 +93,8 @@ class Category extends \Tk\Db\Map\Model
     {
         $errors = array();
 
-        if ((int)$this->profileId <= 0) {
-            $errors['institutionId'] = 'Invalid institution ID';
-        }
-
-        if ((int)$this->parentId <= 0) {
-            $errors['parentId'] = 'Invalid parent category ID';
+        if ((int)$this->collectionId <= 0) {
+            $errors['collectionId'] = 'Invalid Collection ID';
         }
         if (!$this->name) {
             $errors['name'] = 'Please enter a valid name';
