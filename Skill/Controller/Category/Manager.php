@@ -52,8 +52,7 @@ class Manager extends AdminManagerIface
         $this->table = \App\Factory::createTable(\Tk\Object::basename($this).'_categoryList');
         $this->table->setParam('renderer', \App\Factory::createTableRenderer($this->table));
 
-        $this->table->addCell(new \Tk\Table\Cell\Check
-        box('id'));
+        $this->table->addCell(new \Tk\Table\Cell\Checkbox('id'));
         $this->table->addCell(new \Tk\Table\Cell\Text('name'))->addCss('key')->setUrl(clone $this->editUrl);
         $this->table->addCell(new \Tk\Table\Cell\Boolean('publish'));
         $this->table->addCell(new \Tk\Table\Cell\Date('modified'));
