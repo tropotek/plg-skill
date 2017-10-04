@@ -21,7 +21,9 @@ class Manager extends AdminManagerIface
      */
     private $collection = null;
 
-
+    /**
+     * @var null|\Tk\Uri
+     */
     private $editUrl = null;
 
 
