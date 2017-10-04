@@ -33,7 +33,7 @@ class Item extends \Tk\Db\Map\Model
     /**
      * @var string
      */
-    public $name = '';
+    public $question = '';
 
     /**
      * @var string
@@ -144,8 +144,8 @@ class Item extends \Tk\Db\Map\Model
         if ((int)$this->domainId <= 0) {
             $errors['domainId'] = 'Invalid Domain ID';
         }
-        if (!$this->name) {
-            $errors['name'] = 'Please enter a valid name';
+        if (!$this->question) {
+            $errors['question'] = 'Please enter a valid name';
         }
         
         return $errors;

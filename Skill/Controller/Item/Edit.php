@@ -1,5 +1,5 @@
 <?php
-namespace Skill\Controller\Category;
+namespace Skill\Controller\Item;
 
 use App\Controller\AdminEditIface;
 use Dom\Template;
@@ -22,9 +22,9 @@ class Edit extends AdminEditIface
     protected $collection = null;
 
     /**
-     * @var \Skill\Db\Category
+     * @var \Skill\Db\Item
      */
-    protected $category = null;
+    protected $item = null;
 
 
 
@@ -34,7 +34,7 @@ class Edit extends AdminEditIface
     public function __construct()
     {
         parent::__construct();
-        $this->setPageTitle('Skill Category Edit');
+        $this->setPageTitle('Skill Item Edit');
     }
 
     /**
@@ -47,31 +47,40 @@ class Edit extends AdminEditIface
             $this->collection = \Skill\Db\CollectionMap::create()->find($request->get('collectionId'));
         }
 
-        $this->category = new \Skill\Db\Category();
-        $this->category->collectionId = (int)$request->get('collectionId');
-        if ($request->get('categoryId')) {
-            $this->category = \Skill\Db\CategoryMap::create()->find($request->get('categoryId'));
+        $this->item = new \Skill\Db\Item();
+        $this->item->collectionId = (int)$request->get('collectionId');
+        if ($request->get('itemId')) {
+            $this->item = \Skill\Db\ItemMap::create()->find($request->get('itemId'));
         }
 
         $this->buildForm();
 
-        $this->form->load(\Skill\Db\CategoryMap::create()->unmapForm($this->category));
+        $this->form->load(\Skill\Db\ItemMap::create()->unmapForm($this->item));
         $this->form->execute($request);
     }
 
 
     protected function buildForm() 
     {
-        $this->form = \App\Factory::createForm('categoryEdit');
+        $this->form = \App\Factory::createForm('itemEdit');
         $this->form->setParam('renderer', \App\Factory::createFormRenderer($this->form));
 
-        $this->form->addField(new Field\Input('name'))->setNotes('');
-        $this->form->addField(new Field\Checkbox('publish'))->setNotes('is this category contents visible to students');
-        $this->form->addField(new Field\Textarea('description'))->addCss('tkTextareaTool')->setNotes('A short description of the category');
+        $this->form->addField(new Field\Input('question'))->setNotes('');
+
+        $list = \Skill\Db\CategoryMap::create()->findFiltered(array('collectionId' => $this->collection->getId()));
+        $this->form->addField(new Field\Select('categoryId', \Tk\Form\Field\Option\ArrayObjectIterator::create($list)))->prependOption('-- Select --', '')->setNotes('');
+
+        $list = \Skill\Db\DomainMap::create()->findFiltered(array('collectionId' => $this->collection->getId()));
+        $this->form->addField(new Field\Select('domainId', \Tk\Form\Field\Option\ArrayObjectIterator::create($list)))->prependOption('-- Select --', '')->setNotes('');
+
+        // text, textblock, select, checkbox, date, file(????)
+        $this->form->addField(new Field\Input('description'))->setNotes('A short description');
+        $this->form->addField(new Field\Checkbox('publish'))->setNotes('');
 
         $this->form->addField(new Event\Button('update', array($this, 'doSubmit')));
         $this->form->addField(new Event\Button('save', array($this, 'doSubmit')));
         $this->form->addField(new Event\Link('cancel', \App\Factory::getCrumbs()->getBackUrl()));
+
     }
 
     /**
@@ -80,20 +89,21 @@ class Edit extends AdminEditIface
     public function doSubmit($form)
     {
         // Load the object with data from the form using a helper object
-        \Skill\Db\CategoryMap::create()->mapForm($form->getValues(), $this->category);
+        \Skill\Db\ItemMap::create()->mapForm($form->getValues(), $this->item);
 
-        $form->addFieldErrors($this->category->validate());
+
+        $form->addFieldErrors($this->item->validate());
 
         if ($form->hasErrors()) {
             return;
         }
-        $this->category->save();
+        $this->item->save();
 
         \Tk\Alert::addSuccess('Record saved!');
         if ($form->getTriggeredEvent()->getName() == 'update') {
             \App\Factory::getCrumbs()->getBackUrl()->redirect();
         }
-        \Tk\Uri::create()->set('categoryId', $this->category->getId())->redirect();
+        \Tk\Uri::create()->set('itemId', $this->item->getId())->redirect();
     }
 
     /**
@@ -121,7 +131,7 @@ class Edit extends AdminEditIface
     
   <div class="panel panel-default">
     <div class="panel-heading">
-      <h4 class="panel-title"><i class="fa fa-folder-o"></i> <span var="panel-title">Skill Category Edit</span></h4>
+      <h4 class="panel-title"><i class="fa fa-question"></i> <span var="panel-title">Skill Item Edit</span></h4>
     </div>
     <div class="panel-body">
       <div var="form"></div>

@@ -61,6 +61,7 @@ class ScaleMap extends \App\Db\Mapper
      */
     public function findFiltered($filter = array(), $tool = null)
     {
+        if (!$tool) $tool = \Tk\Db\Tool::create('orderBy');
         $from = sprintf('%s a ', $this->getDb()->quoteParameter($this->getTable()));
         $where = '';
 

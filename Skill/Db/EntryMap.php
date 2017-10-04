@@ -58,14 +58,6 @@ class EntryMap extends \App\Db\Mapper
         return $this->formMap;
     }
 
-    public function findSelfAssessment($userId)
-    {
-        return $this->findFiltered(array(
-            'userId' => $userId,
-            'type' => Entry::TYPE_SELF_ASSESSMENT
-        ))->current();
-    }
-
     /**
      * Find filtered records
      *

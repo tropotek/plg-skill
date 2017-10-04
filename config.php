@@ -16,10 +16,14 @@ $params = array('role' => array('client', 'staff'));
 $routes->add('Skill Profile Settings', new \Tk\Routing\Route('/skill/profileSettings.html', 'Skill\Controller\ProfileSettings::doDefault', $params));
 
 $routes->add('skill-collection-manager', new \Tk\Routing\Route('/skill/collectionManager.html', 'Skill\Controller\Collection\Manager::doDefault', $params));
-$routes->add('skill-collection-edit', new \Tk\Routing\Route('/skill/collectionEdit.html', 'Skill\Controller\Collection\Edit::doDefault', $params));
-$routes->add('skill-domain-manager', new \Tk\Routing\Route('/skill/domainManager.html', 'Skill\Controller\Domain\Manager::doDefault', $params));
-$routes->add('skill-domain-edit', new \Tk\Routing\Route('/skill/domainEdit.html', 'Skill\Controller\Domain\Edit::doDefault', $params));
-$routes->add('skill-category-manager', new \Tk\Routing\Route('/skill/categoryManager.html', 'Skill\Controller\Category\Manager::doDefault', $params));
-$routes->add('skill-category-edit', new \Tk\Routing\Route('/skill/categoryEdit.html', 'Skill\Controller\Category\Edit::doDefault', $params));
+$routes->add('skill-collection-edit',    new \Tk\Routing\Route('/skill/collectionEdit.html',    'Skill\Controller\Collection\Edit::doDefault', $params));
+$routes->add('skill-domain-manager',     new \Tk\Routing\Route('/skill/domainManager.html',     'Skill\Controller\Domain\Manager::doDefault', $params));
+$routes->add('skill-domain-edit',        new \Tk\Routing\Route('/skill/domainEdit.html',        'Skill\Controller\Domain\Edit::doDefault', $params));
+$routes->add('skill-category-manager',   new \Tk\Routing\Route('/skill/categoryManager.html',   'Skill\Controller\Category\Manager::doDefault', $params));
+$routes->add('skill-category-edit',      new \Tk\Routing\Route('/skill/categoryEdit.html',      'Skill\Controller\Category\Edit::doDefault', $params));
+$routes->add('skill-scale-manager',      new \Tk\Routing\Route('/skill/scaleManager.html',      'Skill\Controller\Scale\Manager::doDefault', $params));
+$routes->add('skill-scale-edit',         new \Tk\Routing\Route('/skill/scaleEdit.html',         'Skill\Controller\Scale\Edit::doDefault', $params));
+$routes->add('skill-item-manager',       new \Tk\Routing\Route('/skill/itemManager.html',       'Skill\Controller\Item\Manager::doDefault', $params));
+$routes->add('skill-item-edit',          new \Tk\Routing\Route('/skill/itemEdit.html',          'Skill\Controller\Item\Edit::doDefault', $params));
 
 

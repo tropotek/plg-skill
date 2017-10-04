@@ -27,7 +27,7 @@ class ItemMap extends \App\Db\Mapper
             $this->dbMap->addPropertyMap(new Db\Integer('collectionId', 'collection_id'));
             $this->dbMap->addPropertyMap(new Db\Integer('categoryId', 'category_id'));
             $this->dbMap->addPropertyMap(new Db\Integer('domainId', 'domain_id'));
-            $this->dbMap->addPropertyMap(new Db\Text('name'));
+            $this->dbMap->addPropertyMap(new Db\Text('question'));
             $this->dbMap->addPropertyMap(new Db\Text('description'));
             $this->dbMap->addPropertyMap(new Db\Boolean('publish'));
             $this->dbMap->addPropertyMap(new Db\Integer('orderBy', 'order_by'));
@@ -48,7 +48,7 @@ class ItemMap extends \App\Db\Mapper
             $this->formMap->addPropertyMap(new Form\Integer('collectionId'));
             $this->formMap->addPropertyMap(new Form\Integer('categoryId'));
             $this->formMap->addPropertyMap(new Form\Integer('domainId'));
-            $this->formMap->addPropertyMap(new Form\Text('name'));
+            $this->formMap->addPropertyMap(new Form\Text('question'));
             $this->formMap->addPropertyMap(new Form\Text('description'));
             $this->formMap->addPropertyMap(new Form\Boolean('publish'));
         }
@@ -56,13 +56,13 @@ class ItemMap extends \App\Db\Mapper
     }
 
     /**
-     * @param string $name
+     * @param string $question
      * @param int $profileId
      * @param int $categoryId
      * @return null|Item|\Tk\Db\ModelInterface
      */
-    public function findByName($name, $profileId, $categoryId = null) {
-        $filter = array('profileId' => $profileId, 'name' => $name);
+    public function findByName($question, $profileId, $categoryId = null) {
+        $filter = array('profileId' => $profileId, 'question' => $question);
         if ($categoryId !== null) {
             $filter['categoryId'] = $categoryId;
         }
@@ -78,14 +78,15 @@ class ItemMap extends \App\Db\Mapper
      */
     public function findFiltered($filter = array(), $tool = null)
     {
+        if (!$tool) $tool = \Tk\Db\Tool::create('orderBy');
         $from = sprintf('%s a ', $this->getDb()->quoteParameter($this->getTable()));
         $where = '';
 
         if (!empty($filter['keywords'])) {
             $kw = '%' . $this->getDb()->escapeString($filter['keywords']) . '%';
             $w = '';
-            $w .= sprintf('a.name LIKE %s OR ', $this->getDb()->quote($kw));
-            //$w .= sprintf('a.description LIKE %s OR ', $this->getDb()->quote($kw));
+            $w .= sprintf('a.question LIKE %s OR ', $this->getDb()->quote($kw));
+            $w .= sprintf('a.description LIKE %s OR ', $this->getDb()->quote($kw));
             if (is_numeric($filter['keywords'])) {
                 $id = (int)$filter['keywords'];
                 $w .= sprintf('a.id = %d OR ', $id);
@@ -135,8 +136,8 @@ class ItemMap extends \App\Db\Mapper
             $where .= sprintf('a.id = c.item_id AND c.entry_id = %s AND ', (int)$filter['entryId']);
         }
 
-        if (!empty($filter['name'])) {
-            $where .= sprintf('a.name = %s AND ', $this->quote($filter['name']));
+        if (!empty($filter['question'])) {
+            $where .= sprintf('a.question = %s AND ', $this->quote($filter['question']));
         }
 
         if (!empty($filter['publish'])) {

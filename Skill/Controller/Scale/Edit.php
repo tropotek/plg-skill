@@ -1,5 +1,5 @@
 <?php
-namespace Skill\Controller\Category;
+namespace Skill\Controller\Scale;
 
 use App\Controller\AdminEditIface;
 use Dom\Template;
@@ -22,9 +22,9 @@ class Edit extends AdminEditIface
     protected $collection = null;
 
     /**
-     * @var \Skill\Db\Category
+     * @var \Skill\Db\Scale
      */
-    protected $category = null;
+    protected $scale = null;
 
 
 
@@ -34,7 +34,7 @@ class Edit extends AdminEditIface
     public function __construct()
     {
         parent::__construct();
-        $this->setPageTitle('Skill Category Edit');
+        $this->setPageTitle('Skill Scale Edit');
     }
 
     /**
@@ -47,31 +47,35 @@ class Edit extends AdminEditIface
             $this->collection = \Skill\Db\CollectionMap::create()->find($request->get('collectionId'));
         }
 
-        $this->category = new \Skill\Db\Category();
-        $this->category->collectionId = (int)$request->get('collectionId');
-        if ($request->get('categoryId')) {
-            $this->category = \Skill\Db\CategoryMap::create()->find($request->get('categoryId'));
+        $this->scale = new \Skill\Db\Scale();
+        $this->scale->collectionId = (int)$request->get('collectionId');
+        if ($request->get('scaleId')) {
+            $this->scale = \Skill\Db\ScaleMap::create()->find($request->get('scaleId'));
         }
 
         $this->buildForm();
 
-        $this->form->load(\Skill\Db\CategoryMap::create()->unmapForm($this->category));
+        $this->form->load(\Skill\Db\ScaleMap::create()->unmapForm($this->scale));
         $this->form->execute($request);
     }
 
 
     protected function buildForm() 
     {
-        $this->form = \App\Factory::createForm('categoryEdit');
+        $this->form = \App\Factory::createForm('scaleEdit');
         $this->form->setParam('renderer', \App\Factory::createFormRenderer($this->form));
 
+        // text, textblock, select, checkbox, date, file(????)
         $this->form->addField(new Field\Input('name'))->setNotes('');
-        $this->form->addField(new Field\Checkbox('publish'))->setNotes('is this category contents visible to students');
-        $this->form->addField(new Field\Textarea('description'))->addCss('tkTextareaTool')->setNotes('A short description of the category');
+        //$this->form->addField(new Field\Input('value'))->setNotes('');
+        $this->form->addField(new Field\Input('description'))->setNotes('A short description');
+
+
 
         $this->form->addField(new Event\Button('update', array($this, 'doSubmit')));
         $this->form->addField(new Event\Button('save', array($this, 'doSubmit')));
         $this->form->addField(new Event\Link('cancel', \App\Factory::getCrumbs()->getBackUrl()));
+
     }
 
     /**
@@ -80,20 +84,21 @@ class Edit extends AdminEditIface
     public function doSubmit($form)
     {
         // Load the object with data from the form using a helper object
-        \Skill\Db\CategoryMap::create()->mapForm($form->getValues(), $this->category);
+        \Skill\Db\ScaleMap::create()->mapForm($form->getValues(), $this->scale);
 
-        $form->addFieldErrors($this->category->validate());
+
+        $form->addFieldErrors($this->scale->validate());
 
         if ($form->hasErrors()) {
             return;
         }
-        $this->category->save();
+        $this->scale->save();
 
         \Tk\Alert::addSuccess('Record saved!');
         if ($form->getTriggeredEvent()->getName() == 'update') {
             \App\Factory::getCrumbs()->getBackUrl()->redirect();
         }
-        \Tk\Uri::create()->set('categoryId', $this->category->getId())->redirect();
+        \Tk\Uri::create()->set('scaleId', $this->scale->getId())->redirect();
     }
 
     /**
@@ -121,7 +126,7 @@ class Edit extends AdminEditIface
     
   <div class="panel panel-default">
     <div class="panel-heading">
-      <h4 class="panel-title"><i class="fa fa-folder-o"></i> <span var="panel-title">Skill Category Edit</span></h4>
+      <h4 class="panel-title"><i class="fa fa-balance-scale"></i> <span var="panel-title">Skill Scale Edit</span></h4>
     </div>
     <div class="panel-body">
       <div var="form"></div>
