@@ -23,17 +23,18 @@
 
 CREATE TABLE IF NOT EXISTS skill_collection (
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  uid VARCHAR(128) NOT NULL DEFAULT '',
   profile_id INT UNSIGNED DEFAULT 0 NOT NULL,
-
   name VARCHAR(255) DEFAULT '' NOT NULL,
   role VARCHAR(128) DEFAULT '' NOT NULL,
-  icon VARCHAR(255) DEFAULT '' NOT NULL,
-  enabled VARCHAR(255) DEFAULT '' NOT NULL,       -- A list of placement statuses that this collection is enabled for
-  confirm TEXT,
+  icon VARCHAR(255) DEFAULT '' NOT NULL,          -- a bootstrap CSS icon for the collection EG: 'fa fa-pen', 'glyphicon glyphicon-home'
+  color VARCHAR(8) DEFAULT '' NOT NULL,           -- the representative color for this collection
+  available VARCHAR(255) DEFAULT '' NOT NULL,     -- A list of placement statuses that the collection is available for submission/editing by user
+  active BOOL NOT NULL DEFAULT 1,                 -- enable/disable user submission/editing
   view_grade BOOL DEFAULT 0 NOT NULL,
+  confirm TEXT,
   instructions TEXT,
   notes TEXT,
-
   del BOOL NOT NULL DEFAULT 0,
   modified DATETIME NOT NULL,
   created DATETIME NOT NULL,
@@ -41,9 +42,9 @@ CREATE TABLE IF NOT EXISTS skill_collection (
   KEY del (del)
 ) ENGINE=InnoDB;
 
-
 CREATE TABLE IF NOT EXISTS skill_domain (
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  uid VARCHAR(128) NOT NULL DEFAULT '',
   collection_id INT UNSIGNED NOT NULL DEFAULT 0,
   name VARCHAR(255) NOT NULL DEFAULT '',
   description TEXT,
@@ -59,6 +60,7 @@ CREATE TABLE IF NOT EXISTS skill_domain (
 
 CREATE TABLE IF NOT EXISTS skill_scale (
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  uid VARCHAR(128) NOT NULL DEFAULT '',
   collection_id INT UNSIGNED NOT NULL DEFAULT 0,
   name VARCHAR(255) NOT NULL DEFAULT '',
   description TEXT,

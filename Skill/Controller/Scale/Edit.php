@@ -94,6 +94,10 @@ class Edit extends AdminEditIface
         }
         $this->scale->save();
 
+
+        // Re-caclulate the values
+
+
         \Tk\Alert::addSuccess('Record saved!');
         if ($form->getTriggeredEvent()->getName() == 'update') {
             \App\Factory::getCrumbs()->getBackUrl()->redirect();

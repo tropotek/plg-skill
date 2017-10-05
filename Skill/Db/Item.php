@@ -18,6 +18,11 @@ class Item extends \Tk\Db\Map\Model
     /**
      * @var int
      */
+    public $uid = 0;
+
+    /**
+     * @var int
+     */
     public $collectionId = 0;
 
     /**
@@ -138,12 +143,12 @@ class Item extends \Tk\Db\Map\Model
         if ((int)$this->collectionId <= 0) {
             $errors['collectionId'] = 'Invalid Collection ID';
         }
-        if ((int)$this->categoryId <= 0) {
-            $errors['categoryId'] = 'Invalid Category ID';
-        }
-        if ((int)$this->domainId <= 0) {
-            $errors['domainId'] = 'Invalid Domain ID';
-        }
+//        if ((int)$this->categoryId <= 0) {
+//            $errors['categoryId'] = 'Invalid Category ID';
+//        }
+//        if ((int)$this->domainId <= 0) {
+//            $errors['domainId'] = 'Invalid Domain ID';
+//        }
         if (!$this->question) {
             $errors['question'] = 'Please enter a valid name';
         }

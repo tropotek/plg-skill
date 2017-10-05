@@ -34,7 +34,7 @@ class Scale extends \Tk\Db\Map\Model
      * @todo: may not be required, calculate on the fly, using order_by
      * @var float
      */
-    //public $value = 0;
+    public $value = 0;
 
     /**
      * @var int
@@ -73,6 +73,25 @@ class Scale extends \Tk\Db\Map\Model
     public function save()
     {
         parent::save();
+        self::recalculateValues($this->collectionId);
+    }
+
+    /**
+     * recalculate the values for a collection of scales
+     *
+     * @param $collectionId
+     */
+    public static function recalculateValues($collectionId) {
+        $list = ScaleMap::create()->findFiltered(array('collectionId' => $collectionId));
+        /** @var Scale $scale */
+        foreach ($list as $i => $scale) {
+            if ($i == 0) {
+                $scale->value = 0;
+            } else {
+                $scale->value = round((100/($list->count()-1))*$i, 2);
+            }
+            $scale->update();
+        }
     }
 
     /**

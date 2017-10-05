@@ -55,7 +55,10 @@ class Manager extends AdminManagerIface
         $this->table->setParam('renderer', \App\Factory::createTableRenderer($this->table));
 
         $this->table->addCell(new \Tk\Table\Cell\Checkbox('id'));
-        $this->table->addCell(new \Tk\Table\Cell\Text('name'))->addCss('key')->setUrl(clone $this->editUrl);
+        $this->table->addCell(new \Tk\Table\Cell\Text('uid'));
+        $this->table->addCell(new \Tk\Table\Cell\Text('question'))->addCss('key')->setUrl(clone $this->editUrl);
+        $this->table->addCell(new \Tk\Table\Cell\Text('categoryId'));
+        $this->table->addCell(new \Tk\Table\Cell\Text('domainId'));
         $this->table->addCell(new \Tk\Table\Cell\Date('modified'));
         $this->table->addCell(new \Tk\Table\Cell\OrderBy('orderBy'));
 
@@ -75,7 +78,7 @@ class Manager extends AdminManagerIface
     {
         $filter = $this->table->getFilterValues();
         $filter['collectionId'] = $this->collection->getId();
-        return \Skill\Db\ItemMap::create()->findFiltered($filter, $this->table->makeDbTool());
+        return \Skill\Db\ItemMap::create()->findFiltered($filter, $this->table->makeDbTool('orderBy', 100));
     }
 
     /**

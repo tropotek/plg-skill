@@ -65,28 +65,29 @@ class Edit extends AdminEditIface
         $this->form = \App\Factory::createForm('collectionEdit');
         $this->form->setParam('renderer', \App\Factory::createFormRenderer($this->form));
 
-        // text, textblock, select, checkbox, date, file(????)
         $this->form->addField(new Field\Input('name'))->setNotes('Create a label for this collection');
         $list = array('-- Select --' => '', 'Staff' => 'staff', 'Student' => 'student', 'Company' => 'company', 'Supervisor' => 'supervisor');
         $this->form->addField(new Field\Select('role', $list));
         $this->form->addField(new Field\Input('icon'))->setNotes('TODO: Create a jquery plugin to select icons.... Select an Icon for this collection.');
 
+        $list = array('#ffffcc', '#e8fdff', '#ac725e', '#d06b64', '#f83a22', '#fa573c', '#ff7537', '#ffad46', '#42d692',
+            '#16a765', '#7bd148', '#b3dc6c', '#fbe983', '#fad165', '#92e1c0', '#9fe1e7', '#9fc6e7', '#4986e7', '#9a9cff', '#b99aff',
+            '#c2c2c2', '#cabdbf', '#cca6ac', '#f691b2', '#cd74e6', '#a47ae2');
+        $this->form->addField(new Field\Select('color', $list))->addCss('colorpicker')->setNotes('Select a color scheme for this collection');
 
         $list = \Tk\Form\Field\Select::arrayToSelectList(\Tk\Object::getClassConstants('\App\Db\Placement', 'STATUS'));
-        $this->form->addField(new Field\Select('enabled[]', $list))->addCss('tk-dual-select')->setAttr('data-title', 'Placement Status')->setNotes('Enable this collection on the following placement status');
-        //NOTE: not needed they can just use the existing mail event with the template param {collection-url}
-        //$this->form->addField(new Field\Select('notify', $list))->prependOption('-- None --', '')->setNotes('Send the target user an email informing them to complete their entry for this collection');
+        $this->form->addField(new Field\Select('available[]', $list))->addCss('tk-dual-select')->setAttr('data-title', 'Placement Status')->setNotes('Enable this collection on the following placement status');
 
-        $this->form->addField(new Field\Input('confirm'))->setNotes('If enabled, the user will be prompted with the given text before they can submit their entry.');
-
-        //$this->form->addField(new Field\Checkbox('selfAssessment'))->setNotes('Enable a student self-assessment button for completed placements.<br/>Only one self assessment is permitted per student per course.');
+        $this->form->addField(new Field\Checkbox('active'))->setNotes('Enable this collection for user submissions.');
         $this->form->addField(new Field\Checkbox('viewGrade'))->setNotes('Allow students to view their course results from all entries from this collection.');
 
+        $this->form->addField(new Field\Input('confirm'))->setNotes('If enabled, the user will be prompted with the given text before they can submit their entry.');
         $this->form->addField(new Field\Textarea('instructions'))->addCss('mce')->setNotes('Enter any student instructions on how to complete placement entries.');
         $this->form->addField(new Field\Textarea('notes'))->addCss('tkTextareaTool')->setNotes('Staff only notes that can only be vied in this edit screen.');
 
         if ($this->collection->getId())
             $this->form->addField(new Event\Button('update', array($this, 'doSubmit')));
+
         $this->form->addField(new Event\Button('save', array($this, 'doSubmit')));
         $this->form->addField(new Event\Link('cancel', \App\Factory::getCrumbs()->getBackUrl()));
 

@@ -36,9 +36,22 @@ class Collection extends \Tk\Db\Map\Model
     public $icon = '';
 
     /**
+     * A HEX color for this collection
      * @var string
      */
-    public $enabled = '';
+    public $color = '#ffffcc';
+
+    /**
+     *  A list of placement statuses that the collection is available for submission/editing by user
+     * @var string
+     */
+    public $available = '';
+
+    /**
+     * enable/disable user submission/editing
+     * @var boolean
+     */
+    public $active = true;
 
     /**
      * @var string
@@ -47,7 +60,6 @@ class Collection extends \Tk\Db\Map\Model
 
     /**
      * Enable students to view their final results of all compiled entry grades
-     *
      * @var boolean
      */
     public $viewGrade = false;
@@ -127,8 +139,8 @@ class Collection extends \Tk\Db\Map\Model
         if (!$this->role) {
             $errors['role'] = 'Please enter a valid role for this collection';
         }
-        if (!$this->enabled) {
-            $errors['enabled'] = 'Please select at least one valid status for this collection to be enabled for.';
+        if (!$this->available) {
+            $errors['available'] = 'Please select at least one valid status for this collection to be available for.';
         }
         
         return $errors;

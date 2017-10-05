@@ -43,15 +43,12 @@ class Edit extends AdminEditIface
      */
     public function doDefault(Request $request)
     {
-        if ($request->get('collectionId')) {
-            $this->collection = \Skill\Db\CollectionMap::create()->find($request->get('collectionId'));
-        }
-
         $this->item = new \Skill\Db\Item();
         $this->item->collectionId = (int)$request->get('collectionId');
         if ($request->get('itemId')) {
             $this->item = \Skill\Db\ItemMap::create()->find($request->get('itemId'));
         }
+        $this->collection = $this->item->getCollection();
 
         $this->buildForm();
 
@@ -65,16 +62,16 @@ class Edit extends AdminEditIface
         $this->form = \App\Factory::createForm('itemEdit');
         $this->form->setParam('renderer', \App\Factory::createFormRenderer($this->form));
 
-        $this->form->addField(new Field\Input('question'))->setNotes('');
+        //$this->form->addField(new Field\Input('uid'))->setNotes('(optional) Use this to match up questions from other collections, for generating reports');
 
         $list = \Skill\Db\CategoryMap::create()->findFiltered(array('collectionId' => $this->collection->getId()));
         $this->form->addField(new Field\Select('categoryId', \Tk\Form\Field\Option\ArrayObjectIterator::create($list)))->prependOption('-- Select --', '')->setNotes('');
-
+vd($this->item);
         $list = \Skill\Db\DomainMap::create()->findFiltered(array('collectionId' => $this->collection->getId()));
-        $this->form->addField(new Field\Select('domainId', \Tk\Form\Field\Option\ArrayObjectIterator::create($list)))->prependOption('-- Select --', '')->setNotes('');
+        $this->form->addField(new Field\Select('domainId', \Tk\Form\Field\Option\ArrayObjectIterator::create($list)))->prependOption('-- None --', '')->setNotes('');
 
-        // text, textblock, select, checkbox, date, file(????)
-        $this->form->addField(new Field\Input('description'))->setNotes('A short description');
+        $this->form->addField(new Field\Input('question'))->setRequired()->setNotes('The question text to display');
+        $this->form->addField(new Field\Input('description'))->setNotes('Description or help text');
         $this->form->addField(new Field\Checkbox('publish'))->setNotes('');
 
         $this->form->addField(new Event\Button('update', array($this, 'doSubmit')));

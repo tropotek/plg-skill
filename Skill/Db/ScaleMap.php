@@ -27,7 +27,7 @@ class ScaleMap extends \App\Db\Mapper
             $this->dbMap->addPropertyMap(new Db\Integer('collectionId', 'collection_id'));
             $this->dbMap->addPropertyMap(new Db\Text('name'));
             $this->dbMap->addPropertyMap(new Db\Text('description'));
-            //$this->dbMap->addPropertyMap(new Db\Float('value'));
+            $this->dbMap->addPropertyMap(new Db\Decimal('value'));
             $this->dbMap->addPropertyMap(new Db\Integer('orderBy', 'order_by'));
             $this->dbMap->addPropertyMap(new Db\Date('modified'));
             $this->dbMap->addPropertyMap(new Db\Date('created'));
@@ -47,7 +47,7 @@ class ScaleMap extends \App\Db\Mapper
             $this->formMap->addPropertyMap(new Form\Integer('collectionId'));
             $this->formMap->addPropertyMap(new Form\Text('name'));
             $this->formMap->addPropertyMap(new Form\Text('description'));
-            //$this->formMap->addPropertyMap(new Form\Float('value'));
+            $this->formMap->addPropertyMap(new Form\Decimal('value'));
         }
         return $this->formMap;
     }

@@ -24,6 +24,7 @@ class ItemMap extends \App\Db\Mapper
             $this->setTable('skill_item');
             $this->dbMap = new \Tk\DataMap\DataMap();
             $this->dbMap->addPropertyMap(new Db\Integer('id'), 'key');
+            $this->dbMap->addPropertyMap(new Db\Integer('uid'));
             $this->dbMap->addPropertyMap(new Db\Integer('collectionId', 'collection_id'));
             $this->dbMap->addPropertyMap(new Db\Integer('categoryId', 'category_id'));
             $this->dbMap->addPropertyMap(new Db\Integer('domainId', 'domain_id'));
@@ -45,6 +46,7 @@ class ItemMap extends \App\Db\Mapper
         if (!$this->formMap) {
             $this->formMap = new \Tk\DataMap\DataMap();
             $this->formMap->addPropertyMap(new Form\Integer('id'), 'key');
+            $this->formMap->addPropertyMap(new Form\Integer('uid'));
             $this->formMap->addPropertyMap(new Form\Integer('collectionId'));
             $this->formMap->addPropertyMap(new Form\Integer('categoryId'));
             $this->formMap->addPropertyMap(new Form\Integer('domainId'));
