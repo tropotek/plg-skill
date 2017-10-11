@@ -86,21 +86,19 @@ class EntryMap extends \App\Db\Mapper
 
 
         if (!empty($filter['courseId'])) {
-            // TODO: link query to the placement courseId
-
-            //$where .= sprintf('a.collection_id = %s AND ', (int)$filter['courseId']);
+            $where .= sprintf('a.course_id = %s AND ', (int)$filter['courseId']);
         }
 
         if (!empty($filter['collectionId'])) {
             $where .= sprintf('a.collection_id = %s AND ', (int)$filter['collectionId']);
         }
 
-        if (!empty($filter['placementId'])) {
-            $where .= sprintf('a.placement_id = %s AND ', (int)$filter['placementId']);
-        }
-
         if (!empty($filter['userId'])) {
             $where .= sprintf('a.user_id = %s AND ', (int)$filter['userId']);
+        }
+
+        if (!empty($filter['placementId'])) {
+            $where .= sprintf('a.placement_id = %s AND ', (int)$filter['placementId']);
         }
 
         if (!empty($filter['title'])) {
@@ -126,6 +124,7 @@ class EntryMap extends \App\Db\Mapper
         }
 
         $res = $this->selectFrom($from, $where, $tool);
+        
         return $res;
     }
 

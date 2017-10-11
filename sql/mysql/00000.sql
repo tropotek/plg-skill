@@ -126,21 +126,22 @@ CREATE TABLE IF NOT EXISTS skill_item (
 --
 CREATE TABLE IF NOT EXISTS skill_entry (
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  collection_id INT UNSIGNED NOT NULL DEFAULT 0,
-  placement_id INT UNSIGNED NOT NULL DEFAULT 0,         -- The placement this entry is linked to if 0 then assume self-assessment
-  user_id INT UNSIGNED NOT NULL DEFAULT 0,              -- The student user id the bundle belongs to
+  collection_id INT UNSIGNED NOT NULL DEFAULT 0,            --
+  course_id INT UNSIGNED NOT NULL DEFAULT 0,                --
+  user_id INT UNSIGNED NOT NULL DEFAULT 0,                  -- The student user id the bundle belongs to
+  placement_id INT UNSIGNED NOT NULL DEFAULT 0,             -- (optional) The placement this entry is linked to if 0 then assume self-assessment
   title VARCHAR(255) NOT NULL DEFAULT '',                   -- A title for the assessment instance
   assessor VARCHAR(128) DEFAULT '' NOT NULL,                -- Name of person assessing the student if not supervisor.
   absent INT(4) DEFAULT '0' NOT NULL,                       -- Number of days absent from placement.
   status VARCHAR(64) NOT NULL DEFAULT '',                   -- pending, approved, not-approved
-
   notes TEXT,                                               -- Staff only notes
   del BOOL NOT NULL DEFAULT 0,
   modified DATETIME NOT NULL,
   created DATETIME NOT NULL,
   KEY (collection_id),
-  KEY (placement_id),
+  KEY (course_id),
   KEY (user_id),
+  KEY (placement_id),
   KEY (del)
 ) ENGINE=InnoDB;
 

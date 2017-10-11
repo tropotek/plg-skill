@@ -147,7 +147,7 @@ class Edit extends AdminEditIface
     
   <div class="panel panel-default">
     <div class="panel-heading">
-      <h4 class="panel-title"><i class="fa fa-wpforms"></i> <span var="panel-title">Skill Collection Edit</span></h4>
+      <h4 class="panel-title"><i class="fa fa-graduation-cap"></i> <span var="panel-title">Skill Collection Edit</span></h4>
     </div>
     <div class="panel-body">
       <div var="form"></div>

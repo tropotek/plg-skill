@@ -41,26 +41,17 @@ class SetupHandler implements Subscriber
             $dispatcher->addSubscriber(new \Skill\Listener\ExampleHandler(\Skill\Plugin::ZONE_COURSE, $course->getId()));
         }
 
-//        $profile = \App\Factory::getProfile();
-//        if ($profile && $plugin->isZonePluginEnabled(\Skill\Plugin::ZONE_COURSE_PROFILE, $profile->getId())) {
-//            \Tk\Log::debug($plugin->getName() . ': Sample init course profile plugin stuff: ' . $profile->name);
-//            $dispatcher->addSubscriber(new \Skill\Listener\ExampleHandler(\Skill\Plugin::ZONE_COURSE_PROFILE, $profile->getId()));
-//        }
+        $profile = \App\Factory::getProfile();
+        if ($profile && $plugin->isZonePluginEnabled(\Skill\Plugin::ZONE_COURSE_PROFILE, $profile->getId())) {
+            \Tk\Log::debug($plugin->getName() . ': Sample init course profile plugin stuff: ' . $profile->name);
+            $dispatcher->addSubscriber(new \Skill\Listener\ProfileEditHandler($profile->getId()));
+            $course = \App\Factory::getCourse();
+            if ($course) {
+                $dispatcher->addSubscriber(new \Skill\Listener\EntryManagerButtonHandler($course));
+            }
+        }
 
     }
-
-
-
-    public function onInit(\Tk\Event\KernelEvent $event)
-    {
-        //vd('onInit');
-    }
-
-    public function onController(\Tk\Event\ControllerEvent $event)
-    {
-        //vd('onController');
-    }
-    
 
     /**
      * Returns an array of event names this subscriber wants to listen to.
@@ -85,8 +76,6 @@ class SetupHandler implements Subscriber
     public static function getSubscribedEvents()
     {
         return array(
-            //\Tk\Kernel\KernelEvents::INIT => array('onInit', 0),
-            //\Tk\Kernel\KernelEvents::CONTROLLER => array('onController', 0),
             \Tk\Kernel\KernelEvents::REQUEST => array('onRequest', -10)
         );
     }

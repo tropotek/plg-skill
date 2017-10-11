@@ -14,44 +14,46 @@ use Tk\Event\Event;
  * @link http://www.tropotek.com/
  * @license Copyright 2015 Michael Mifsud
  */
-class ExampleHandler implements Subscriber
+class EntryManagerButtonHandler implements Subscriber
 {
 
-    private $zoneName = '';
-    private $zoneId = 0;
-
-
-    public function __construct($zoneName, $zoneId)
-    {
-        $this->zoneName = $zoneName;
-        $this->zoneId = (int)$zoneId;
-    }
-
     /**
-     *
-     * @param GetResponseEvent $event
+     * @var \App\Db\Course
      */
-    public function onSystemInit(GetResponseEvent $event)
-    {
-        //$this->plugin = \Skill\Plugin::getInstance();
-        //vd('Example: onSystemInit');
+    private $course = null;
 
-        //vd($event->getRequest()->getAttribute('courseCode'));
-        //vd(\Tk\Config::getInstance()->getCourse());
+
+    public function __construct($course)
+    {
+        $this->course = $course;
     }
+
 
     /**
      * Check the user has access to this controller
      *
-     * @param ControllerEvent $event
+     * @param Event $event
      */
-    public function onControllerAccess(ControllerEvent $event)
+    public function onControllerInit(Event $event)
     {
         $plugin = \Skill\Plugin::getInstance();
         $config = $plugin->getConfig();
-        $config->getLog()->info($plugin->getName() . ': onControllerAccess(\''.$this->zoneName.'\', '.$this->zoneId.') ');
+        //$config->getLog()->info($plugin->getName() . ': onControllerAccess(\'profile\', '.$this->profileId.') ');
+
+        /** @var \Tk\Controller\Iface $controller */
+        $controller = $event->get('controller');
+
+
+        if ($controller instanceof \App\Controller\Course\Edit) {
+            /** @var \Tk\Ui\Admin\ActionPanel $actionPanel */
+            $actionPanel = $controller->getActionPanel();
+            $actionPanel->addButton(\Tk\Ui\Button::create('Skill Collections',
+                \App\Uri::create('/skill/entryCollectionManager.html')->set('courseId', $this->course->getId()),
+                'fa fa-graduation-cap'));
+        }
 
     }
+
 
     /**
      * Check the user has access to this controller
@@ -62,7 +64,7 @@ class ExampleHandler implements Subscriber
     {
         $plugin = \Skill\Plugin::getInstance();
         $config = $plugin->getConfig();
-        $config->getLog()->info($plugin->getName() . ': onControllerAccess(\''.$this->zoneName.'\', '.$this->zoneId.') ');
+        //$config->getLog()->info($plugin->getName() . ': onControllerShow(\'profile\', '.$this->profileId.') ');
     }
 
 
@@ -89,8 +91,7 @@ class ExampleHandler implements Subscriber
     public static function getSubscribedEvents()
     {
         return array(
-            KernelEvents::REQUEST => array('onSystemInit', -10),
-            KernelEvents::CONTROLLER => array('onControllerAccess', 0),
+            \Tk\PageEvents::CONTROLLER_INIT => array('onControllerInit', 0),
             \Tk\PageEvents::CONTROLLER_SHOW => array('onControllerShow', 0)
         );
     }

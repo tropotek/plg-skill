@@ -1,5 +1,5 @@
 <?php
-namespace Skill\Controller\Collection;
+namespace Skill\Controller\Entry;
 
 use App\Controller\AdminManagerIface;
 use Dom\Template;
@@ -17,14 +17,14 @@ class Manager extends AdminManagerIface
 {
 
     /**
-     * @var \App\Db\Profile
+     * @var \Skill\Db\Collection
      */
-    protected $profile = null;
+    private $collection = null;
 
     /**
      * @var null|\Tk\Uri
      */
-    protected $editUrl = null;
+    private $editUrl = null;
 
 
 
@@ -34,16 +34,7 @@ class Manager extends AdminManagerIface
     public function __construct()
     {
         parent::__construct();
-        $this->setPageTitle('Skill Collection Manager');
-    }
-
-    protected function findProfile(Request $request)
-    {
-        $profile = \App\Db\ProfileMap::create()->find($request->get('zoneId'));
-        if ($request->get('profileId')) {
-            $profile = \App\Db\ProfileMap::create()->find($request->get('profileId'));
-        }
-        return $profile;
+        $this->setPageTitle('Skill Entry Manager');
     }
 
     /**
@@ -52,25 +43,33 @@ class Manager extends AdminManagerIface
      */
     public function doDefault(Request $request)
     {
-        $this->profile = $this->findProfile($request);
-        if ($this->editUrl === null)
-            $this->editUrl = \App\Uri::create('/skill/collectionEdit.html');
+        $this->collection = \Skill\Db\CollectionMap::create()->find($request->get('collectionId'));
 
-        $this->table = \App\Factory::createTable(\Tk\Object::basename($this).'_fieldList');
+        if ($this->editUrl === null)
+            $this->editUrl = \App\Uri::create('/skill/entryEdit.html');
+
+
+        $this->table = \App\Factory::createTable(\Tk\Object::basename($this).'_entryList'.$this->collection->name);
         $this->table->setParam('renderer', \App\Factory::createTableRenderer($this->table));
 
         $this->table->addCell(new \Tk\Table\Cell\Checkbox('id'));
-        $this->table->addCell(new \Tk\Table\Cell\Text('name'))->addCss('key')->setUrl(clone $this->editUrl);
-        $this->table->addCell(new \Tk\Table\Cell\Text('role'));
-        $this->table->addCell(new \Tk\Table\Cell\ArrayObject('enabled'));
-        $this->table->addCell(new \Tk\Table\Cell\Boolean('viewGrade'));
-        $this->table->addCell(new \Tk\Table\Cell\Date('modified'));
+        $this->table->addCell(new \Tk\Table\Cell\Text('title'))->addCss('key')->setUrl(clone $this->editUrl);
+        $this->table->addCell(new \Tk\Table\Cell\Text('status'));
+        $this->table->addCell(new \Tk\Table\Cell\Text('userId'))->setOnPropertyValue(function ($cell, $obj) {
+            /** @var \Skill\Db\Entry $obj */
+            if ($obj->getUser())
+                return $obj->getUser()->name;
+            return '';
+        });
+        $this->table->addCell(new \Tk\Table\Cell\Text('assessor'));
+        $this->table->addCell(new \Tk\Table\Cell\Date('created'));
+
 
         // Filters
         $this->table->addFilter(new Field\Input('keywords'))->setAttr('placeholder', 'Keywords');
 
         // Actions
-        $this->table->addAction(\Tk\Table\Action\ColumnSelect::create()->setDisabled(array('id', 'name')));
+        $this->table->addAction(\Tk\Table\Action\ColumnSelect::create()->setDisabled(array('id', 'title')));
         $this->table->addAction(\Tk\Table\Action\Csv::create());
         $this->table->addAction(\Tk\Table\Action\Delete::create());
 
@@ -81,8 +80,9 @@ class Manager extends AdminManagerIface
     protected function getList()
     {
         $filter = $this->table->getFilterValues();
-        $filter['profileId'] = $this->profile->getId();
-        return \Skill\Db\CollectionMap::create()->findFiltered($filter, $this->table->makeDbTool());
+        $filter['collectionId'] = $this->collection->getId();
+        $filter['courseId'] = $this->getCourse()->getId();
+        return \Skill\Db\EntryMap::create()->findFiltered($filter, $this->table->makeDbTool('created DESC'));
     }
 
     /**
@@ -92,11 +92,9 @@ class Manager extends AdminManagerIface
     {
         $template = parent::show();
 
-        $u = clone $this->editUrl;
-        $this->getActionPanel()->addButton(\Tk\Ui\Button::create('New Collection',
-            $u->set('profileId', $this->profile->getId()), 'fa fa-graduation-cap'));
-
         $template->replaceTemplate('table', $this->table->getParam('renderer')->show());
+
+        $template->insertText('title', $this->collection->name . ' entries for ' . $this->getCourse()->name);
 
         return $template;
     }
@@ -113,7 +111,7 @@ class Manager extends AdminManagerIface
 
   <div class="panel panel-default">
     <div class="panel-heading">
-      <h4 class="panel-title"><i class="fa fa-graduation-cap"></i> Skill Collections</h4>
+      <h4 class="panel-title"><i class="fa fa-pencil"></i> <span var="title">Entry Manager</span></h4>
     </div>
     <div class="panel-body">
       <div var="table"></div>

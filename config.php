@@ -26,4 +26,6 @@ $routes->add('skill-scale-edit',         new \Tk\Routing\Route('/skill/scaleEdit
 $routes->add('skill-item-manager',       new \Tk\Routing\Route('/skill/itemManager.html',       'Skill\Controller\Item\Manager::doDefault', $params));
 $routes->add('skill-item-edit',          new \Tk\Routing\Route('/skill/itemEdit.html',          'Skill\Controller\Item\Edit::doDefault', $params));
 
-
+$routes->add('skill-entry-collection-manager', new \Tk\Routing\Route('/skill/entryCollectionManager.html', 'Skill\Controller\Entry\CollectionManager::doDefault', $params));
+$routes->add('skill-entry-manager', new \Tk\Routing\Route('/skill/entryManager.html', 'Skill\Controller\Entry\Manager::doDefault', $params));
+$routes->add('skill-entry-edit', new \Tk\Routing\Route('/skill/entryEdit.html', 'Skill\Controller\Entry\Edit::doDefault', $params));
