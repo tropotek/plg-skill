@@ -49,7 +49,6 @@ class Manager extends AdminManagerIface
         }
         $this->editUrl = \App\Uri::create('/skill/collectionEdit.html');
 
-
         $this->table = \App\Factory::createTable(\Tk\Object::basename($this).'_fieldList');
         $this->table->setParam('renderer', \App\Factory::createTableRenderer($this->table));
 
