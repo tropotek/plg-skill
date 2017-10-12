@@ -110,7 +110,7 @@ class Entry extends \Tk\Db\Map\Model
 
 
     /**
-     * @return \App\Db\Course|null|\Tk\Db\Map\Model|\Tk\Db\ModelInterface
+     * @return \Skill\Db\Collection|null|\Tk\Db\Map\Model|\Tk\Db\ModelInterface
      */
     public function getCollection()
     {
@@ -151,6 +151,15 @@ class Entry extends \Tk\Db\Map\Model
             $this->placement = \App\Db\PlacementMap::create()->find($this->placementId);
         }
         return $this->placement;
+    }
+
+    /**
+     * return the status list for a select field
+     * @return array
+     */
+    public static function getStatusList()
+    {
+        return \Tk\Form\Field\Select::arrayToSelectList(\Tk\Object::getClassConstants(__CLASS__, 'STATUS'));
     }
 
 

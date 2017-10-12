@@ -25,8 +25,9 @@ class EntryMap extends \App\Db\Mapper
             $this->dbMap = new \Tk\DataMap\DataMap();
             $this->dbMap->addPropertyMap(new Db\Integer('id'), 'key');
             $this->dbMap->addPropertyMap(new Db\Integer('collectionId', 'collection_id'));
-            $this->dbMap->addPropertyMap(new Db\Integer('placementId', 'placement_id'));
+            $this->dbMap->addPropertyMap(new Db\Integer('courseId', 'course_id'));
             $this->dbMap->addPropertyMap(new Db\Integer('userId', 'user_id'));
+            $this->dbMap->addPropertyMap(new Db\Integer('placementId', 'placement_id'));
             $this->dbMap->addPropertyMap(new Db\Text('title'));
             $this->dbMap->addPropertyMap(new Db\Text('assessor'));
             $this->dbMap->addPropertyMap(new Db\Integer('absent'));
@@ -47,8 +48,9 @@ class EntryMap extends \App\Db\Mapper
             $this->formMap = new \Tk\DataMap\DataMap();
             $this->formMap->addPropertyMap(new Form\Integer('id'), 'key');
             $this->formMap->addPropertyMap(new Form\Integer('collectionId'));
-            $this->formMap->addPropertyMap(new Form\Integer('placementId'));
+            $this->formMap->addPropertyMap(new Form\Integer('courseId'));
             $this->formMap->addPropertyMap(new Form\Integer('userId'));
+            $this->formMap->addPropertyMap(new Form\Integer('placementId'));
             $this->formMap->addPropertyMap(new Form\Text('title'));
             $this->formMap->addPropertyMap(new Form\Text('assessor'));
             $this->formMap->addPropertyMap(new Form\Text('absent'));
@@ -162,13 +164,8 @@ class EntryMap extends \App\Db\Mapper
     {
         if ($this->hasValue($entryId, $itemId)) {
             $st = $this->getDb()->prepare('UPDATE skill_value SET value = ? WHERE entry_id = ? AND item_id = ? ');
-//            $sql = sprintf('UPDATE %s SET value = %s WHERE entry_id = %s AND item_id = %s ',
-//                $this->quoteTable('skill_value'), $this->quote($value), (int)$entryId, (int)$itemId);
-//            $this->getDb()->query($sql);
         } else {
-            $st = $this->getDb()->prepare('INSERT INTO skill_value (value, entry_id, item_id) VALUES (%s, %s, %s)');
-//            $sql = sprintf('INSERT INTO %s (entry_id, item_id, value) VALUES (%s, %s, %s)',
-//                $this->quoteTable('skill_value'), (int)$entryId, (int)$itemId, $this->quote($value));
+            $st = $this->getDb()->prepare('INSERT INTO skill_value (value, entry_id, item_id) VALUES (?, ?, ?)');
         }
         $st->bindParam(1, $value);
         $st->bindParam(2, $entryId);
@@ -186,9 +183,6 @@ class EntryMap extends \App\Db\Mapper
         $st->bindParam(1, $entryId);
         $st->bindParam(2, $itemId);
         $st->execute();
-
-//        $query = sprintf('DELETE FROM %s WHERE entry_id = %d AND item_id = %d', $this->quoteTable('skill_value'), (int)$entryId, (int)$itemId);
-//        $this->getDb()->exec($query);
     }
 
     /**
