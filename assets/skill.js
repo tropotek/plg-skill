@@ -1,5 +1,5 @@
 
-;$(document).ready(function () {
+jQuery(function($) {
 
   // TODO: change the color of the slider as it slides....
   // TODO: move this to the plugin folder
@@ -28,7 +28,6 @@
       // $(this).closest('.slider').find('.slider-track .tick-slider-selection').css('background', color);
       // console.log($(this).closest('.slider'));
 
-
     }).attr('data-slider-value', function (e) {
       return $(this).val();
     }).wrap('<div class="slide-wrap"></div>').bootstrapSlider({
@@ -42,7 +41,4 @@
 
   }
 
-
-
-
-})(jQuery);
+});

@@ -63,6 +63,7 @@ class Manager extends AdminManagerIface
         });
         $this->table->addCell(new \Tk\Table\Cell\Text('assessor'));
         $this->table->addCell(new \Tk\Table\Cell\Text('absent'));
+        $this->table->addCell(new \Tk\Table\Cell\Boolean('confirm'));
         $this->table->addCell(new \Tk\Table\Cell\Date('created'));
 
 

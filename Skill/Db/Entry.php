@@ -9,12 +9,11 @@ namespace Skill\Db;
  */
 class Entry extends \Tk\Db\Map\Model
 {
-
     const STATUS_PENDING = 'pending';
     const STATUS_APPROVED = 'approved';
     const STATUS_NOT_APPROVED = 'not approved';
 
-    
+
     /**
      * @var int
      */
@@ -55,6 +54,11 @@ class Entry extends \Tk\Db\Map\Model
      * @var int
      */
     public $absent = 0;
+
+    /**
+     * @var int|null
+     */
+    public $confirm = null;
 
     /**
      * @var string

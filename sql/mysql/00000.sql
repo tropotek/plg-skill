@@ -133,6 +133,7 @@ CREATE TABLE IF NOT EXISTS skill_entry (
   title VARCHAR(255) NOT NULL DEFAULT '',                   -- A title for the assessment instance
   assessor VARCHAR(128) DEFAULT '' NOT NULL,                -- Name of person assessing the student if not supervisor.
   absent INT(4) DEFAULT '0' NOT NULL,                       -- Number of days absent from placement.
+  confirm BOOL NOT NULL DEFAULT 0,                          -- The value of the confirmation question
   status VARCHAR(64) NOT NULL DEFAULT '',                   -- pending, approved, not-approved
   notes TEXT,                                               -- Staff only notes
   del BOOL NOT NULL DEFAULT 0,
@@ -154,7 +155,7 @@ CREATE TABLE IF NOT EXISTS skill_entry (
 CREATE TABLE IF NOT EXISTS skill_value (
   entry_id INT UNSIGNED NOT NULL DEFAULT 0,
   item_id INT UNSIGNED NOT NULL DEFAULT 0,
-  value VARCHAR(32) NOT NULL DEFAULT '',
+  value TEXT,
   PRIMARY KEY (entry_id, item_id),
   KEY (entry_id),
   KEY (item_id)

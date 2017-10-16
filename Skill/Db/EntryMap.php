@@ -31,6 +31,7 @@ class EntryMap extends \App\Db\Mapper
             $this->dbMap->addPropertyMap(new Db\Text('title'));
             $this->dbMap->addPropertyMap(new Db\Text('assessor'));
             $this->dbMap->addPropertyMap(new Db\Integer('absent'));
+            $this->dbMap->addPropertyMap(new Db\Integer('confirm'));
             $this->dbMap->addPropertyMap(new Db\Text('status'));
             $this->dbMap->addPropertyMap(new Db\Text('notes'));
             $this->dbMap->addPropertyMap(new Db\Date('modified'));
@@ -54,6 +55,7 @@ class EntryMap extends \App\Db\Mapper
             $this->formMap->addPropertyMap(new Form\Text('title'));
             $this->formMap->addPropertyMap(new Form\Text('assessor'));
             $this->formMap->addPropertyMap(new Form\Text('absent'));
+            $this->formMap->addPropertyMap(new Form\Integer('confirm'));
             $this->formMap->addPropertyMap(new Form\Text('status'));
             $this->formMap->addPropertyMap(new Form\Text('notes'));
         }
