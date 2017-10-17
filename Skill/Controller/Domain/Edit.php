@@ -17,11 +17,6 @@ class Edit extends AdminEditIface
 {
 
     /**
-     * @var \Skill\Db\Collection
-     */
-    protected $collection = null;
-
-    /**
      * @var \Skill\Db\Domain
      */
     protected $domain = null;
@@ -43,10 +38,6 @@ class Edit extends AdminEditIface
      */
     public function doDefault(Request $request)
     {
-        if ($request->get('collectionId')) {
-            $this->collection = \Skill\Db\CollectionMap::create()->find($request->get('collectionId'));
-        }
-
         $this->domain = new \Skill\Db\Domain();
         $this->domain->collectionId = (int)$request->get('collectionId');
         if ($request->get('domainId')) {
@@ -71,7 +62,6 @@ class Edit extends AdminEditIface
         $this->form->addField(new Field\Input('weight'))->setNotes('for weighted marks ad a multiplier value here from 0.0 to 1.0');
         $this->form->addField(new Field\Input('description'))->setNotes('A short description of the domain');
 
-
         $this->form->addField(new Event\Button('update', array($this, 'doSubmit')));
         $this->form->addField(new Event\Button('save', array($this, 'doSubmit')));
         $this->form->addField(new Event\Link('cancel', \App\Factory::getCrumbs()->getBackUrl()));
@@ -85,7 +75,6 @@ class Edit extends AdminEditIface
     {
         // Load the object with data from the form using a helper object
         \Skill\Db\DomainMap::create()->mapForm($form->getValues(), $this->domain);
-
 
         $form->addFieldErrors($this->domain->validate());
 

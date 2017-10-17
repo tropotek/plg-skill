@@ -21,12 +21,6 @@ class Edit extends AdminEditIface
      */
     protected $collection = null;
 
-    /**
-     * @var \App\Db\Profile
-     */
-    protected $profile = null;
-
-
 
     /**
      * Iface constructor.
@@ -43,15 +37,11 @@ class Edit extends AdminEditIface
      */
     public function doDefault(Request $request)
     {
-        if ($request->get('profileId'))
-            $this->profile = \App\Db\ProfileMap::create()->find($request->get('profileId'));
-
         $this->collection = new \Skill\Db\Collection();
-        if ($this->profile)
-            $this->collection->profileId = $this->profile->getId();
-
-        if ($request->get('collectionId'))
+        $this->collection->profileId = (int)$request->get('profileId');
+        if ($request->get('collectionId')) {
             $this->collection = \Skill\Db\CollectionMap::create()->find($request->get('collectionId'));
+        }
 
         $this->buildForm();
 
@@ -82,6 +72,10 @@ class Edit extends AdminEditIface
 
         $list = \Tk\Form\Field\Select::arrayToSelectList(\Tk\Object::getClassConstants('\App\Db\Placement', 'STATUS'));
         $this->form->addField(new Field\Select('available[]', $list))->addCss('tk-dual-select')->setAttr('data-title', 'Placement Status')->setNotes('Enable this collection on the following placement status');
+
+        //$list = \Tk\Form\Field\Select::arrayToSelectList(\Tk\Object::getClassConstants('\App\Db\Placement', 'STATUS'));
+        $list = \App\Db\PlacementTypeMap::create()->findFiltered(array('profileId' => $this->collection->getProfile()->getId()));
+        $this->form->addField(new Field\Select('available[]', \Tk\Form\Field\Option\ArrayObjectIterator::create($list)))->addCss('tk-dual-select')->setAttr('data-title', 'Placement Types')->setNotes('Enable this collection for the selected placement types.');
 
         $this->form->addField(new Field\Checkbox('active'))->setNotes('Enable this collection for user submissions.');
         $this->form->addField(new Field\Checkbox('viewGrade'))->setNotes('Allow students to view their course results from all entries from this collection.');

@@ -62,8 +62,16 @@ class Manager extends AdminManagerIface
         $this->table->addCell(new \Tk\Table\Cell\Checkbox('id'));
         $this->table->addCell(new \Tk\Table\Cell\Text('name'))->addCss('key')->setUrl(clone $this->editUrl);
         $this->table->addCell(new \Tk\Table\Cell\Text('role'));
-        $this->table->addCell(new \Tk\Table\Cell\ArrayObject('enabled'));
+        $this->table->addCell(new \Tk\Table\Cell\ArrayObject('available'))->setLabel('Placement Enabled Status');
         $this->table->addCell(new \Tk\Table\Cell\Boolean('viewGrade'));
+        $this->table->addCell(new \Tk\Table\Cell\Text('entries'))->setOnPropertyValue(function ($cell, $obj) {
+            /** @var \Skill\Db\Collection $obj */
+            $filter = array('collectionId' => $obj->getId());
+            if (\App\Factory::getCourse()) {
+                $filter['courseId'] = \App\Factory::getCourse()->getId();
+            }
+            return \Skill\Db\EntryMap::create()->findFiltered($filter)->count();
+        });
         $this->table->addCell(new \Tk\Table\Cell\Date('modified'));
 
         // Filters

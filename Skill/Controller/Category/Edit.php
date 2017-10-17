@@ -17,11 +17,6 @@ class Edit extends AdminEditIface
 {
 
     /**
-     * @var \Skill\Db\Collection
-     */
-    protected $collection = null;
-
-    /**
      * @var \Skill\Db\Category
      */
     protected $category = null;
@@ -43,10 +38,6 @@ class Edit extends AdminEditIface
      */
     public function doDefault(Request $request)
     {
-        if ($request->get('collectionId')) {
-            $this->collection = \Skill\Db\CollectionMap::create()->find($request->get('collectionId'));
-        }
-
         $this->category = new \Skill\Db\Category();
         $this->category->collectionId = (int)$request->get('collectionId');
         if ($request->get('categoryId')) {

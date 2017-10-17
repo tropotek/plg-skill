@@ -17,11 +17,6 @@ class Edit extends AdminEditIface
 {
 
     /**
-     * @var \Skill\Db\Collection
-     */
-    protected $collection = null;
-
-    /**
      * @var \Skill\Db\Entry
      */
     protected $entry = null;
@@ -104,7 +99,7 @@ class Edit extends AdminEditIface
         $this->form->addField(new Field\Input('absent'))->setFieldset('Entry Details');
         $this->form->addField(new Field\Textarea('notes'))->addCss('tkTextareaTool')->setFieldset('Entry Details');
 
-        $items = \Skill\Db\ItemMap::create()->findFiltered(array('collectionId' => $this->collection->getId()),
+        $items = \Skill\Db\ItemMap::create()->findFiltered(array('collectionId' => $this->entry->getCollection()->getId()),
             \Tk\Db\Tool::create('category_id, order_by'));
         /** @var \Skill\Db\Item $item */
         foreach ($items as $item) {
@@ -115,7 +110,7 @@ class Edit extends AdminEditIface
             }
         }
 
-        $radioBtn = new \Tk\Form\Field\RadioButton('confirm', $this->collection->confirm);
+        $radioBtn = new \Tk\Form\Field\RadioButton('confirm', $this->entry->getCollection()->confirm);
         $radioBtn->appendOption('Yes', '1', 'fa fa-check')->appendOption('No', '0', 'fa fa-ban');
         $this->form->addField($radioBtn)->setLabel(null)->setFieldset('Confirmation')->setValue(true);
 
@@ -133,7 +128,8 @@ class Edit extends AdminEditIface
         // Load the object with data from the form using a helper object
         \Skill\Db\EntryMap::create()->mapForm($form->getValues(), $this->entry);
         
-        if (!$form->getFieldValue('status') || !in_array($form->getFieldValue('status'), \Tk\Object::getClassConstants($this->entry, 'STATUS'))) {
+        if (!$form->getFieldValue('status') || !in_array($form->getFieldValue('status'),
+                \Tk\Object::getClassConstants($this->entry, 'STATUS'))) {
             $form->addFieldError('status', 'Please Select a valid status');
         }
 
@@ -185,11 +181,13 @@ class Edit extends AdminEditIface
             }
         }
 
-        $template->insertHtml('instructions', $this->entry->getCollection()->instructions);
+        if (!$this->getUser()->isStaff()) {
+            $template->insertHtml('instructions', $this->entry->getCollection()->instructions);
+        }
 
         $css = <<<CSS
 .form-group.tk-item:nth-child(odd) .skill-item {
-  background-color: {$this->collection->color};
+  background-color: {$this->entry->getCollection()->color};
 }
 CSS;
         $template->appendCss($css);

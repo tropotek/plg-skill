@@ -17,11 +17,6 @@ class Edit extends AdminEditIface
 {
 
     /**
-     * @var \Skill\Db\Collection
-     */
-    protected $collection = null;
-
-    /**
      * @var \Skill\Db\Scale
      */
     protected $scale = null;
@@ -43,10 +38,6 @@ class Edit extends AdminEditIface
      */
     public function doDefault(Request $request)
     {
-        if ($request->get('collectionId')) {
-            $this->collection = \Skill\Db\CollectionMap::create()->find($request->get('collectionId'));
-        }
-
         $this->scale = new \Skill\Db\Scale();
         $this->scale->collectionId = (int)$request->get('collectionId');
         if ($request->get('scaleId')) {
@@ -84,17 +75,12 @@ class Edit extends AdminEditIface
         // Load the object with data from the form using a helper object
         \Skill\Db\ScaleMap::create()->mapForm($form->getValues(), $this->scale);
 
-
         $form->addFieldErrors($this->scale->validate());
 
         if ($form->hasErrors()) {
             return;
         }
         $this->scale->save();
-
-
-        // Re-caclulate the values
-
 
         \Tk\Alert::addSuccess('Record saved!');
         if ($form->getTriggeredEvent()->getName() == 'update') {

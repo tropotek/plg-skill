@@ -17,11 +17,6 @@ class Edit extends AdminEditIface
 {
 
     /**
-     * @var \Skill\Db\Collection
-     */
-    protected $collection = null;
-
-    /**
      * @var \Skill\Db\Item
      */
     protected $item = null;
@@ -48,7 +43,6 @@ class Edit extends AdminEditIface
         if ($request->get('itemId')) {
             $this->item = \Skill\Db\ItemMap::create()->find($request->get('itemId'));
         }
-        $this->collection = $this->item->getCollection();
 
         $this->buildForm();
 
@@ -64,10 +58,10 @@ class Edit extends AdminEditIface
 
         //$this->form->addField(new Field\Input('uid'))->setNotes('(optional) Use this to match up questions from other collections, for generating reports');
 
-        $list = \Skill\Db\CategoryMap::create()->findFiltered(array('collectionId' => $this->collection->getId()));
+        $list = \Skill\Db\CategoryMap::create()->findFiltered(array('collectionId' => $this->item->getCollection()->getId()));
         $this->form->addField(new Field\Select('categoryId', \Tk\Form\Field\Option\ArrayObjectIterator::create($list)))->prependOption('-- Select --', '')->setNotes('');
 
-        $list = \Skill\Db\DomainMap::create()->findFiltered(array('collectionId' => $this->collection->getId()));
+        $list = \Skill\Db\DomainMap::create()->findFiltered(array('collectionId' => $this->item->getCollection()->getId()));
         $this->form->addField(new Field\Select('domainId', \Tk\Form\Field\Option\ArrayObjectIterator::create($list)))->prependOption('-- None --', '')->setNotes('');
 
         $this->form->addField(new Field\Input('question'))->setRequired()->setNotes('The question text to display');
