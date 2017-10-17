@@ -43,13 +43,13 @@ class Item extends \Tk\Form\Field\Input
         $template = parent::show();
 
         // TODO: setup slider javascript etc
-        $template->appendCssUrl(\Tk\Uri::create('/plugin/ems-skill/assets/skill.less'));
         $template->appendCssUrl(\Tk\Uri::create('/plugin/ems-skill/assets/bootstrap-slider/src/less/bootstrap-slider.less'));
         $template->appendJsUrl(\Tk\Uri::create('/plugin/ems-skill/assets/bootstrap-slider/dist/bootstrap-slider.js'));
-        $template->appendJsUrl(\Tk\Uri::create('/plugin/ems-skill/assets/skill.js'));
 
         $template->insertText('uid', self::$incr.'.');
         $template->insertText('question', $this->item->question);
+        $list = \Skill\Db\ScaleMap::create()->findFiltered(array('collectionId' => $this->item->collectionId))->toArray('name');
+        $template->setAttr('element', 'data-slider-labels', implode(',', $list));
 
         self::$incr++;
         return $template;

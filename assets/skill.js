@@ -17,28 +17,27 @@ jQuery(function($) {
 
   // Bootstrap Slider
   if ($.fn.bootstrapSlider !== undefined) {
-    var labels = ['Not Assessed', 'Unable', 'Developing', 'Acceptable', 'Good', 'Exceptional'];
-    var ticks = [0, 1, 2, 3, 4, 5];
 
-    $('.tk-skillSlider').on('change', function (e) {
-      //console.log('Current value: ' + $(this).val());
-      //console.log(arguments);
-      // var value = $(this).val();
-      // var color = getGreenToRed((value / (labels.length-1)) * 100);
-      // $(this).closest('.slider').find('.slider-track .tick-slider-selection').css('background', color);
-      // console.log($(this).closest('.slider'));
+    $('.tk-skillSlider').each(function () {
+      var labels = $(this).data('slider-labels').split(',');
+      var ticks = Array.apply(null, {length: labels.length}).map(Number.call, Number);
 
-    }).attr('data-slider-value', function (e) {
-      return $(this).val();
-    }).wrap('<div class="slide-wrap"></div>').bootstrapSlider({
-      ticks: ticks,
-      //ticks_labels: ['Not Assessed', 'Unable', 'Developing', 'Acceptable', 'Good', 'Exceptional'],
-      //tooltip: 'hide'
-      formatter: function (value) {
-        return labels[value];
+      $(this).on('change', function (e) {
+        //console.log('Current value: ' + $(this).val());
+      }).attr('data-slider-value', function (e) {
+        return $(this).val();
+      }).wrap('<div class="slide-wrap"></div>').bootstrapSlider({
+        ticks: ticks,
+        ticks_labels: labels,
+        tooltip: 'hide',
+        formatter: function (value) {
+          return labels[value];
+        }
+      });
+      if ($(this).prop('disabled') || $(this).prop('readonly')) {
+        $(this).bootstrapSlider('disable');
       }
     });
-
   }
 
 });

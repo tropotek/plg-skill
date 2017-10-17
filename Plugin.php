@@ -8,13 +8,8 @@ use Tk\Event\Dispatcher;
  * @link http://www.tropotek.com/
  * @license Copyright 2016 Michael Mifsud
  */
-class Plugin extends \Tk\Plugin\Iface
+class Plugin extends \App\Plugin\Iface
 {
-
-    const ZONE_INSTITUTION = 'institution';
-    const ZONE_COURSE_PROFILE = 'profile';
-    const ZONE_COURSE = 'course';
-
 
     /**
      * A helper method to get the Plugin instance globally
@@ -27,23 +22,10 @@ class Plugin extends \Tk\Plugin\Iface
     }
 
     /**
-     * @return \App\PluginApi
-     */
-    public static function getPluginApi()
-    {
-        return \Tk\Config::getInstance()->getPluginApi();
-    }
-
-
-    // ---- \Tk\Plugin\Iface Interface Methods ----
-    
-    
-    /**
      * Init the plugin
      *
      * This is called when the session first registers the plugin to the queue
-     * So it is the first called method after the constructor.....
-     *
+     * So it is the first called method after the constructor...
      */
     function doInit()
     {
@@ -64,7 +46,6 @@ class Plugin extends \Tk\Plugin\Iface
      * installing any DB and settings required to run
      * Will only be called when activating the plugin in the
      * plugin control panel
-     *
      */
     function doActivate()
     {
@@ -83,13 +64,13 @@ class Plugin extends \Tk\Plugin\Iface
 //        $data->set('plugin.title', 'Day One Skills');
 //        $data->set('plugin.email', 'fvas-elearning@unimelb.edu.au');
 //        $data->save();
+
     }
 
     /**
      * Deactivate the plugin removing any DB data and settings
      * Will only be called when deactivating the plugin in the
      * plugin control panel
-     *
      */
     function doDeactivate()
     {
@@ -97,7 +78,6 @@ class Plugin extends \Tk\Plugin\Iface
         $db = \App\Factory::getDb();
 
         // TODO: are we sure we want to remove data, preserve for historic access, this will need an archive strategy
-
 
         // Clear the data table of all plugin data
 //        $sql = sprintf('DELETE FROM %s WHERE %s LIKE %s', $db->quoteParameter(\Tk\Db\Data::$DB_TABLE), $db->quoteParameter('fkey'),
@@ -121,32 +101,5 @@ class Plugin extends \Tk\Plugin\Iface
 //        $data->save();
     }
 
-    /**
-     * Get the course settings URL, if null then there is none
-     *
-     * @param string $zoneName
-     * @return null|string|\Tk\Uri
-     */
-    public function getZoneSettingsUrl($zoneName)
-    {
-//        switch ($zoneName) {
-//            case self::ZONE_INSTITUTION:
-//                return \Tk\Uri::create('/skill/institutionSettings.html');
-//            case self::ZONE_COURSE_PROFILE:
-//                return \Tk\Uri::create('/skill/profileSettings.html');
-//            case self::ZONE_COURSE:
-//                return \Tk\Uri::create('/skill/courseSettings.html');
-//        }
-        return null;
-    }
-
-    /**
-     * @return \Tk\Uri
-     */
-    public function getSettingsUrl()
-    {
-        return null;
-        //return \Tk\Uri::create('/skill/adminSettings.html');
-    }
 
 }

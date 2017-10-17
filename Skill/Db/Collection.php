@@ -43,9 +43,9 @@ class Collection extends \Tk\Db\Map\Model
 
     /**
      *  A list of placement statuses that the collection is available for submission/editing by user
-     * @var string
+     * @var array
      */
-    public $available = '';
+    public $available = array();
 
     /**
      * enable/disable user submission/editing
@@ -121,6 +121,15 @@ class Collection extends \Tk\Db\Map\Model
             $this->profile = \App\Db\ProfileMap::create()->find($this->profileId);
         }
         return $this->profile;
+    }
+
+    /**
+     * @param string $placementStatus
+     * @return bool
+     */
+    public function isAvailable($placementStatus)
+    {
+        return in_array($placementStatus, $this->available);
     }
 
     /**

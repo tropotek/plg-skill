@@ -54,6 +54,10 @@ class Manager extends AdminManagerIface
 
         $this->table->addCell(new \Tk\Table\Cell\Checkbox('id'));
         $this->table->addCell(new \Tk\Table\Cell\Text('title'))->addCss('key')->setUrl(clone $this->editUrl);
+        $this->table->addCell(new \Tk\Table\Cell\Text('average'))->setOnPropertyValue(function ($cell, $obj) {
+            /** @var \Skill\Db\Entry $obj */
+            return sprintf('%.2f', $obj->getAverage());
+        });
         $this->table->addCell(new \Tk\Table\Cell\Text('status'));
         $this->table->addCell(new \Tk\Table\Cell\Text('userId'))->setOnPropertyValue(function ($cell, $obj) {
             /** @var \Skill\Db\Entry $obj */
@@ -65,7 +69,6 @@ class Manager extends AdminManagerIface
         $this->table->addCell(new \Tk\Table\Cell\Text('absent'));
         $this->table->addCell(new \Tk\Table\Cell\Boolean('confirm'));
         $this->table->addCell(new \Tk\Table\Cell\Date('created'));
-
 
         // Filters
         $this->table->addFilter(new Field\Input('keywords'))->setAttr('placeholder', 'Keywords');

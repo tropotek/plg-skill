@@ -35,11 +35,11 @@ class SetupHandler implements Subscriber
 //            $dispatcher->addSubscriber(new \Skill\Listener\ExampleHandler(Plugin::ZONE_INSTITUTION, $institution->getId()));
 //        }
 
-        $course = \App\Factory::getCourse();
-        if ($course && $plugin->isZonePluginEnabled(\Skill\Plugin::ZONE_COURSE, $course->getId())) {
-            $config->getLog()->debug($plugin->getName() . ': Sample init course plugin stuff: ' . $course->name);
-            $dispatcher->addSubscriber(new \Skill\Listener\ExampleHandler(\Skill\Plugin::ZONE_COURSE, $course->getId()));
-        }
+//        $course = \App\Factory::getCourse();
+//        if ($course && $plugin->isZonePluginEnabled(\Skill\Plugin::ZONE_COURSE, $course->getId())) {
+//            $config->getLog()->debug($plugin->getName() . ': Sample init course plugin stuff: ' . $course->name);
+//            $dispatcher->addSubscriber(new \Skill\Listener\ExampleHandler(\Skill\Plugin::ZONE_COURSE, $course->getId()));
+//        }
 
         $profile = \App\Factory::getProfile();
         if ($profile && $plugin->isZonePluginEnabled(\Skill\Plugin::ZONE_COURSE_PROFILE, $profile->getId())) {
@@ -48,6 +48,7 @@ class SetupHandler implements Subscriber
             $course = \App\Factory::getCourse();
             if ($course) {
                 $dispatcher->addSubscriber(new \Skill\Listener\EntryManagerButtonHandler($course));
+                $dispatcher->addSubscriber(new \Skill\Listener\PlacementManagerButtonHandler($course));
             }
         }
 

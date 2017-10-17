@@ -32,7 +32,6 @@ class Edit extends AdminEditIface
     protected $statusTable = null;
 
 
-
     /**
      * Iface constructor.
      */
@@ -53,10 +52,18 @@ class Edit extends AdminEditIface
         if ($request->get('entryId')) {
             $this->entry = \Skill\Db\EntryMap::create()->find($request->get('entryId'));
         }
+        if ($request->get('collectionId') && $request->get('placementId')) {
+            $e = \Skill\Db\EntryMap::create()->findFiltered(array('collectionId' => $request->get('collectionId'),
+                'placementId' => $request->get('placementId')))->current();
+            if ($e) $this->entry = $e;
+        }
         $this->collection = $this->entry->getCollection();
 
-        $this->buildForm();
+        if ($this->entry->getId()) {
+            $this->getActionPanel()->addButton(\Tk\Ui\Button::create('View', \App\Uri::create('/skill/entryView.html')->set('entryId', $this->entry->getId()), 'fa fa-eye'));
+        }
 
+        $this->buildForm();
 
         $this->form->load(\Skill\Db\EntryMap::create()->unmapForm($this->entry));
         $this->form->execute($request);
@@ -74,13 +81,18 @@ class Edit extends AdminEditIface
 
     }
 
-
+    /**
+     * buildForm
+     */
     protected function buildForm() 
     {
         $this->form = \App\Factory::createForm('entryEdit');
         $this->form->setParam('renderer', \App\Factory::createFormRenderer($this->form));
 
         $this->form->addField(new Field\Input('title'))->setRequired()->setFieldset('Entry Details');
+        if ($this->entry->getId()) {
+            $this->form->addField(new Field\Html('averageScore', $this->entry->getAverage()))->setFieldset('Entry Details');
+        }
 
         if ($this->getUser()->isStaff()) {
             $this->form->addField(new \App\Form\Field\CheckSelect('status', \App\Db\Company::getStatusList(),'notify', 'Un-check to disable sending of email messages.'))
@@ -92,16 +104,20 @@ class Edit extends AdminEditIface
         $this->form->addField(new Field\Input('absent'))->setFieldset('Entry Details');
         $this->form->addField(new Field\Textarea('notes'))->addCss('tkTextareaTool')->setFieldset('Entry Details');
 
-
         $items = \Skill\Db\ItemMap::create()->findFiltered(array('collectionId' => $this->collection->getId()),
             \Tk\Db\Tool::create('category_id, order_by'));
         /** @var \Skill\Db\Item $item */
         foreach ($items as $item) {
-            $this->form->addField(new \Skill\Form\Field\Item($item))->setLabel(null)->setValue(\Skill\Db\EntryMap::create()->findValue($this->entry->getId(), $item->getId())->value);
+            $fld = $this->form->addField(new \Skill\Form\Field\Item($item))->setLabel(null);
+            $val = \Skill\Db\EntryMap::create()->findValue($this->entry->getId(), $item->getId());
+            if ($val) {
+                $fld->setValue($val->value);
+            }
         }
 
-        $this->form->addField(new \Skill\Form\Field\Confirm('confirm', $this->collection->confirm))->setLabel(null)->setFieldset('Confirmation')->setValue(true);
-
+        $radioBtn = new \Tk\Form\Field\RadioButton('confirm', $this->collection->confirm);
+        $radioBtn->appendOption('Yes', '1', 'fa fa-check')->appendOption('No', '0', 'fa fa-ban');
+        $this->form->addField($radioBtn)->setLabel(null)->setFieldset('Confirmation')->setValue(true);
 
         $this->form->addField(new Event\Button('update', array($this, 'doSubmit')));
         $this->form->addField(new Event\Button('save', array($this, 'doSubmit')));
@@ -123,17 +139,20 @@ class Edit extends AdminEditIface
 
         $form->addFieldErrors($this->entry->validate());
 
-
-
-        vd($form->getValues());
-
-
-
         if ($form->hasErrors()) {
             return;
         }
+
         $this->entry->save();
 
+        // Save Item values
+        \Skill\Db\EntryMap::create()->removeValue($this->entry->getId());
+        foreach ($form->getValues('/^item\-/') as $name => $val) {
+            $id = (int)substr($name, strrpos($name, '-')+1);
+            \Skill\Db\EntryMap::create()->saveValue($this->entry->getId(), $id, (int)$val);
+        }
+
+        // Save status
         \App\Db\Status::create(\Skill\Status\EntryHandler::create($this->entry), $form->getFieldValue('status'),
             $this->entry->getId(), $this->entry->courseId, $form->getFieldValue('statusNotes'));
 
@@ -154,6 +173,9 @@ class Edit extends AdminEditIface
         // Render the form
         $template->insertTemplate('form', $this->form->getParam('renderer')->show()->getTemplate());
 
+        $template->appendCssUrl(\Tk\Uri::create('/plugin/ems-skill/assets/skill.less'));
+        $template->appendJsUrl(\Tk\Uri::create('/plugin/ems-skill/assets/skill.js'));
+
         if ($this->entry->getId()) {
             $template->setChoice('edit');
 
@@ -162,6 +184,8 @@ class Edit extends AdminEditIface
                 $template->setChoice('statusLog');
             }
         }
+
+        $template->insertHtml('instructions', $this->entry->getCollection()->instructions);
 
         $css = <<<CSS
 .form-group.tk-item:nth-child(odd) .skill-item {
@@ -188,6 +212,7 @@ CSS;
       <h4 class="panel-title"><i class="fa fa-pencil"></i> <span var="panel-title">Skill Entry Edit</span></h4>
     </div>
     <div class="panel-body">
+      <div var="instructions"></div>
       <div var="form"></div>
     </div>
   </div>

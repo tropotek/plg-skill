@@ -68,12 +68,17 @@ class Edit extends AdminEditIface
         $this->form->addField(new Field\Input('name'))->setNotes('Create a label for this collection');
         $list = array('-- Select --' => '', 'Staff' => 'staff', 'Student' => 'student', 'Company' => 'company', 'Supervisor' => 'supervisor');
         $this->form->addField(new Field\Select('role', $list));
+
         $this->form->addField(new Field\Input('icon'))->setNotes('TODO: Create a jquery plugin to select icons.... Select an Icon for this collection.');
+
+        $list = array('fa fa-eye', 'fa fa-check', 'fa fa-comments', 'fa fa-cutlery', 'fa fa-desktop', 'fa fa-drivers-license'
+        , 'fa fa-envira', 'fa fa-database', 'fa fa-cut', 'fa fa-euro', 'fa fa-cube', 'fa fa-crop', 'tk tk-goals');
+        $this->form->addField(new Field\Select('icon', Field\Select::arrayToSelectList($list, false)))->addCss('iconpicker')->setNotes('Select an icon for this collection');
 
         $list = array('#ffffcc', '#e8fdff', '#ac725e', '#d06b64', '#f83a22', '#fa573c', '#ff7537', '#ffad46', '#42d692',
             '#16a765', '#7bd148', '#b3dc6c', '#fbe983', '#fad165', '#92e1c0', '#9fe1e7', '#9fc6e7', '#4986e7', '#9a9cff', '#b99aff',
             '#c2c2c2', '#cabdbf', '#cca6ac', '#f691b2', '#cd74e6', '#a47ae2');
-        $this->form->addField(new Field\Select('color', $list))->addCss('colorpicker')->setNotes('Select a color scheme for this collection');
+        $this->form->addField(new Field\Select('color', Field\Select::arrayToSelectList($list, false)))->addCss('colorpicker')->setNotes('Select a color scheme for this collection');
 
         $list = \Tk\Form\Field\Select::arrayToSelectList(\Tk\Object::getClassConstants('\App\Db\Placement', 'STATUS'));
         $this->form->addField(new Field\Select('available[]', $list))->addCss('tk-dual-select')->setAttr('data-title', 'Placement Status')->setNotes('Enable this collection on the following placement status');

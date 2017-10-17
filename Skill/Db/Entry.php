@@ -168,6 +168,33 @@ class Entry extends \Tk\Db\Map\Model
 
 
     /**
+     * Get the entry values average, this average is not weighted to the Domain.weight values
+     *
+     * @return float
+     */
+    public function getAverage($excludeZero = true)
+    {
+        $grades = array();
+        $valueList = EntryMap::create()->findValue($this->getId());
+        foreach ($valueList as $value) {
+            if (!$value->value && $excludeZero) continue;
+            $grades[$value->item_id] = (int)$value->value;
+        }
+        return round(\Tk\Math::average($grades), 2);
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+    /**
      *
      */
     public function validate()
