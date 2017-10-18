@@ -156,4 +156,88 @@ class CollectionMap extends \App\Db\Mapper
         return $res;
     }
 
+
+    // Link to placement types
+
+    /**
+     * @param int $collectionId
+     * @param int $placementTypeId
+     * @return boolean
+     */
+    public function hasPlacementType($collectionId, $placementTypeId)
+    {
+        $stm = $this->getDb()->prepare('SELECT * FROM skill_collection_placement_type WHERE collection_id = ? AND placement_type_id = ?');
+        $stm->bindParam(1, $collectionId);
+        $stm->bindParam(2, $placementTypeId);
+        $stm->execute();
+        return ($stm->rowCount() > 0);
+    }
+
+    /**
+     * @param int $collectionId
+     * @param int $placementTypeId (optional) If null all are to be removed
+     */
+    public function removePlacementType($collectionId, $placementTypeId = null)
+    {
+        $stm = $this->getDb()->prepare('DELETE FROM skill_collection_placement_type WHERE collection_id = ?');
+        $stm->bindParam(1, $collectionId);
+        if ($placementTypeId) {
+            $stm = $this->getDb()->prepare('DELETE FROM skill_collection_placement_type WHERE collection_id = ? AND placement_type_id = ?');
+            $stm->bindParam(1, $collectionId);
+            $stm->bindParam(2, $placementTypeId);
+        }
+        $stm->execute();
+    }
+
+    /**
+     * @param int $collectionId
+     * @param int $placementTypeId
+     */
+    public function addPlacementType($collectionId, $placementTypeId)
+    {
+        $stm = $this->getDb()->prepare('INSERT INTO skill_collection_placement_type (collection_id, placement_type_id)  VALUES (?, ?)');
+        $stm->bindParam(1, $collectionId);
+        $stm->bindParam(2, $placementTypeId);
+        $stm->execute();
+    }
+
+    /**
+     * @param int $collectionId
+     * @return array
+     */
+    public function findPlacementTypes($collectionId)
+    {
+        $stm = $this->getDb()->prepare('SELECT placement_type_id FROM skill_collection_placement_type WHERE collection_id = ?');
+        $stm->bindParam(1, $collectionId);
+        $stm->execute();
+        $arr = array();
+        foreach($stm as $row) {
+            $arr[] = $row->placement_type_id;
+        }
+        return $arr;
+    }
+
+
+
+
+
+
+    public function findCourseAverage($collectionId, $courseId)
+    {
+        $stm = $this->getDb()->prepare('SELECT * 
+          FROM skill_value a, skill_entry b LEFT JOIN skill_item c ON (b.item_id = c.id) LEFT JOIN skill_domain d ON (c.domain_id = d.id)   
+          WHERE a.id = b.entry_id AND collection_id = ? AND course_id = ? ');
+        $stm->bindParam(1, $collectionId);
+        $stm->execute();
+        $arr = array();
+        foreach($stm as $row) {
+            $arr[] = $row->placement_type_id;
+        }
+        return $arr;
+    }
+
+
+
+
+
 }

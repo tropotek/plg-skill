@@ -44,6 +44,12 @@ CREATE TABLE IF NOT EXISTS skill_collection (
   KEY del (del)
 ) ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS skill_collection_placement_type (
+  collection_id INT UNSIGNED NOT NULL DEFAULT 0,
+  placement_type_id INT UNSIGNED NOT NULL DEFAULT 0,
+  PRIMARY KEY (collection_id, placement_type_id)
+) ENGINE=InnoDB;
+
 CREATE TABLE IF NOT EXISTS skill_domain (
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   uid VARCHAR(128) NOT NULL DEFAULT '',
@@ -111,15 +117,10 @@ CREATE TABLE IF NOT EXISTS skill_item (
   del BOOL NOT NULL DEFAULT 0,
   modified DATETIME NOT NULL,
   created DATETIME NOT NULL,
-  -- KEY (category_id),
+  KEY (category_id),
   KEY (collection_id),
   KEY (del)
 ) ENGINE=InnoDB;
-
-
-
-
-
 
 
 -- These are the instance tables.
@@ -160,9 +161,7 @@ CREATE TABLE IF NOT EXISTS skill_value (
   entry_id INT UNSIGNED NOT NULL DEFAULT 0,
   item_id INT UNSIGNED NOT NULL DEFAULT 0,
   value TEXT,
-  PRIMARY KEY (entry_id, item_id),
-  KEY (entry_id),
-  KEY (item_id)
+  PRIMARY KEY (entry_id, item_id)
 ) ENGINE=InnoDB;
 
 

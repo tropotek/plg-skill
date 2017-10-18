@@ -3,6 +3,7 @@ namespace Skill\Controller\Collection;
 
 use App\Controller\AdminEditIface;
 use Dom\Template;
+use Skill\Db\CollectionMap;
 use Tk\Form\Event;
 use Tk\Form\Field;
 use Tk\Request;
@@ -45,6 +46,8 @@ class Edit extends AdminEditIface
 
         $this->buildForm();
 
+
+
         $this->form->load(\Skill\Db\CollectionMap::create()->unmapForm($this->collection));
         $this->form->execute($request);
     }
@@ -73,17 +76,10 @@ class Edit extends AdminEditIface
         $list = \Tk\Form\Field\Select::arrayToSelectList(\Tk\Object::getClassConstants('\App\Db\Placement', 'STATUS'));
         $this->form->addField(new Field\Select('available[]', $list))->addCss('tk-dual-select')->setAttr('data-title', 'Placement Status')->setNotes('Enable this collection on the following placement status');
 
-
-        // TODO TODO TODO TODO TODO TODO TODO
-        // TODO TODO TODO TODO TODO TODO TODO
-        // TODO TODO TODO TODO TODO TODO TODO
-        // TODO TODO TODO TODO TODO TODO TODO
-        // TODO TODO TODO TODO TODO TODO TODO
-        // TODO TODO TODO TODO TODO TODO TODO
         $list = \App\Db\PlacementTypeMap::create()->findFiltered(array('profileId' => $this->collection->getProfile()->getId()));
-        $this->form->addField(new Field\Select('placementtypeId[]', \Tk\Form\Field\Option\ArrayObjectIterator::create($list)))->addCss('tk-dual-select')->setAttr('data-title', 'Placement Types')->setNotes('Enable this collection for the selected placement types.');
-
-
+        $ptiField = $this->form->addField(new Field\Select('placementTypeId[]', \Tk\Form\Field\Option\ArrayObjectIterator::create($list)))->addCss('tk-dual-select')->setAttr('data-title', 'Placement Types')->setNotes('Enable this collection for the selected placement types.');
+        $list = \Skill\Db\CollectionMap::create()->findPlacementTypes($this->collection->getId());
+        $ptiField->setValue($list);
 
         $this->form->addField(new Field\Checkbox('active'))->setNotes('Enable this collection for user submissions.');
         $this->form->addField(new Field\Checkbox('viewGrade'))->setNotes('Allow students to view their course results from all entries from this collection.');
@@ -117,6 +113,13 @@ class Edit extends AdminEditIface
         }
         $this->collection->save();
 
+        $placemenTypeIds = $form->getFieldValue('placementTypeId');
+        \Skill\Db\CollectionMap::create()->removePlacementType($this->collection->getId());
+        if (count($placemenTypeIds)) {
+            foreach ($placemenTypeIds as $placementTypeId) {
+                \Skill\Db\CollectionMap::create()->addPlacementType($this->collection->getId(), $placementTypeId);
+            }
+        }
 
         \Tk\Alert::addSuccess('Record saved!');
         if ($form->getTriggeredEvent()->getName() == 'update') {

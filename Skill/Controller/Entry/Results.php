@@ -2,6 +2,7 @@
 namespace Skill\Controller\Entry;
 
 use App\Controller\AdminEditIface;
+use App\Controller\AdminIface;
 use Dom\Template;
 use Tk\Form\Event;
 use Tk\Form\Field;
@@ -13,13 +14,18 @@ use Tk\Request;
  * @link http://www.tropotek.com/
  * @license Copyright 2015 Michael Mifsud
  */
-class Results extends AdminEditIface
+class Results extends AdminIface
 {
 
     /**
-     * @var \Skill\Db\Entry
+     * @var \App\Db\User
      */
-    protected $entry = null;
+    protected $user = null;
+
+    /**
+     * @var \Skill\Db\Collection
+     */
+    protected $collection = null;
 
 
 
@@ -29,7 +35,7 @@ class Results extends AdminEditIface
     public function __construct()
     {
         parent::__construct();
-        $this->setPageTitle('Skill Student Results');
+        $this->setPageTitle('Results');
     }
 
     /**
@@ -38,56 +44,12 @@ class Results extends AdminEditIface
      */
     public function doDefault(Request $request)
     {
-        $this->entry = \Skill\Db\EntryMap::create()->find($request->get('entryId'));
-        $this->collection = $this->entry->getCollection();
+        $this->user = \App\Db\UserMap::create()->find($request->get('userId'));
+        $this->collection = \Skill\Db\CollectionMap::create()->find($request->get('collectionId'));
 
-        $this->buildForm();
-
-        $this->form->load(\Skill\Db\EntryMap::create()->unmapForm($this->entry));
-        $this->form->execute($request);
 
     }
 
-    /**
-     *
-     */
-    protected function buildForm() 
-    {
-        $this->form = \App\Factory::createForm('entryEdit');
-        $this->form->setParam('renderer', \App\Factory::createFormRenderer($this->form));
-
-        $this->form->addField(new Field\Html('title'))->setFieldset('Entry Details');
-        if($this->getUser()->isStaff() || $this->entry->getCollection()->viewGrade) {
-            $this->form->addField(new Field\Html('averageScore', $this->entry->calcAverage()))->setFieldset('Entry Details');
-        }
-
-
-        $this->form->addField(new Field\Html('status'))->setFieldset('Entry Details');
-        $this->form->addField(new Field\Html('assessor'))->setFieldset('Entry Details');
-        $this->form->addField(new Field\Html('absent'))->setLabel('Days Absent')->setFieldset('Entry Details');
-        if ($this->entry->getCollection()->confirm) {
-            $s = ($this->entry->confirm === null ? '' : ($this->entry->confirm ? 'Yes' : 'No'));
-            $this->form->addField(new Field\Html('confirm', $s))->setFieldset('Entry Details')->setNotes($this->entry->getCollection()->confirm);
-        }
-        if ($this->entry->notes)
-            $this->form->addField(new Field\Html('notes'))->setFieldset('Entry Details');
-
-        $items = \Skill\Db\ItemMap::create()->findFiltered(array('collectionId' => $this->entry->getCollection()->getId()),
-            \Tk\Db\Tool::create('category_id, order_by'));
-
-        /** @var \Skill\Db\Item $item */
-        foreach ($items as $item) {
-            $fld = $this->form->addField(new \Skill\Form\Field\Item($item))->setLabel(null)->setDisabled();
-            $val = \Skill\Db\EntryMap::create()->findValue($this->entry->getId(), $item->getId());
-            if ($val)
-                $fld->setValue($val->value);
-        }
-
-//        $radioBtn = new \Tk\Form\Field\RadioButton('confirm', $this->collection->confirm);
-//        $radioBtn->appendOption('Yes', '1', 'fa fa-check')->appendOption('No', '0', 'fa fa-ban');
-//        $this->form->addField($radioBtn)->setLabel(null)->setFieldset('Confirmation')->setValue(true);
-
-    }
 
     /**
      * @return \Dom\Template
@@ -96,23 +58,17 @@ class Results extends AdminEditIface
     {
         $template = parent::show();
 
-        // Render the form
-        $template->insertTemplate('form', $this->form->getParam('renderer')->show()->getTemplate());
+        if ($this->collection->icon) {
+            $template->addCss('icon', $this->collection->icon);
+        }
+        $panelTitle = sprintf('%s Results for `%s`', $this->collection->name, $this->user->name);
+        $template->insertText('panel-title', $panelTitle);
 
-        $template->appendCssUrl(\Tk\Uri::create('/plugin/ems-skill/assets/skill.less'));
-        $template->appendJsUrl(\Tk\Uri::create('/plugin/ems-skill/assets/skill.js'));
 
-        //$template->insertHtml('instructions', $this->entry->getCollection()->instructions);
+        $entryList = \Skill\Db\EntryMap::create()->findFiltered(array('userId' => $this->user->getId(), 'collectionId' => $this->collection->getId(), 'courseId' => $this->getCourse()->getId()), \Tk\Db\Tool::create('created DESC'));
+        $template->insertText('entryCount', count($entryList));
 
-        $css = <<<CSS
-.form-group.tk-item:nth-child(odd) .skill-item {
-  background-color: {$this->entry->getCollection()->color};
-}
-.tk-form fieldset:first-child legend {
-  display: none !important;
-}
-CSS;
-        $template->appendCss($css);
+
 
         return $template;
     }
@@ -125,15 +81,24 @@ CSS;
     public function __makeTemplate()
     {
         $xhtml = <<<HTML
-<div class="EntryEdit">
+<div class="EntryResults">
   
   <div class="panel panel-default">
     <div class="panel-heading">
-      <h4 class="panel-title"><i class="fa fa-eye"></i> <span var="panel-title">Skill Entry View</span></h4>
+      <h4 class="panel-title"><i class="fa fa-eye" var="icon"></i> <span var="panel-title">Skill Entry Results</span></h4>
     </div>
     <div class="panel-body">
-      <div var="instructions"></div>
-      <div var="form"></div>
+    
+      <ul class="data">
+        <li>Placements Assessed: <span var="entryCount">0</span></li>
+        <li>Total Result: <span var="total">0</span></li>
+        
+        <li>Course Min: <span var="min">0</span></li>
+        <li>Course Max: <span var="max">0</span></li>
+        <li>Course Median: <span var="med">0</span></li>
+      </ul>
+      
+      
     </div>
   </div>
   

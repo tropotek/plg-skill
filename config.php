@@ -32,9 +32,9 @@ $routes->add('skill-entry-edit',               new \Tk\Routing\Route('/skill/ent
 $routes->add('skill-entry-view',               new \Tk\Routing\Route('/skill/entryView.html',              'Skill\Controller\Entry\View::doDefault', $params));
 
 
-$routes->add('skill-entry-results',            new \Tk\Routing\Route('/skill/entryResults.html',      'Skill\Controller\Entry\Results::doDefault', $params));
+$routes->add('skill-entry-results-staff',      new \Tk\Routing\Route('/staff/{courseCode}/skillEntryResults.html', 'Skill\Controller\Entry\Results::doDefault', $params));
+$routes->add('skill-entry-results-student',    new \Tk\Routing\Route('/student/{courseCode}/skillEntryResults.html', 'Skill\Controller\Entry\Results::doDefault', $params));
+
+
+// Staff Only
 $routes->add('skill-collection-report',        new \Tk\Routing\Route('/skill/collectionReport.html',  'Skill\Controller\Collection\Report::doDefault', $params));
-
-
-
-

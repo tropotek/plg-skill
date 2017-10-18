@@ -34,6 +34,7 @@ class CourseUserListButtonHandler implements Subscriber
         /** @var \App\Controller\Staff\CourseDashboard $controller */
         $controller = $event->get('controller');
         if ($controller instanceof \App\Controller\Staff\CourseDashboard) {
+
             $course = $controller->getCourse();
             $userList = $controller->getCourseUserList();
             $userList->setOnShowUser(function (\Dom\Template $template, \App\Db\User $user) use ($course) {
@@ -41,10 +42,16 @@ class CourseUserListButtonHandler implements Subscriber
                     'gradable' => true, 'view_grade' => true));
                 /** @var \Skill\Db\Collection $collection */
                 foreach ($collectionList as $collection) {
-                    $btn = \Tk\Ui\Button::create($collection->name . ' Results', \Tk\Uri::create('/skill/entryResults.html')->
-                        set('courseId', $course->getId())->set('userid', $user->getId()), $collection->icon);
-                    $btn->addCss('btn-success btn-xs');
-                    $template->prependTemplate('utr-row2', $btn->show());
+                    $placementTypeIdList = \Skill\Db\CollectionMap::create()->findPlacementTypes($collection->getId());
+                    $placementStatusList = $collection->available;
+                    // if user has a placement of at least one of the types and statuses used by the collection
+                    if (\App\Db\PlacementMap::create()->userHasTypes($user->getId(), $placementTypeIdList, $placementStatusList)) {
+                        $btn = \Tk\Ui\Button::create($collection->name . ' Results', \App\Uri::createCourseUrl('/skillEntryResults.html')->
+                            set('userId', $user->getId())->set('collectionId', $collection->getId()), $collection->icon);
+                        $btn->addCss('btn-success btn-xs');
+                        $btn->setAttr('title', 'View Student ' . $collection->name . ' Results');
+                        $template->prependTemplate('utr-row2', $btn->show());
+                    }
                 }
             });
         }
