@@ -31,7 +31,9 @@ class CollectionMap extends \App\Db\Mapper
             $this->dbMap->addPropertyMap(new Db\Text('color'));
             $this->dbMap->addPropertyMap(new Db\ArrayObject('available'));
             $this->dbMap->addPropertyMap(new Db\Boolean('active'));
+            $this->dbMap->addPropertyMap(new Db\Boolean('gradable'));
             $this->dbMap->addPropertyMap(new Db\Boolean('viewGrade', 'view_grade'));
+            $this->dbMap->addPropertyMap(new Db\Boolean('includeZero', 'include_zero'));
             $this->dbMap->addPropertyMap(new Db\Text('confirm'));
             $this->dbMap->addPropertyMap(new Db\Text('instructions'));
             $this->dbMap->addPropertyMap(new Db\Text('notes'));
@@ -56,7 +58,9 @@ class CollectionMap extends \App\Db\Mapper
             $this->formMap->addPropertyMap(new Form\Text('color'));
             $this->formMap->addPropertyMap(new Form\Object('available'));
             $this->formMap->addPropertyMap(new Form\Boolean('active'));
+            $this->formMap->addPropertyMap(new Form\Boolean('gradable'));
             $this->formMap->addPropertyMap(new Form\Boolean('viewGrade'));
+            $this->formMap->addPropertyMap(new Form\Boolean('includeZero'));
             $this->formMap->addPropertyMap(new Form\Text('confirm'));
             $this->formMap->addPropertyMap(new Form\Text('instructions'));
             $this->formMap->addPropertyMap(new Form\Text('notes'));
@@ -117,23 +121,19 @@ class CollectionMap extends \App\Db\Mapper
             $where .= sprintf('a.color = %s AND ', $this->quote($filter['color']));
         }
 
-        if (!empty($filter['viewResults'])) {
-            $where .= sprintf('a.view_results = %s AND ', (int)$filter['viewResults']);
+        if (!empty($filter['gradable'])) {
+            $where .= sprintf('a.gradable = %s AND ', (int)$filter['gradable']);
+        }
+
+        if (!empty($filter['viewGrade'])) {
+            $where .= sprintf('a.view_grade = %s AND ', (int)$filter['viewGrade']);
         }
 
         if (!empty($filter['active'])) {
             $where .= sprintf('a.active = %s AND ', (int)$filter['active']);
         }
 
-
-
         // Find all collections that are enabled for the given placement statuses
-//        if (!empty($filter['status'])) {
-//            $w = $this->makeMultiQuery($filter['status'], 'd.available');
-//            if ($w) {
-//                $where .= '('. $w . ') AND ';
-//            }
-//        }
         if (!empty($filter['available'])) {
             $w = $this->makeMultiQuery($filter['available'], 'd.available');
             if ($w) {

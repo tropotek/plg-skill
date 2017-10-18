@@ -4,8 +4,6 @@ namespace Skill\Listener;
 use Tk\Event\Subscriber;
 
 /**
- * Class StartupHandler
- *
  * @author Michael Mifsud <info@tropotek.com>
  * @link http://www.tropotek.com/
  * @license Copyright 2015 Michael Mifsud
@@ -49,6 +47,7 @@ class SetupHandler implements Subscriber
             if ($course) {
                 $dispatcher->addSubscriber(new \Skill\Listener\EntryManagerButtonHandler($course));
                 $dispatcher->addSubscriber(new \Skill\Listener\PlacementManagerButtonHandler($course));
+                $dispatcher->addSubscriber(new \Skill\Listener\CourseUserListButtonHandler($course));
             }
         }
 

@@ -113,11 +113,11 @@ class Scale extends \Tk\Db\Map\Model
      */
     public function getValue()
     {
-        $list = ScaleMap::create()->findFiltered(array('profileId' => $this->collectionId), \Tk\Db\Tool::create('order_by'));
+        $list = ScaleMap::create()->findFiltered(array('collectionId' => $this->collectionId), \Tk\Db\Tool::create('order_by'));
         $cnt = count($list)-1;
         $pos = 0;
         $val = 0;
-        /** @var \App\Db\Scale $s */
+        /** @var Scale $s */
         foreach ($list as $i => $s) {
             if ($s->getId() == $this->getId()) {
                 $pos = $i;

@@ -31,6 +31,8 @@ class EntryMap extends \App\Db\Mapper
             $this->dbMap->addPropertyMap(new Db\Text('title'));
             $this->dbMap->addPropertyMap(new Db\Text('assessor'));
             $this->dbMap->addPropertyMap(new Db\Integer('absent'));
+            $this->dbMap->addPropertyMap(new Db\Decimal('average'));
+            $this->dbMap->addPropertyMap(new Db\Decimal('weightedAverage', 'weighted_average'));
             $this->dbMap->addPropertyMap(new Db\Text('confirm'));
             $this->dbMap->addPropertyMap(new Db\Text('status'));
             $this->dbMap->addPropertyMap(new Db\Text('notes'));
@@ -55,6 +57,8 @@ class EntryMap extends \App\Db\Mapper
             $this->formMap->addPropertyMap(new Form\Text('title'));
             $this->formMap->addPropertyMap(new Form\Text('assessor'));
             $this->formMap->addPropertyMap(new Form\Integer('absent'));
+//            $this->formMap->addPropertyMap(new Form\Decimal('average'));
+//            $this->formMap->addPropertyMap(new Form\Decimal('weightedAverage'));
             $this->formMap->addPropertyMap(new Form\Text('confirm'));
             $this->formMap->addPropertyMap(new Form\Text('status'));
             $this->formMap->addPropertyMap(new Form\Text('notes'));
@@ -131,8 +135,6 @@ class EntryMap extends \App\Db\Mapper
         //vd($from, $where);
         return $res;
     }
-
-
 
 
     /**

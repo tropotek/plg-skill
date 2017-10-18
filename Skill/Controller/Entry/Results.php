@@ -13,7 +13,7 @@ use Tk\Request;
  * @link http://www.tropotek.com/
  * @license Copyright 2015 Michael Mifsud
  */
-class View extends AdminEditIface
+class Results extends AdminEditIface
 {
 
     /**
@@ -29,7 +29,7 @@ class View extends AdminEditIface
     public function __construct()
     {
         parent::__construct();
-        $this->setPageTitle('Skill Entry View');
+        $this->setPageTitle('Skill Student Results');
     }
 
     /**
@@ -39,6 +39,7 @@ class View extends AdminEditIface
     public function doDefault(Request $request)
     {
         $this->entry = \Skill\Db\EntryMap::create()->find($request->get('entryId'));
+        $this->collection = $this->entry->getCollection();
 
         $this->buildForm();
 
@@ -56,11 +57,8 @@ class View extends AdminEditIface
         $this->form->setParam('renderer', \App\Factory::createFormRenderer($this->form));
 
         $this->form->addField(new Field\Html('title'))->setFieldset('Entry Details');
-        if($this->entry->getCollection()->gradable && ($this->getUser()->isStaff() || $this->entry->getCollection()->viewGrade)) {
-            $pct = round(($this->entry->average/($this->entry->getCollection()->getScaleLength()-1))*100);
-            $this->form->addField(new Field\Html('average', sprintf('%.2f &nbsp; (%d%%)', $this->entry->average, $pct)))->setFieldset('Entry Details');
-            $pct = round(($this->entry->weightedAverage/($this->entry->getCollection()->getScaleLength()-1))*100);
-            $this->form->addField(new Field\Html('weightedAverage', sprintf('%.2f &nbsp; (%d%%)', $this->entry->weightedAverage, $pct)))->setFieldset('Entry Details');
+        if($this->getUser()->isStaff() || $this->entry->getCollection()->viewGrade) {
+            $this->form->addField(new Field\Html('averageScore', $this->entry->calcAverage()))->setFieldset('Entry Details');
         }
 
 
@@ -85,6 +83,10 @@ class View extends AdminEditIface
                 $fld->setValue($val->value);
         }
 
+//        $radioBtn = new \Tk\Form\Field\RadioButton('confirm', $this->collection->confirm);
+//        $radioBtn->appendOption('Yes', '1', 'fa fa-check')->appendOption('No', '0', 'fa fa-ban');
+//        $this->form->addField($radioBtn)->setLabel(null)->setFieldset('Confirmation')->setValue(true);
+
     }
 
     /**
@@ -99,6 +101,8 @@ class View extends AdminEditIface
 
         $template->appendCssUrl(\Tk\Uri::create('/plugin/ems-skill/assets/skill.less'));
         $template->appendJsUrl(\Tk\Uri::create('/plugin/ems-skill/assets/skill.js'));
+
+        //$template->insertHtml('instructions', $this->entry->getCollection()->instructions);
 
         $css = <<<CSS
 .form-group.tk-item:nth-child(odd) .skill-item {

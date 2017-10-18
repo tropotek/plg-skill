@@ -85,8 +85,11 @@ class Edit extends AdminEditIface
         $this->form->setParam('renderer', \App\Factory::createFormRenderer($this->form));
 
         $this->form->addField(new Field\Input('title'))->setRequired()->setFieldset('Entry Details');
-        if ($this->entry->getId()) {
-            $this->form->addField(new Field\Html('averageScore', $this->entry->getAverage()))->setFieldset('Entry Details');
+        if ($this->entry->getId() && $this->entry->getCollection()->gradable) {
+            $pct = round(($this->entry->average/($this->entry->getCollection()->getScaleLength()-1))*100);
+            $this->form->addField(new Field\Html('average', sprintf('%.2f &nbsp; (%d%%)', $this->entry->average, $pct)))->setFieldset('Entry Details');
+            $pct = round(($this->entry->weightedAverage/($this->entry->getCollection()->getScaleLength()-1))*100);
+            $this->form->addField(new Field\Html('weightedAverage', sprintf('%.2f &nbsp; (%d%%)', $this->entry->weightedAverage, $pct)))->setFieldset('Entry Details');
         }
 
         if ($this->getUser()->isStaff()) {
@@ -139,14 +142,14 @@ class Edit extends AdminEditIface
             return;
         }
 
-        $this->entry->save();
-
         // Save Item values
-        \Skill\Db\EntryMap::create()->removeValue($this->entry->getId());
+        \Skill\Db\EntryMap::create()->removeValue($this->entry->getVolatileId());
         foreach ($form->getValues('/^item\-/') as $name => $val) {
             $id = (int)substr($name, strrpos($name, '-')+1);
-            \Skill\Db\EntryMap::create()->saveValue($this->entry->getId(), $id, (int)$val);
+            \Skill\Db\EntryMap::create()->saveValue($this->entry->getVolatileId(), $id, (int)$val);
         }
+
+        $this->entry->save();
 
         // Save status
         \App\Db\Status::create(\Skill\Status\EntryHandler::create($this->entry), $form->getFieldValue('status'),
@@ -188,6 +191,9 @@ class Edit extends AdminEditIface
         $css = <<<CSS
 .form-group.tk-item:nth-child(odd) .skill-item {
   background-color: {$this->entry->getCollection()->color};
+}
+.tk-form fieldset:first-child legend {
+  display: none !important;
 }
 CSS;
         $template->appendCss($css);

@@ -2,9 +2,6 @@
 namespace Skill\Listener;
 
 use Tk\Event\Subscriber;
-use Tk\Kernel\KernelEvents;
-use Tk\Event\ControllerEvent;
-use Tk\Event\GetResponseEvent;
 use Tk\Event\Event;
 
 /**

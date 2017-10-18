@@ -26,6 +26,11 @@ class Manager extends AdminManagerIface
      */
     private $editUrl = null;
 
+    /**
+     * @var \Tk\Table\Cell\Actions
+     */
+    protected $actionsCell = null;
+
 
 
     /**
@@ -35,6 +40,14 @@ class Manager extends AdminManagerIface
     {
         parent::__construct();
         $this->setPageTitle('Skill Entry Manager');
+    }
+
+    /**
+     * @return \Tk\Table\Cell\Actions
+     */
+    public function getActionsCell()
+    {
+        return $this->actionsCell;
     }
 
     /**
@@ -49,15 +62,23 @@ class Manager extends AdminManagerIface
             $this->editUrl = \App\Uri::create('/skill/entryEdit.html');
 
 
+        $this->getActionPanel()->addButton(\Tk\Ui\Button::create('Setup',
+            \App\Uri::create('/skill/collectionEdit.html')->set('collectionId', $this->collection->getId()), 'fa fa-gears'));
+        $this->getActionPanel()->addButton(\Tk\Ui\Button::create('Grade Report',
+            \App\Uri::create('/skill/collectionReport.html')->set('collectionId', $this->collection->getId()), 'fa fa-pie-chart'));
+
+
+        $this->actionsCell = new \Tk\Table\Cell\Actions();
+        $this->actionsCell->addButton(\Tk\Table\Cell\ActionButton::create('View Entry',
+            \App\Uri::create('/skill/entryView.html'), 'fa fa-eye'))->setAppendQuery();
+
         $this->table = \App\Factory::createTable(\Tk\Object::basename($this).'_entryList'.$this->collection->name);
         $this->table->setParam('renderer', \App\Factory::createTableRenderer($this->table));
 
         $this->table->addCell(new \Tk\Table\Cell\Checkbox('id'));
+        $this->table->addCell($this->actionsCell);
         $this->table->addCell(new \Tk\Table\Cell\Text('title'))->addCss('key')->setUrl(clone $this->editUrl);
-        $this->table->addCell(new \Tk\Table\Cell\Text('average'))->setOnPropertyValue(function ($cell, $obj) {
-            /** @var \Skill\Db\Entry $obj */
-            return sprintf('%.2f', $obj->getAverage());
-        });
+        $this->table->addCell(new \Tk\Table\Cell\Text('average'));
         $this->table->addCell(new \Tk\Table\Cell\Text('status'));
         $this->table->addCell(new \Tk\Table\Cell\Text('userId'))->setOnPropertyValue(function ($cell, $obj) {
             /** @var \Skill\Db\Entry $obj */

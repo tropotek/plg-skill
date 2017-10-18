@@ -9,7 +9,11 @@ namespace Skill\Db;
  */
 class Collection extends \Tk\Db\Map\Model
 {
-    
+    const ROLE_STAFF    = 'staff';
+    const ROLE_STUDENT  = 'student';
+    const ROLE_COMPANY  = 'company';
+
+
     /**
      * @var int
      */
@@ -59,10 +63,22 @@ class Collection extends \Tk\Db\Map\Model
     public $confirm = '';
 
     /**
+     * Is this collection gradable
+     * @var boolean
+     */
+    public $gradable = false;
+
+    /**
      * Enable students to view their final results of all compiled entry grades
      * @var boolean
      */
     public $viewGrade = false;
+
+    /**
+     * Should the zero values be included in the weighted average calculation
+     * @var boolean
+     */
+    public $includeZero = false;
 
     /**
      * @var string
@@ -71,7 +87,6 @@ class Collection extends \Tk\Db\Map\Model
 
     /**
      * staff only notes
-     *
      * @var string
      */
     public $notes = '';
@@ -130,6 +145,16 @@ class Collection extends \Tk\Db\Map\Model
     public function isAvailable($placementStatus)
     {
         return in_array($placementStatus, $this->available);
+    }
+
+    /**
+     * Get the total number of scale ticks/records for this collection
+     *
+     * @return int
+     */
+    public function getScaleLength()
+    {
+        return ScaleMap::create()->findFiltered(array('collectionId' => $this->getVolatileId()))->count();
     }
 
     /**

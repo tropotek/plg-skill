@@ -5,21 +5,22 @@ use Tk\Event\Subscriber;
 use Tk\Event\Event;
 
 /**
- * Class StartupHandler
- *
  * @author Michael Mifsud <info@tropotek.com>
  * @link http://www.tropotek.com/
  * @license Copyright 2015 Michael Mifsud
  */
-class ProfileEditHandler implements Subscriber
+class CourseUserListButtonHandler implements Subscriber
 {
 
-    private $profileId = 0;
+    /**
+     * @var \App\Db\Course
+     */
+    private $course = null;
 
 
-    public function __construct($profileId)
+    public function __construct($course)
     {
-        $this->profileId = (int)$profileId;
+        $this->course = $course;
     }
 
 
@@ -30,19 +31,23 @@ class ProfileEditHandler implements Subscriber
      */
     public function onControllerInit(Event $event)
     {
-        $plugin = \Skill\Plugin::getInstance();
-        $config = $plugin->getConfig();
-        //$config->getLog()->info($plugin->getName() . ': onControllerAccess(\'profile\', '.$this->profileId.') ');
-
-        /** @var \Tk\Controller\Iface $controller */
+        /** @var \App\Controller\Staff\CourseDashboard $controller */
         $controller = $event->get('controller');
-        if ($controller instanceof \App\Controller\Profile\Edit) {
-            /** @var \Tk\Ui\Admin\ActionPanel $actionPanel */
-            $actionPanel = $controller->getActionPanel();
-            $actionPanel->addButton(\Tk\Ui\Button::create('Skill Collections',
-                \App\Uri::create('/skill/collectionManager.html')->set('profileId', $this->profileId), 'fa fa-graduation-cap'));
+        if ($controller instanceof \App\Controller\Staff\CourseDashboard) {
+            $course = $controller->getCourse();
+            $userList = $controller->getCourseUserList();
+            $userList->setOnShowUser(function (\Dom\Template $template, \App\Db\User $user) use ($course) {
+                $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('profileId' => $course->profileId,
+                    'gradable' => true, 'view_grade' => true));
+                /** @var \Skill\Db\Collection $collection */
+                foreach ($collectionList as $collection) {
+                    $btn = \Tk\Ui\Button::create($collection->name . ' Results', \Tk\Uri::create('/skill/entryResults.html')->
+                        set('courseId', $course->getId())->set('userid', $user->getId()), $collection->icon);
+                    $btn->addCss('btn-success btn-xs');
+                    $template->prependTemplate('utr-row2', $btn->show());
+                }
+            });
         }
-
     }
 
 
@@ -83,7 +88,7 @@ class ProfileEditHandler implements Subscriber
     {
         return array(
             \Tk\PageEvents::CONTROLLER_INIT => array('onControllerInit', 0),
-            \Tk\PageEvents::CONTROLLER_SHOW => array('onControllerShow', 0)
+            //\Tk\PageEvents::CONTROLLER_SHOW => array('onControllerShow', 0)
         );
     }
     

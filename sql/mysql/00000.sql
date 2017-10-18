@@ -31,7 +31,9 @@ CREATE TABLE IF NOT EXISTS skill_collection (
   color VARCHAR(8) DEFAULT '' NOT NULL,           -- the representative color for this collection
   available VARCHAR(255) DEFAULT '' NOT NULL,     -- A list of placement statuses that the collection is available for submission/editing by user
   active BOOL NOT NULL DEFAULT 1,                 -- enable/disable user submission/editing
-  view_grade BOOL DEFAULT 0 NOT NULL,
+  gradable BOOL DEFAULT 0 NOT NULL,               -- Is this collection gradable
+  view_grade BOOL DEFAULT 0 NOT NULL,             -- Can the student view their grade results for this collection
+  include_zero BOOL DEFAULT 1 NOT NULL,           -- Should the zero values be included in the weighted average calculation (Default: true)
   confirm TEXT,
   instructions TEXT,
   notes TEXT,
@@ -133,6 +135,8 @@ CREATE TABLE IF NOT EXISTS skill_entry (
   title VARCHAR(255) NOT NULL DEFAULT '',                   -- A title for the assessment instance
   assessor VARCHAR(128) DEFAULT '' NOT NULL,                -- Name of person assessing the student if not supervisor.
   absent INT(4) DEFAULT '0' NOT NULL,                       -- Number of days absent from placement.
+  average DECIMAL(6,2) NOT NULL DEFAULT 0.0,                -- Average calculated from all item values
+  weighted_average DECIMAL(6,2) NOT NULL DEFAULT 0.0,       -- Average calculated from all item values with their domain weight, including/not zero values
   confirm BOOL NOT NULL DEFAULT 0,                          -- The value of the confirmation question
   status VARCHAR(64) NOT NULL DEFAULT '',                   -- pending, approved, not-approved
   notes TEXT,                                               -- Staff only notes

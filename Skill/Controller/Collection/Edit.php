@@ -56,13 +56,13 @@ class Edit extends AdminEditIface
         $this->form->setParam('renderer', \App\Factory::createFormRenderer($this->form));
 
         $this->form->addField(new Field\Input('name'))->setNotes('Create a label for this collection');
-        $list = array('-- Select --' => '', 'Staff' => 'staff', 'Student' => 'student', 'Company' => 'company', 'Supervisor' => 'supervisor');
-        $this->form->addField(new Field\Select('role', $list));
+        $list = \Tk\Form\Field\Select::arrayToSelectList(\Tk\Object::getClassConstants('\Skill\Db\Collection', 'ROLE'));
+        $this->form->addField(new Field\Select('role', $list))->prependOption('-- Select --', '');
 
         $this->form->addField(new Field\Input('icon'))->setNotes('TODO: Create a jquery plugin to select icons.... Select an Icon for this collection.');
 
-        $list = array('fa fa-eye', 'fa fa-check', 'fa fa-comments', 'fa fa-cutlery', 'fa fa-desktop', 'fa fa-drivers-license'
-        , 'fa fa-envira', 'fa fa-database', 'fa fa-cut', 'fa fa-euro', 'fa fa-cube', 'fa fa-crop', 'tk tk-goals');
+        $list = array('fa fa-eye', 'fa fa-check', 'fa fa-commenting-o', 'fa fa-cutlery', 'fa fa-desktop', 'fa fa-drivers-license'
+        , 'fa fa-question', 'fa fa-database', 'fa fa-cut', 'fa fa-euro', 'fa fa-cube', 'fa fa-crop', 'tk tk-goals');
         $this->form->addField(new Field\Select('icon', Field\Select::arrayToSelectList($list, false)))->addCss('iconpicker')->setNotes('Select an icon for this collection');
 
         $list = array('#ffffcc', '#e8fdff', '#ac725e', '#d06b64', '#f83a22', '#fa573c', '#ff7537', '#ffad46', '#42d692',
@@ -73,12 +73,21 @@ class Edit extends AdminEditIface
         $list = \Tk\Form\Field\Select::arrayToSelectList(\Tk\Object::getClassConstants('\App\Db\Placement', 'STATUS'));
         $this->form->addField(new Field\Select('available[]', $list))->addCss('tk-dual-select')->setAttr('data-title', 'Placement Status')->setNotes('Enable this collection on the following placement status');
 
-        //$list = \Tk\Form\Field\Select::arrayToSelectList(\Tk\Object::getClassConstants('\App\Db\Placement', 'STATUS'));
+
+        // TODO TODO TODO TODO TODO TODO TODO
+        // TODO TODO TODO TODO TODO TODO TODO
+        // TODO TODO TODO TODO TODO TODO TODO
+        // TODO TODO TODO TODO TODO TODO TODO
+        // TODO TODO TODO TODO TODO TODO TODO
+        // TODO TODO TODO TODO TODO TODO TODO
         $list = \App\Db\PlacementTypeMap::create()->findFiltered(array('profileId' => $this->collection->getProfile()->getId()));
-        $this->form->addField(new Field\Select('available[]', \Tk\Form\Field\Option\ArrayObjectIterator::create($list)))->addCss('tk-dual-select')->setAttr('data-title', 'Placement Types')->setNotes('Enable this collection for the selected placement types.');
+        $this->form->addField(new Field\Select('placementtypeId[]', \Tk\Form\Field\Option\ArrayObjectIterator::create($list)))->addCss('tk-dual-select')->setAttr('data-title', 'Placement Types')->setNotes('Enable this collection for the selected placement types.');
+
+
 
         $this->form->addField(new Field\Checkbox('active'))->setNotes('Enable this collection for user submissions.');
         $this->form->addField(new Field\Checkbox('viewGrade'))->setNotes('Allow students to view their course results from all entries from this collection.');
+        $this->form->addField(new Field\Checkbox('includeZero'))->setNotes('Should the zero values be included in the weighted average calculation.');
 
         $this->form->addField(new Field\Input('confirm'))->setNotes('If enabled, the user will be prompted with the given text before they can submit their entry.');
         $this->form->addField(new Field\Textarea('instructions'))->addCss('mce')->setNotes('Enter any student instructions on how to complete placement entries.');
@@ -107,6 +116,7 @@ class Edit extends AdminEditIface
             return;
         }
         $this->collection->save();
+
 
         \Tk\Alert::addSuccess('Record saved!');
         if ($form->getTriggeredEvent()->getName() == 'update') {
