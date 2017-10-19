@@ -69,6 +69,11 @@ class Collection extends \Tk\Db\Map\Model
     public $gradable = false;
 
     /**
+     * @var float
+     */
+    public $maxGrade = 10.0;
+
+    /**
      * Enable students to view their final results of all compiled entry grades
      * @var boolean
      */
@@ -101,6 +106,13 @@ class Collection extends \Tk\Db\Map\Model
      */
     public $created = null;
 
+    /**
+     * @var int
+     */
+    private $scaleLength = 0;
+    
+    
+    
 
     /**
      * @var \App\Db\Profile
@@ -154,7 +166,9 @@ class Collection extends \Tk\Db\Map\Model
      */
     public function getScaleLength()
     {
-        return ScaleMap::create()->findFiltered(array('collectionId' => $this->getVolatileId()))->count();
+        if (!$this->scaleLength)
+            $this->scaleLength = ScaleMap::create()->findFiltered(array('collectionId' => $this->getVolatileId()))->count();
+        return $this->scaleLength;
     }
 
     /**

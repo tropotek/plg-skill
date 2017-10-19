@@ -32,6 +32,7 @@ class CollectionMap extends \App\Db\Mapper
             $this->dbMap->addPropertyMap(new Db\ArrayObject('available'));
             $this->dbMap->addPropertyMap(new Db\Boolean('active'));
             $this->dbMap->addPropertyMap(new Db\Boolean('gradable'));
+            $this->dbMap->addPropertyMap(new Db\Decimal('maxGrade', 'max_grade'));
             $this->dbMap->addPropertyMap(new Db\Boolean('viewGrade', 'view_grade'));
             $this->dbMap->addPropertyMap(new Db\Boolean('includeZero', 'include_zero'));
             $this->dbMap->addPropertyMap(new Db\Text('confirm'));
@@ -59,6 +60,7 @@ class CollectionMap extends \App\Db\Mapper
             $this->formMap->addPropertyMap(new Form\Object('available'));
             $this->formMap->addPropertyMap(new Form\Boolean('active'));
             $this->formMap->addPropertyMap(new Form\Boolean('gradable'));
+            $this->formMap->addPropertyMap(new Form\Boolean('maxGrade'));
             $this->formMap->addPropertyMap(new Form\Boolean('viewGrade'));
             $this->formMap->addPropertyMap(new Form\Boolean('includeZero'));
             $this->formMap->addPropertyMap(new Form\Text('confirm'));
