@@ -71,8 +71,8 @@ class Results extends AdminIface
         $template->insertText('entryCount', $entryList->count());
         $studentResult =  \Skill\Db\ReportingMap::create()->findStudentResult($this->collection->getId(), $this->getCourse()->getId(), $this->user->getId(), true);
         
-        $template->insertText('avg', sprintf('%.2f', $studentResult*$this->collection->getScaleLength()-1));
-        $template->insertText('grade', sprintf('%.2f', $studentResult*$this->collection->maxGrade));
+        $template->insertText('avg', sprintf('%.2f / %d', $studentResult*$this->collection->getScaleLength()-1, $this->collection->getScaleLength()-1));
+        $template->insertText('grade', sprintf('%.2f / %d', $studentResult*$this->collection->maxGrade, $this->collection->maxGrade));
         $template->insertText('gradePcnt', sprintf('%.2f', $studentResult*100) . '%');
         
         
@@ -84,8 +84,8 @@ class Results extends AdminIface
             $row = $template->getRepeat('domain-row');
             $row->insertText('name', $domain->name . ' (' .$domain->label. ')');
             $row->insertText('avg', sprintf('%.2f', $obj->avg));
-            $row->insertText('weight', round($obj->weight*100) . '%');
             $row->insertText('grade', sprintf('%.2f', ($obj->avg/$obj->scale)*$this->collection->maxGrade));
+            $row->insertText('weight', round($obj->weight*100) . '%');
             $row->appendRepeat();
         }
         
