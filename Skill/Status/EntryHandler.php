@@ -3,7 +3,7 @@ namespace Skill\Status;
 
 use Skill\Db\Entry;
 use App\Db\Status;
-use App\Status\HandlerInterface;
+use App\Status\Iface;
 
 /**
  * Define when the status event should be triggered
@@ -12,7 +12,7 @@ use App\Status\HandlerInterface;
  * @link http://www.tropotek.com/
  * @license Copyright 2017 Michael Mifsud
  */
-class EntryHandler extends HandlerInterface
+class EntryHandler extends Iface
 {
 
     /**

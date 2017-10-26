@@ -93,9 +93,8 @@ class Edit extends AdminEditIface
         }
 
         if ($this->getUser()->isStaff()) {
-            $this->form->addField(new \App\Form\Field\CheckSelect('status', \App\Db\Company::getStatusList(),'notify', 'Un-check to disable sending of email messages.'))
+            $this->form->addField(new \App\Form\Field\CheckSelect('status', \App\Db\Company::getStatusList()))
                 ->setRequired()->prependOption('-- Status --', '')->setNotes('Set the status. Use the checkbox to disable notification emails.')->setFieldset('Entry Details');
-            $this->form->addField(new Field\Textarea('statusNotes'))->setNotes('Add a comment to the change status log.')->setFieldset('Entry Details');
         }
 
         $this->form->addField(new Field\Input('assessor'))->setFieldset('Entry Details')->setRequired();
@@ -152,8 +151,11 @@ class Edit extends AdminEditIface
         $this->entry->save();
 
         // Save status
-        \App\Db\Status::create(\Skill\Status\EntryHandler::create($this->entry), $form->getFieldValue('status'),
-            $this->entry->getId(), $this->entry->courseId, $form->getFieldValue('statusNotes'));
+
+        /** @var \App\Form\Field\CheckSelect $f */
+        $f = $form->getField('status');
+        \App\Db\Status::create(\Skill\Status\EntryHandler::create($this->entry, $f->isChecked()), $f->getValue(),
+            $this->entry->getId(), $this->entry->courseId, $f->getNotesValue());
 
         \Tk\Alert::addSuccess('Record saved!');
         if ($form->getTriggeredEvent()->getName() == 'update') {
