@@ -57,11 +57,11 @@ class Plugin extends \App\Plugin\Iface
         
         // TODO: Implement doActivate() method.
 
-        $stm = $db->prepare("INSERT INTO status_type (model_class, event, name, description, email_tags)
+        $stm = $db->prepare("INSERT INTO mail_template_type (event, name, description, email_tags)
 VALUES
-  ('Skill\\Db\\Entry', 'status.skill.entry.pending', 'pending', '', ''),
-  ('Skill\\Db\\Entry', 'status.skill.entry.approved', 'approved', '', ''),
-  ('Skill\\Db\\Entry', 'status.skill.entry.notApproved', 'not approved', '', '')
+  ('status.skill.entry.pending', 'Skill Entry Pending', '', ''),
+  ('status.skill.entry.approved', 'Skill Entry Approved', '', ''),
+  ('status.skill.entry.not approved', 'Skill Entry Not Approved', '', '')
 ");
         $stm->execute();
 
@@ -84,7 +84,7 @@ VALUES
         $db = \App\Factory::getDb();
 
         // Remove status types
-        $stm = $db->prepare("DELETE FROM status_type WHERE model_class = 'Skill\\Db\\Entry' ");
+        $stm = $db->prepare("DELETE FROM mail_template_type WHERE event LIKE 'status.skill.entry.%' ");
         $stm->execute();
 
 
