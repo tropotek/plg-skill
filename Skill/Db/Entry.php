@@ -7,7 +7,7 @@ namespace Skill\Db;
  * @link http://www.tropotek.com/
  * @license Copyright 2015 Michael Mifsud
  */
-class Entry extends \Tk\Db\Map\Model
+class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface, \App\Db\StatusInterface
 {
     const STATUS_PENDING = 'pending';
     const STATUS_APPROVED = 'approved';
@@ -256,5 +256,105 @@ class Entry extends \Tk\Db\Map\Model
 //        }
         
         return $errors;
+    }
+
+    /**
+     * return tru to trigger the status change events
+     *
+     * @param \App\Db\Status $status
+     * @return boolean
+     */
+    public function triggerStatusChange($status)
+    {
+        $prevStatusName = $status->getPreviousName();
+
+        switch($status->name) {
+            case self::STATUS_PENDING:
+                if (!$prevStatusName)
+                    return true;
+            case self::STATUS_APPROVED:
+                if (!$prevStatusName || self::STATUS_PENDING == $prevStatusName)
+                    return true;
+            case self::STATUS_NOT_APPROVED:
+                if (self::STATUS_PENDING == $prevStatusName)
+                    return true;
+        }
+        return false;
+    }
+
+    /**
+     * @param \App\Db\Status $status
+     * @param \App\Db\MailTemplate $mailTemplate
+     * @return null|\Tk\Mail\CurlyMessage
+     */
+    public function sendStatusMessage($status, $mailTemplate)
+    {
+
+        $placement = $this->getPlacement();
+        if (!$placement->getPlacementType()->notifications) {
+            \Tk\Log::warning('PlacementType[' . $placement->getPlacementType()->name . '] Notifications Disabled');
+            return null;
+        }
+        $profile = $status->getProfile();
+        $course = $status->getCourse();
+        $student = $placement->getUser();
+        $supervisor = $placement->getSupervisor();
+        $company = $placement->getCompany();
+        $courseName = $profile->name;
+        if ($course) {
+            $courseName = $course->name;
+        }
+
+        $message = \Tk\Mail\CurlyMessage::create($mailTemplate->template);
+        $message->setSubject($this->getCollection()->name . ' Entry ' . ucfirst($status->name) . ' for ' . $placement->getTitle(true) . ' ');
+        $message->setFrom(\Tk\Mail\Message::joinEmail($profile->email, $courseName));
+
+        // Setup the message vars
+        \App\Util\StatusMessage::setRecipientType($message, $mailTemplate->recipient);
+        \App\Util\StatusMessage::setProfile($message, $profile);
+        \App\Util\StatusMessage::setCourse($message, $course);
+        \App\Util\StatusMessage::setStatus($message, $status);
+        \App\Util\StatusMessage::setStudent($message, $student);
+        \App\Util\StatusMessage::setSupervisor($message, $supervisor, $profile);
+        \App\Util\StatusMessage::setCompany($message, $company, $profile);
+        \App\Util\StatusMessage::setPlacement($message, $placement);
+
+        // TODO: add entry details
+        $message->set('entry::id', $this->getVolatileId());
+        $message->set('entry::title', $this->title);
+        $message->set('entry::assessor', $this->assessor);
+        $message->set('entry::status', $this->status);
+        $message->set('entry::notes', $this->notes);
+
+
+        switch ($mailTemplate->recipient) {              // <<< ??????? this is not elegant, refactor at some point
+            case \App\Db\MailTemplate::RECIPIENT_STUDENT:
+                if ($student) {
+                    $message->addTo(\Tk\Mail\Message::joinEmail($student->email, $student->name));
+                }
+                break;
+            case \App\Db\MailTemplate::RECIPIENT_STAFF:
+                $staffList = \App\Db\UserMap::create()->findFiltered(array('profileId' => $profile->getId(), 'role' => \App\Db\UserGroup::ROLE_STAFF));
+                if (count($staffList)) {
+                    /** @var \App\Db\User $s */
+                    foreach ($staffList as $s) {
+                        $message->addBcc(\Tk\Mail\Message::joinEmail($s->email, $s->name));
+                    }
+                    $message->addTo(\Tk\Mail\Message::joinEmail($profile->email, $courseName));
+                }
+                break;
+            case \App\Db\MailTemplate::RECIPIENT_COMPANY:
+                if ($company) {
+                    $message->addTo(\Tk\Mail\Message::joinEmail($company->email, $company->name));
+                }
+                break;
+//            case \App\Db\MailTemplate::RECIPIENT_SUPERVISOR:
+//                if ($supervisor) {
+//                    $message->addTo(\Tk\Mail\Message::joinEmail($supervisor->email, $supervisor->name));
+//                }
+//                break;
+        }
+
+        return $message;
     }
 }
