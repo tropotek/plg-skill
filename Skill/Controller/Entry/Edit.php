@@ -93,7 +93,7 @@ class Edit extends AdminEditIface
         }
 
         if ($this->getUser()->isStaff()) {
-            $this->form->addField(new \App\Form\Field\CheckSelect('status', \App\Db\Company::getStatusList()))
+            $this->form->addField(new \App\Form\Field\CheckSelect('status', \Skill\Db\Entry::getStatusList()))
                 ->setRequired()->prependOption('-- Status --', '')->setNotes('Set the status. Use the checkbox to disable notification emails.')->setFieldset('Entry Details');
         }
 

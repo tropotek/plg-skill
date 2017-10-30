@@ -1,7 +1,8 @@
 <?php
 namespace Skill;
 
-use Tk\Event\Dispatcher;
+
+
 
 /**
  * @author Michael Mifsud <info@tropotek.com>
@@ -59,9 +60,9 @@ class Plugin extends \App\Plugin\Iface
 
         $stm = $db->prepare("INSERT INTO mail_template_type (event, name, description, email_tags)
 VALUES
-  ('status.skill.entry.pending', 'Skill Entry Pending', '', ''),
-  ('status.skill.entry.approved', 'Skill Entry Approved', '', ''),
-  ('status.skill.entry.not approved', 'Skill Entry Not Approved', '', '')
+  ('status.entry.pending', 'Skill Entry Pending', '', ''),
+  ('status.entry.approved', 'Skill Entry Approved', '', ''),
+  ('status.entry.not approved', 'Skill Entry Not Approved', '', '')
 ");
         $stm->execute();
 
@@ -84,9 +85,8 @@ VALUES
         $db = \App\Factory::getDb();
 
         // Remove status types
-        $stm = $db->prepare("DELETE FROM mail_template_type WHERE event LIKE 'status.skill.entry.%' ");
+        $stm = $db->prepare("DELETE FROM mail_template_type WHERE event LIKE 'status.entry.%' ");
         $stm->execute();
-
 
 
         // Clear the data table of all plugin data
