@@ -36,9 +36,7 @@ class Plugin extends \App\Plugin\Iface
         $this->getPluginFactory()->registerZonePlugin($this, self::ZONE_COURSE_PROFILE);
         //$this->getPluginFactory()->registerZonePlugin($this, self::ZONE_COURSE);
 
-        /** @var Dispatcher $dispatcher */
-        $dispatcher = \Tk\Config::getInstance()->getEventDispatcher();
-        $dispatcher->addSubscriber(new \Skill\Listener\SetupHandler());
+        \App\Factory::getEventDispatcher()->addSubscriber(new \Skill\Listener\SetupHandler());
     }
     
     /**
@@ -59,6 +57,14 @@ class Plugin extends \App\Plugin\Iface
         
         // TODO: Implement doActivate() method.
 
+        $stm = $db->prepare("INSERT INTO status_type (model_class, event, name, description, email_tags)
+VALUES
+  ('Skill\\Db\\Entry', 'status.skill.entry.pending', 'pending', '', ''),
+  ('Skill\\Db\\Entry', 'status.skill.entry.approved', 'approved', '', ''),
+  ('Skill\\Db\\Entry', 'status.skill.entry.notApproved', 'not approved', '', '')
+");
+        $stm->execute();
+
         // Init Settings
 //        $data = \Tk\Db\Data::create($this->getName());
 //        $data->set('plugin.title', 'Day One Skills');
@@ -77,7 +83,11 @@ class Plugin extends \App\Plugin\Iface
         // TODO: Implement doDeactivate() method.
         $db = \App\Factory::getDb();
 
-        // TODO: are we sure we want to remove data, preserve for historic access, this will need an archive strategy
+        // Remove status types
+        $stm = $db->prepare("DELETE FROM status_type WHERE model_class = 'Skill\\Db\\Entry' ");
+        $stm->execute();
+
+
 
         // Clear the data table of all plugin data
 //        $sql = sprintf('DELETE FROM %s WHERE %s LIKE %s', $db->quoteParameter(\Tk\Db\Data::$DB_TABLE), $db->quoteParameter('fkey'),

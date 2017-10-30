@@ -150,12 +150,10 @@ class Edit extends AdminEditIface
 
         $this->entry->save();
 
-        // Save status
+        // Create status if changed and trigger notifications
+        \App\Db\Status::createFromField($this->entry, $form->getField('status'),
+            $this->entry->getCourse()->getProfile(), $this->entry->getCourse());
 
-        /** @var \App\Form\Field\CheckSelect $f */
-        $f = $form->getField('status');
-        \App\Db\Status::create(\Skill\Status\EntryHandler::create($this->entry, $f->isChecked()), $f->getValue(),
-            $this->entry->getId(), $this->entry->courseId, $f->getNotesValue());
 
         \Tk\Alert::addSuccess('Record saved!');
         if ($form->getTriggeredEvent()->getName() == 'update') {
