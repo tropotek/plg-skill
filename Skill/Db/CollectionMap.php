@@ -111,10 +111,6 @@ class CollectionMap extends \App\Db\Mapper
             $where .= sprintf('a.profile_id = %s AND ', (int)$filter['profileId']);
         }
 
-        if (isset($filter['parentId']) && $filter['parentId'] !== null) {
-            $where .= sprintf('a.parent_id = %s AND ', (int)$filter['parentId']);
-        }
-
         if (!empty($filter['name'])) {
             $where .= sprintf('a.name = %s AND ', $this->quote($filter['name']));
         }
@@ -135,12 +131,28 @@ class CollectionMap extends \App\Db\Mapper
             $where .= sprintf('a.active = %s AND ', (int)$filter['active']);
         }
 
-        // Find all collections that are enabled for the given placement statuses
-        if (!empty($filter['available'])) {
-            $w = $this->makeMultiQuery($filter['available'], 'd.available');
+        if (!empty($filter['placementTypeId'])) {
+            $from .= sprintf(' LEFT JOIN %s b ON (a.id = b.collection_id) ',
+                $this->quoteTable('skill_collection_placement_type'));
+            $where .= sprintf('b.placement_type_id = %s AND ', (int)$filter['placementTypeId']);
+        }
+
+        if (!empty($filter['role'])) {
+            $w = $this->makeMultiQuery($filter['role'], 'a.role');
             if ($w) {
                 $where .= '('. $w . ') AND ';
             }
+        }
+
+        // Find all collections that are enabled for the given placement statuses
+        if (!empty($filter['available'])) {
+            if (!is_array($filter['available'])) $filter['available'] = array($filter['available']);
+            $w = '';
+            foreach ($filter['available'] as $r) {
+                $w .= sprintf('a.available LIKE %s OR ', $this->getDb()->quote('%'.$r.'%'));
+            }
+            if ($w)
+                $where .= '('. rtrim($w, ' OR ') . ') AND ';
         }
 
         if (!empty($filter['exclude'])) {

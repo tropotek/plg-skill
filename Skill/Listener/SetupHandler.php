@@ -41,7 +41,7 @@ class SetupHandler implements Subscriber
 
         $profile = \App\Factory::getProfile();
         if ($profile && $plugin->isZonePluginEnabled(\Skill\Plugin::ZONE_COURSE_PROFILE, $profile->getId())) {
-            \Tk\Log::debug($plugin->getName() . ': Sample init course profile plugin stuff: ' . $profile->name);
+            //\Tk\Log::debug($plugin->getName() . ': Sample init course profile plugin stuff: ' . $profile->name);
             $dispatcher->addSubscriber(new \Skill\Listener\ProfileEditHandler($profile->getId()));
             $course = \App\Factory::getCourse();
             if ($course) {
@@ -50,6 +50,8 @@ class SetupHandler implements Subscriber
                 $dispatcher->addSubscriber(new \Skill\Listener\CourseUserListButtonHandler($course));
             }
         }
+
+        $dispatcher->addSubscriber(new \Skill\Listener\StatusMailHandler());
 
     }
 

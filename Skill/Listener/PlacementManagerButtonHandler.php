@@ -41,7 +41,13 @@ class PlacementManagerButtonHandler implements Subscriber
             /** @var \Tk\Ui\Admin\ActionPanel $actionPanel */
             $actionPanel = $controller->getActionPanel();
 
-            $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('profileId' => $this->course->profileId, 'active' => true));
+            $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array(
+                'active' => true,
+                'profileId' => $this->course->profileId,
+                'available' => $controller->getPlacement()->status,
+                'placementTypeId' => $controller->getPlacement()->placementTypeId
+            ));
+
             $status = $controller->getPlacement()->status;
             /** @var \Skill\Db\Collection $collection */
             foreach ($collectionList as $collection) {
