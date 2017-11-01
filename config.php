@@ -41,5 +41,5 @@ $routes->add('skill-collection-report', new \Tk\Routing\Route('/skill/collection
 
 
 // Guest Pages
-$routes->add('guest-skill-entry-submit', new \Tk\Routing\Route('/guest/skillEdit/{collectionId}/{placementHash}', 'Skill\Controller\Entry\Edit::doDefault', array()));
+$routes->add('guest-skill-entry-submit', new \Tk\Routing\Route('/inst/{institutionHash}/{collectionId}/{placementHash}/skillEdit.html', 'Skill\Controller\Entry\Edit::doEntrySubmission', array()));
 

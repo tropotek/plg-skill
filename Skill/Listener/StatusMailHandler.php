@@ -35,7 +35,9 @@ class StatusMailHandler implements Subscriber
                 $skillLinkHtml = 'Submit Student Performance Review: ';
                 /** @var \Skill\Db\Collection $collection */
                 foreach ($collections as $collection) {
-                    $url = \Tk\Uri::create('/guest/skillEdit/' . $collection->getId() . '/' . $message->get('placement::hash'));
+                    $url = \App\Uri::createInstitutionUrl(
+                        '/'.$collection->getId() . '/' . $message->get('placement::hash').'/skillEdit.html');
+
                     $skillLinkHtml .= sprintf('<a href="%s" title="%s">%s</a> | ', htmlentities($url->toString()),
                         htmlentities($collection->name), htmlentities($collection->name));
                 }

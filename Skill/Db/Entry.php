@@ -285,8 +285,8 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface, \App\Db\Stat
 
         // Setup the message vars
         \App\Util\StatusMessage::setStudent($message, $placement->getUser());
-        \App\Util\StatusMessage::setSupervisor($message, $placement->getSupervisor(), $status->getProfile());
-        \App\Util\StatusMessage::setCompany($message, $placement->getCompany(), $status->getProfile());
+        \App\Util\StatusMessage::setSupervisor($message, $placement->getSupervisor());
+        \App\Util\StatusMessage::setCompany($message, $placement->getCompany());
         \App\Util\StatusMessage::setPlacement($message, $placement);
 
         // A`dd entry details

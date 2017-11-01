@@ -37,6 +37,19 @@ class Edit extends AdminEditIface
     }
 
     /**
+     * @param Request $request
+     * @param $institutionHash
+     * @param $collectionId
+     * @param $placementHash
+     * @return string
+     */
+    public function doEntrySubmission(Request $request, $institutionHash, $collectionId, $placementHash)
+    {
+        vd($institutionHash, $collectionId, $placementHash);
+        return '<div><h4>This is waiting for the goods</h4></div>';
+    }
+
+    /**
      *
      * @param Request $request
      */
