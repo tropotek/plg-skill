@@ -176,7 +176,7 @@ class Results extends AdminIface
     </div>
     <div class="panel-body">
 
-      <div class="col-md-6">
+      <div class="col-lg-4">
       
       <table class="table keyvalue-table">
         <tbody>
@@ -199,7 +199,7 @@ class Results extends AdminIface
         </tbody>
       </table>
       </div>
-      <div class="col-md-6">
+      <div class="col-lg-4">
       <table class="table table-bordered">
         <tr>
           <th>Domain</th>
@@ -214,6 +214,9 @@ class Results extends AdminIface
           <td var="grade"></td>
         </tr>
       </table>
+      </div>
+      <div class="col-lg-4">
+        <p>{Consider a graph of all completed entries}</p>
       </div>
 
 
