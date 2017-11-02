@@ -42,11 +42,13 @@ class EntryManagerButtonHandler implements Subscriber
 
 
         if ($controller instanceof \App\Controller\Course\Edit) {
-            /** @var \Tk\Ui\Admin\ActionPanel $actionPanel */
-            $actionPanel = $controller->getActionPanel();
-            $actionPanel->addButton(\Tk\Ui\Button::create('Skill Collections',
-                \App\Uri::create('/skill/entryCollectionManager.html')->set('courseId', $this->course->getId()),
-                'fa fa-graduation-cap'));
+            if ($controller->getUser()->isStaff()) {
+                /** @var \Tk\Ui\Admin\ActionPanel $actionPanel */
+                $actionPanel = $controller->getActionPanel();
+                $actionPanel->addButton(\Tk\Ui\Button::create('Skill Collections',
+                    \App\Uri::create('/skill/entryCollectionManager.html')->set('courseId', $this->course->getId()),
+                    'fa fa-graduation-cap'));
+            }
         }
 
     }

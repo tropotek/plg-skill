@@ -37,10 +37,12 @@ class ProfileEditHandler implements Subscriber
         /** @var \Tk\Controller\Iface $controller */
         $controller = $event->get('controller');
         if ($controller instanceof \App\Controller\Profile\Edit) {
-            /** @var \Tk\Ui\Admin\ActionPanel $actionPanel */
-            $actionPanel = $controller->getActionPanel();
-            $actionPanel->addButton(\Tk\Ui\Button::create('Skill Collections',
-                \App\Uri::create('/skill/collectionManager.html')->set('profileId', $this->profileId), 'fa fa-graduation-cap'));
+            if ($controller->getUser()->isStaff()) {
+                /** @var \Tk\Ui\Admin\ActionPanel $actionPanel */
+                $actionPanel = $controller->getActionPanel();
+                $actionPanel->addButton(\Tk\Ui\Button::create('Skill Collections',
+                    \App\Uri::create('/skill/collectionManager.html')->set('profileId', $this->profileId), 'fa fa-graduation-cap'));
+            }
         }
 
     }
