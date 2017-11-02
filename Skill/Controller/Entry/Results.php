@@ -116,6 +116,11 @@ class Results extends AdminIface
         }
         
         
+        // TODO: plot a graph of all completed entry averages
+        
+        
+        
+        
         return $template;
     }
 
@@ -216,7 +221,17 @@ class Results extends AdminIface
       </table>
       </div>
       <div class="col-lg-4">
-        <p>{Consider a graph of all completed entries}</p>
+      
+        <table class="table line-chart" var="line-chart">
+            <tr>
+              <th>Entries</th><th repeat="month" var="month"></th>
+            </tr>
+            <tr repeat="dataRow">
+              <th var="status">Average</th>
+              <!-- data x12 -->
+              <td repeat="td" var="td">0.0</td>
+            </tr>
+          </table>
       </div>
 
 
