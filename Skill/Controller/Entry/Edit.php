@@ -26,6 +26,16 @@ class Edit extends AdminEditIface
      */
     protected $statusTable = null;
 
+    /**
+     * @var bool
+     */
+    protected $isPublic = false;
+
+    /**
+     * @var array
+     */
+    protected $errors = array();
+
 
     /**
      * Iface constructor.
@@ -38,15 +48,15 @@ class Edit extends AdminEditIface
 
     /**
      * @param Request $request
-     * @param $institutionHash
-     * @param $collectionId
-     * @param $placementHash
      * @return string
+     * @throws \Tk\Exception
      */
-    public function doEntrySubmission(Request $request, $institutionHash, $collectionId, $placementHash)
+    public function doPublicSubmission(Request $request)
     {
-        vd($institutionHash, $collectionId, $placementHash);
-        return '<div><h4>This is waiting for the goods</h4></div>';
+        $this->isPublic = true;
+        $this->getActionPanel()->setEnabled(false);
+        $this->setTemplate($this->__makePublicTemplate());
+        $this->doDefault($request);
     }
 
     /**
@@ -56,19 +66,42 @@ class Edit extends AdminEditIface
     public function doDefault(Request $request)
     {
         $this->entry = new \Skill\Db\Entry();
+        $this->entry->userId = (int)$request->get('userId');
+        $this->entry->courseId = (int)$request->get('courseId');
         $this->entry->collectionId = (int)$request->get('collectionId');
+        $this->entry->placementId = (int)$request->get('placementId');
+
         if ($request->get('entryId')) {
             $this->entry = \Skill\Db\EntryMap::create()->find($request->get('entryId'));
         }
         if ($request->get('collectionId') && $request->get('placementId')) {
             $e = \Skill\Db\EntryMap::create()->findFiltered(array('collectionId' => $request->get('collectionId'),
                 'placementId' => $request->get('placementId')))->current();
-            if ($e) $this->entry = $e;
+            if ($e)
+                $this->entry = $e;
         }
-        $this->collection = $this->entry->getCollection();
+
+        if ($this->isPublic) {
+            if ($this->entry->status == \Skill\Db\Entry::STATUS_APPROVED || $this->entry->status == \Skill\Db\Entry::STATUS_NOT_APPROVED) {
+                $this->errors[] = 'This entry has already been submitted.';
+                return;
+            }
+            if ($this->entry->getPlacement() && !$this->entry->getCollection()->isAvailable($this->entry->getPlacement()->status)) {
+                $this->errors[] = 'This entry is no longer available.';
+                return;
+            }
+        }
 
         if ($this->entry->getId()) {
             $this->getActionPanel()->addButton(\Tk\Ui\Button::create('View', \App\Uri::create('/skill/entryView.html')->set('entryId', $this->entry->getId()), 'fa fa-eye'));
+        }
+        if (!$this->entry->getId() && $this->entry->getPlacement()) {
+            $this->entry->title = $this->entry->getPlacement()->getTitle(true);
+            if ($this->entry->getPlacement()->getCompany()) {
+                $this->entry->assessor = $this->entry->getPlacement()->getCompany()->name;
+            }
+            if ($this->entry->getPlacement()->getSupervisor())
+                $this->entry->assessor = $this->entry->getPlacement()->getSupervisor()->name;
         }
 
         $this->buildForm();
@@ -92,20 +125,25 @@ class Edit extends AdminEditIface
     /**
      * buildForm
      */
-    protected function buildForm() 
+    protected function buildForm()
     {
         $this->form = \App\Factory::createForm('entryEdit');
         $this->form->setParam('renderer', \App\Factory::createFormRenderer($this->form));
 
-        $this->form->addField(new Field\Input('title'))->setRequired()->setFieldset('Entry Details');
-        if ($this->entry->getId() && $this->entry->getCollection()->gradable) {
-            $pct = round(($this->entry->average/($this->entry->getCollection()->getScaleLength()-1))*100);
+
+        $f = $this->form->addField(new Field\Input('title'))->setFieldset('Entry Details');
+        if ($this->entry->getPlacement() && $this->isPublic) {
+            $f->setReadonly();
+        }
+
+        if ($this->entry->getId() && $this->entry->getCollection()->gradable && !$this->isPublic) {
+            $pct = round(($this->entry->average / ($this->entry->getCollection()->getScaleLength() - 1)) * 100);
             $this->form->addField(new Field\Html('average', sprintf('%.2f &nbsp; (%d%%)', $this->entry->average, $pct)))->setFieldset('Entry Details');
-            $pct = round(($this->entry->weightedAverage/($this->entry->getCollection()->getScaleLength()-1))*100);
+            $pct = round(($this->entry->weightedAverage / ($this->entry->getCollection()->getScaleLength() - 1)) * 100);
             $this->form->addField(new Field\Html('weightedAverage', sprintf('%.2f &nbsp; (%d%%)', $this->entry->weightedAverage, $pct)))->setFieldset('Entry Details');
         }
 
-        if ($this->getUser()->isStaff()) {
+        if ($this->getUser()->isStaff() && !$this->isPublic) {
             $this->form->addField(new \App\Form\Field\CheckSelect('status', \Skill\Db\Entry::getStatusList()))
                 ->setRequired()->prependOption('-- Status --', '')->setNotes('Set the status. Use the checkbox to disable notification emails.')->setFieldset('Entry Details');
         }
@@ -113,6 +151,7 @@ class Edit extends AdminEditIface
         $this->form->addField(new Field\Input('assessor'))->setFieldset('Entry Details')->setRequired();
         $this->form->addField(new Field\Input('absent'))->setFieldset('Entry Details');
         $this->form->addField(new Field\Textarea('notes'))->addCss('tkTextareaTool')->setFieldset('Entry Details');
+
 
         $items = \Skill\Db\ItemMap::create()->findFiltered(array('collectionId' => $this->entry->getCollection()->getId()),
             \Tk\Db\Tool::create('category_id, order_by'));
@@ -125,13 +164,19 @@ class Edit extends AdminEditIface
             }
         }
 
-        $radioBtn = new \Tk\Form\Field\RadioButton('confirm', $this->entry->getCollection()->confirm);
-        $radioBtn->appendOption('Yes', '1', 'fa fa-check')->appendOption('No', '0', 'fa fa-ban');
-        $this->form->addField($radioBtn)->setLabel(null)->setFieldset('Confirmation')->setValue(true);
+        if ($this->entry->getCollection()->confirm) {
+            $radioBtn = new \Tk\Form\Field\RadioButton('confirm', $this->entry->getCollection()->confirm);
+            $radioBtn->appendOption('Yes', '1', 'fa fa-check')->appendOption('No', '0', 'fa fa-ban');
+            $this->form->addField($radioBtn)->setLabel(null)->setFieldset('Confirmation')->setValue(true);
+        }
 
-        $this->form->addField(new Event\Button('update', array($this, 'doSubmit')));
-        $this->form->addField(new Event\Button('save', array($this, 'doSubmit')));
-        $this->form->addField(new Event\Link('cancel', \App\Factory::getCrumbs()->getBackUrl()));
+        if ($this->isPublic) {
+            $this->form->addField(new Event\Submit('submit', array($this, 'doSubmit')))->setIconRight('fa fa-arrow-right')->addCss('pull-right')->setLabel('Submit ');
+        } else {
+            $this->form->addField(new Event\Submit('update', array($this, 'doSubmit')));
+            $this->form->addField(new Event\Submit('save', array($this, 'doSubmit')));
+            $this->form->addField(new Event\Link('cancel', \App\Factory::getCrumbs()->getBackUrl()));
+        }
 
     }
 
@@ -142,11 +187,24 @@ class Edit extends AdminEditIface
     {
         // Load the object with data from the form using a helper object
         \Skill\Db\EntryMap::create()->mapForm($form->getValues(), $this->entry);
-        
-        if (!$form->getFieldValue('status') || !in_array($form->getFieldValue('status'),
-                \Tk\Object::getClassConstants($this->entry, 'STATUS'))) {
-            $form->addFieldError('status', 'Please Select a valid status');
+
+        if (!$this->isPublic) {
+            if (!$form->getFieldValue('status') || !in_array($form->getFieldValue('status'),
+                    \Tk\Object::getClassConstants($this->entry, 'STATUS'))) {
+                $form->addFieldError('status', 'Please Select a valid status');
+            }
+        } else {
+            $this->entry->status = \Skill\Db\Entry::STATUS_PENDING;
         }
+
+        $hasValue = false;
+        foreach ($form->getValues('/^item\-/') as $name => $val) {
+            if ($val > 0) $hasValue = true;
+        }
+        if (!$hasValue) {
+            $form->addError('Use the slider at the end of the question to leave feedback.');
+        }
+
 
         $form->addFieldErrors($this->entry->validate());
 
@@ -164,9 +222,13 @@ class Edit extends AdminEditIface
         $this->entry->save();
 
         // Create status if changed and trigger notifications
-        \App\Db\Status::createFromField($this->entry, $form->getField('status'),
-            $this->entry->getCourse()->getProfile(), $this->entry->getCourse());
-
+        if (!$this->isPublic) {
+            \App\Db\Status::createFromField($this->entry, $form->getField('status'),
+                $this->entry->getCourse()->getProfile(), $this->entry->getCourse());
+        } else {
+            \App\Db\Status::create($this->entry, $this->entry->status, true, '',
+                $this->entry->getCourse()->getProfile(), $this->entry->getCourse());
+        }
 
         \Tk\Alert::addSuccess('Record saved!');
         if ($form->getTriggeredEvent()->getName() == 'update') {
@@ -182,24 +244,35 @@ class Edit extends AdminEditIface
     {
         $template = parent::show();
 
-        // Render the form
-        $template->insertTemplate('form', $this->form->getParam('renderer')->show()->getTemplate());
 
-        $template->appendCssUrl(\Tk\Uri::create('/plugin/ems-skill/assets/skill.less'));
-        $template->appendJsUrl(\Tk\Uri::create('/plugin/ems-skill/assets/skill.js'));
+        if ($this->isPublic) {
+            if(count($this->errors)) {
+                foreach ($this->errors as $error) {
+                    \Tk\Alert::addWarning($error);
+                }
+                $template->setChoice('not-available');
+                $template->setAttr('contact', 'href', \Tk\Uri::create('/contact.html')->set('courseId', $this->entry->courseId));
+                return $template;
+            } else {
+                $template->setChoice('available');
+            }
+            $template->insertHtml('instructions', $this->entry->getCollection()->instructions);
+        } else {
+            if ($this->entry->getId()) {
+                $template->setChoice('edit');
 
-        if ($this->entry->getId()) {
-            $template->setChoice('edit');
-
-            if ($this->statusTable) {
-                $template->replaceTemplate('statusTable', $this->statusTable->getTable()->getParam('renderer')->show());
-                $template->setChoice('statusLog');
+                if ($this->statusTable) {
+                    $template->replaceTemplate('statusTable', $this->statusTable->getTable()->getParam('renderer')->show());
+                    $template->setChoice('statusLog');
+                }
             }
         }
 
-        if (!$this->getUser()->isStaff()) {
-            $template->insertHtml('instructions', $this->entry->getCollection()->instructions);
-        }
+        // Render the form
+        $template->insertTemplate('form', $this->form->getParam('renderer')->show()->getTemplate());
+        $template->appendCssUrl(\Tk\Uri::create('/plugin/ems-skill/assets/skill.less'));
+        $template->appendJsUrl(\Tk\Uri::create('/plugin/ems-skill/assets/skill.js'));
+
 
         $css = <<<CSS
 .form-group.tk-item:nth-child(odd) .skill-item {
@@ -243,6 +316,32 @@ CSS;
     </div>
   </div>
   
+</div>
+HTML;
+
+        return \Dom\Loader::load($xhtml);
+    }
+
+    /**
+     * DomTemplate magic method
+     *
+     * @return Template
+     */
+    public function __makePublicTemplate()
+    {
+        $xhtml = <<<HTML
+<div class="content EntryEdit">
+  <div class="container">
+    <div class="layout layout-stack-sm layout-main-left">
+      <div class="layout-main" choice="available">
+        <div var="instructions"></div>
+        <div var="form"></div>
+      </div>
+      <div class="layout-main" choice="not-available">
+        <p>Please <a href="/contact.html?courseId=0" var="contact">contact</a> the course coordinator as this resource is no longer available.</p>
+      </div>
+    </div>
+  </div>
 </div>
 HTML;
 

@@ -111,9 +111,10 @@ SQL;
         $stm->execute();
         $arr = $stm->fetchAll();
         if ($valueOnly) {
+            if (!count($arr) && $userId) return 0;
             $arr1 = array();
             foreach ($arr as $obj) {
-                if ($valueOnly && $userId) return $obj->course_result;
+                if ($userId) return $obj->course_result;
                 $arr1[$obj->user_id] = $obj->course_result;
             }
             $arr = $arr1;

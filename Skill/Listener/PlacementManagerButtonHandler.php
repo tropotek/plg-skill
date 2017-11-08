@@ -58,7 +58,7 @@ class PlacementManagerButtonHandler implements Subscriber
 
                 $btn = $actionPanel->addButton(\Tk\Ui\Button::create($collection->name,
                     \App\Uri::create('/skill/entryEdit.html')->set('collectionId', $collection->getId())->
-                    set('placementId', $controller->getPlacement()->getId()), $collection->icon));
+                    set('placementId', $controller->getPlacement()->getId())->set('courseId', $this->course->getId())->set('userId', $controller->getPlacement()->getId()), $collection->icon));
                 //$btn->setAttr('title', 'This is a test');
                 //$btn->addCss('disabled');
 

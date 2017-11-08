@@ -241,6 +241,10 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface, \App\Db\Stat
         if (!$this->assessor) {
             $errors['assessor'] = 'Please enter a valid assessors name';
         }
+        if ($this->getCollection()->confirm && $this->confirm === null) {
+            $errors['confirm'] = 'Please select a valid answer.';
+            $errors['form'] = 'Please answer the confirmation question.';
+        }
         return $errors;
     }
 

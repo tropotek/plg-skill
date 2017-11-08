@@ -46,7 +46,7 @@ class Collection extends \Tk\Db\Map\Model
     public $color = '#ffffcc';
 
     /**
-     *  A list of placement statuses that the collection is available for submission/editing by user
+     *  A list of placement status that the collection is available for submission/editing by user
      * @var array
      */
     public $available = array();
@@ -110,9 +110,7 @@ class Collection extends \Tk\Db\Map\Model
      * @var int
      */
     private $scaleLength = 0;
-    
-    
-    
+
 
     /**
      * @var \App\Db\Profile
@@ -151,6 +149,8 @@ class Collection extends \Tk\Db\Map\Model
     }
 
     /**
+     * Use this to test if the public user can submit an entry
+     *
      * @param string $placementStatus
      * @return bool
      */

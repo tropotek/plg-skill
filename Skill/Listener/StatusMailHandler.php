@@ -3,10 +3,7 @@ namespace Skill\Listener;
 
 use Tk\Event\Subscriber;
 
-
 /**
- * Class StartupHandler
- *
  * @author Michael Mifsud <info@tropotek.com>
  * @link http://www.tropotek.com/
  * @license Copyright 2015 Michael Mifsud
@@ -32,11 +29,14 @@ class StatusMailHandler implements Subscriber
                 );
                 $collections = \Skill\Db\CollectionMap::create()->findFiltered($filter);
 
-                $skillLinkHtml = 'Submit Student Performance Review: ';
+                $skillLinkHtml = '';
                 /** @var \Skill\Db\Collection $collection */
                 foreach ($collections as $collection) {
-                    $url = \App\Uri::createInstitutionUrl(
-                        '/'.$collection->getId() . '/' . $message->get('placement::hash').'/skillEdit.html');
+                    vd($message->all());
+                    $url = \App\Uri::createInstitutionUrl('/skillEdit.html')->set('collectionId', $collection->getId())->
+                        set('userId', $message->get('student::id'))->set('courseId', $message->get('course::id'));
+                    if ($message->get('placement::id'))
+                        $url->set('placementId', $message->get('placement::id'));
 
                     $skillLinkHtml .= sprintf('<a href="%s" title="%s">%s</a> | ', htmlentities($url->toString()),
                         htmlentities($collection->name), htmlentities($collection->name));

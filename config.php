@@ -31,7 +31,6 @@ $routes->add('skill-entry-manager', new \Tk\Routing\Route('/skill/entryManager.h
 $routes->add('skill-entry-edit', new \Tk\Routing\Route('/skill/entryEdit.html', 'Skill\Controller\Entry\Edit::doDefault', $params));
 $routes->add('skill-entry-view', new \Tk\Routing\Route('/skill/entryView.html', 'Skill\Controller\Entry\View::doDefault', $params));
 
-
 $routes->add('skill-entry-results-staff', new \Tk\Routing\Route('/staff/{courseCode}/skillEntryResults.html', 'Skill\Controller\Entry\Results::doDefault', $params));
 $routes->add('skill-entry-results-student', new \Tk\Routing\Route('/student/{courseCode}/skillEntryResults.html', 'Skill\Controller\Entry\Results::doDefault', $params));
 
@@ -41,5 +40,5 @@ $routes->add('skill-collection-report', new \Tk\Routing\Route('/skill/collection
 
 
 // Guest Pages
-$routes->add('guest-skill-entry-submit', new \Tk\Routing\Route('/inst/{institutionHash}/{collectionId}/{placementHash}/skillEdit.html', 'Skill\Controller\Entry\Edit::doEntrySubmission', array()));
+$routes->add('guest-skill-entry-submit', new \Tk\Routing\Route('/inst/{institutionHash}/skillEdit.html', 'Skill\Controller\Entry\Edit::doPublicSubmission', array()));
 

@@ -63,7 +63,8 @@ class Item extends \Tk\Form\Field\Input
     public function __makeTemplate()
     {
         $xhtml = <<<HTML
-<div class="skill-item row" var="item">
+<div class="row" var="item">
+<div class="skill-item clearfix">
   <div class="col-md-8 skill-item-name">
     <span class="uid" var="uid">1.</span>
     <span for="fid-cb" var="question">Skill item question or description text</span>
@@ -71,6 +72,7 @@ class Item extends \Tk\Form\Field\Input
   <div class="col-md-4 skill-input">
     <input type="text" name="item-00" class="form-control skill-input-field tk-skillSlider" value="0" var="element"/>
   </div>
+</div>
 </div>
 HTML;
         return \Dom\Loader::load($xhtml);

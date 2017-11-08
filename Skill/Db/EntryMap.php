@@ -109,6 +109,11 @@ class EntryMap extends \App\Db\Mapper
             $where .= sprintf('a.placement_id = %s AND ', (int)$filter['placementId']);
         }
 
+        if (!empty($filter['placementTypeId'])) {
+            $from .= sprintf(' LEFT JOIN skill_collection_placement_type b ON (a.collection_id = b.collection_id)');
+            $where .= sprintf('b.placement_type_id = %s AND ', (int)$filter['placementTypeId']);
+        }
+
         if (!empty($filter['title'])) {
             $where .= sprintf('a.title = %s AND ', $this->quote($filter['title']));
         }

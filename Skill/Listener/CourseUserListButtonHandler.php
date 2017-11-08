@@ -42,10 +42,17 @@ class CourseUserListButtonHandler implements Subscriber
                     'gradable' => true, 'view_grade' => true));
                 /** @var \Skill\Db\Collection $collection */
                 foreach ($collectionList as $collection) {
+                    if (!$collection->active) continue;
                     $placementTypeIdList = \Skill\Db\CollectionMap::create()->findPlacementTypes($collection->getId());
                     $placementStatusList = $collection->available;
-                    // if user has a placement of at least one of the types and statuses used by the collection
-                    if (\App\Db\PlacementMap::create()->userHasTypes($user->getId(), $placementTypeIdList, $placementStatusList)) {
+                    // if user has a placement of at least one of the types and status
+                    $entryList = \Skill\Db\EntryMap::create()->findFiltered(array(
+                        'userId' => $user->getId(),
+                        'collectionId' => $collection->getId(),
+                        'status' => \Skill\Db\Entry::STATUS_APPROVED
+                    ));
+                    if ($entryList->count()) {
+                    //if (\App\Db\PlacementMap::create()->userHasTypes($user->getId(), $placementTypeIdList, $placementStatusList)) {
                         $btn = \Tk\Ui\Button::create($collection->name . ' Results', \App\Uri::createCourseUrl('/skillEntryResults.html')->
                             set('userId', $user->getId())->set('collectionId', $collection->getId()), $collection->icon);
                         $btn->addCss('btn-success btn-xs');
