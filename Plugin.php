@@ -60,9 +60,9 @@ class Plugin extends \App\Plugin\Iface
 
         $stm = $db->prepare("INSERT INTO mail_template_type (event, name, description, email_tags)
 VALUES
-  ('status.entry.pending', 'Skill Entry Pending', '', ''),
-  ('status.entry.approved', 'Skill Entry Approved', '', ''),
-  ('status.entry.not approved', 'Skill Entry Not Approved', '', '')
+  ('status.entry.pending', 'Skill Entry - Pending', ''),
+  ('status.entry.approved', 'Skill Entry - Approved', ''),
+  ('status.entry.not approved', 'Skill Entry - Not Approved', '')
 ");
         $stm->execute();
 

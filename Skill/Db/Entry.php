@@ -7,7 +7,7 @@ namespace Skill\Db;
  * @link http://www.tropotek.com/
  * @license Copyright 2015 Michael Mifsud
  */
-class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface, \App\Db\StatusInterface
+class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 {
     const STATUS_PENDING = 'pending';
     const STATUS_APPROVED = 'approved';
@@ -248,74 +248,4 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface, \App\Db\Stat
         return $errors;
     }
 
-    /**
-     * return tru to trigger the status change events
-     *
-     * @param \App\Db\Status $status
-     * @return boolean
-     */
-    public function triggerStatusChange($status)
-    {
-        $prevStatusName = $status->getPreviousName();
-        switch($status->name) {
-            case self::STATUS_PENDING:
-                if (!$prevStatusName)
-                    return true;
-            case self::STATUS_APPROVED:
-                if (!$prevStatusName || self::STATUS_PENDING == $prevStatusName)
-                    return true;
-            case self::STATUS_NOT_APPROVED:
-                if (self::STATUS_PENDING == $prevStatusName)
-                    return true;
-        }
-        return false;
-    }
-
-    /**
-     * @param \App\Db\Status $status
-     * @param \App\Db\MailTemplate $mailTemplate
-     * @return null|\Tk\Mail\CurlyMessage
-     */
-    public function makeStatusMessage($status, $mailTemplate)
-    {
-        $placement = $this->getPlacement();
-        if (!$placement->getPlacementType()->notifications) {
-            \Tk\Log::warning('PlacementType[' . $placement->getPlacementType()->name . '] Notifications Disabled');
-            return null;
-        }
-        $message = \Tk\Mail\CurlyMessage::create($mailTemplate->template);
-        $message->setSubject($this->getCollection()->name . ' Entry ' . ucfirst($status->name) . ' for ' . $placement->getTitle(true) . ' ');
-        $message->setFrom(\Tk\Mail\Message::joinEmail($status->getProfile()->email, $status->getCourseName()));
-
-        // Setup the message vars
-        \App\Util\StatusMessage::setStudent($message, $placement->getUser());
-        \App\Util\StatusMessage::setSupervisor($message, $placement->getSupervisor());
-        \App\Util\StatusMessage::setCompany($message, $placement->getCompany());
-        \App\Util\StatusMessage::setPlacement($message, $placement);
-
-        // A`dd entry details
-        $message->set('collection::id', $this->getCollection()->getId());
-        $message->set('collection::name', $this->getCollection()->name);
-        $message->set('collection::instructions', $this->getCollection()->instructions);
-        $message->set('entry::id', $this->getId());
-        $message->set('entry::title', $this->title);
-        $message->set('entry::assessor', $this->assessor);
-        $message->set('entry::status', $this->status);
-        $message->set('entry::notes', nl2br($this->notes, true));
-
-        switch ($mailTemplate->recipient) {
-            case \App\Db\MailTemplate::RECIPIENT_STUDENT:
-                if ($placement->getUser()) {
-                    $message->addTo(\Tk\Mail\Message::joinEmail($placement->getUser()->email, $placement->getUser()->name));
-                }
-                break;
-            case \App\Db\MailTemplate::RECIPIENT_COMPANY:
-                if ($placement->getCompany()) {
-                    $message->addTo(\Tk\Mail\Message::joinEmail($placement->getCompany()->email, $placement->getCompany()->name));
-                }
-                break;
-        }
-
-        return $message;
-    }
 }
