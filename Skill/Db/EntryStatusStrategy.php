@@ -88,13 +88,15 @@ class EntryStatusStrategy implements \App\Db\StatusStrategyInterface
 
     /**
      * @param \Tk\Table\Cell\Iface $cell
-     * @param \Tk\Db\ModelInterface $model
+     * @param \Tk\Db\ModelInterface|Entry $model
      * @param string $html
      * @return string
      */
     public function getIconHtml($cell, $model, $html)
     {
-        // TODO: Implement getIconHtml() method.
+        // TODO: get the icon from the entry collection
+        $collection = $model->getCollection();
+        return sprintf('<div class="status-icon bg-secondary" title="Company"><i class="'.$collection->icon.'"></i></div>');
     }
 
     /**

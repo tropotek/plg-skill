@@ -58,7 +58,7 @@ class Plugin extends \App\Plugin\Iface
         
         // TODO: Implement doActivate() method.
 
-        $stm = $db->prepare("INSERT INTO mail_template_type (event, name, description, email_tags)
+        $stm = $db->prepare("INSERT INTO mail_template_type (event, name, description)
 VALUES
   ('status.entry.pending', 'Skill Entry - Pending', ''),
   ('status.entry.approved', 'Skill Entry - Approved', ''),
