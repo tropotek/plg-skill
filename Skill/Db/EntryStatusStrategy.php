@@ -7,7 +7,7 @@ namespace Skill\Db;
  * @link http://www.tropotek.com/
  * @license Copyright 2015 Michael Mifsud
  */
-class EntryStatusStrategy implements \App\Db\StatusStrategyInterface
+class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
 {
 
     /**
@@ -85,38 +85,36 @@ class EntryStatusStrategy implements \App\Db\StatusStrategyInterface
     }
 
 
-
     /**
-     * @param \Tk\Table\Cell\Iface $cell
-     * @param \Tk\Db\ModelInterface|Entry $model
-     * @param string $html
      * @return string
      */
-    public function getIconHtml($cell, $model, $html)
+    public function getPendingIcon()
     {
+        /** @var Entry $model */
+        $model = $this->getStatus()->getModel();
+
         // TODO: get the icon from the entry collection
         $collection = $model->getCollection();
         return sprintf('<div class="status-icon bg-secondary" title="Company"><i class="'.$collection->icon.'"></i></div>');
     }
 
     /**
-     * @param \Tk\Table\Cell\Iface $cell
-     * @param \Tk\Db\ModelInterface $model
-     * @param string $html
      * @return string
      */
-    public function getTextHtml($cell, $model, $html)
+    public function getPendingHtml()
     {
-        // TODO: Implement getTextHtml() method.
+        /** @var Entry $model */
+        $model = $this->getStatus()->getModel();
+        $collection = $model->getCollection();
+
+        return sprintf('<em>%s</em> submitted a %s Entry for <em>%s</em>',
+            $model->assessor, $collection->name, $model->getPlacement()->getUser()->name);
     }
 
     /**
-     * @param \Tk\Table\Cell\Iface $cell
-     * @param \Tk\Db\ModelInterface $model
-     * @param string $html
-     * @return string
+     * @return null|\Tk\Uri
      */
-    public function getLinkHtml($cell, $model, $html)
+    public function getPendingActionLink()
     {
         // TODO: Implement getLinkHtml() method.
     }
