@@ -107,7 +107,15 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
         $model = $this->getStatus()->getModel();
         $collection = $model->getCollection();
 
-        return sprintf('<em>%s</em> submitted a %s Entry for <em>%s</em>',
+        return sprintf('<div class="status-placement"><div><em>%s</em> submitted a %s Entry for <em>%s</em></div>
+  <div class="status-actions">
+    <a href="#" class="btn btn-xs btn-default"><i class="fa fa-eye"></i> View</a>
+    <a href="#" class="btn btn-xs btn-primary"><i class="fa fa-pencil"></i> Edit</a>
+    <a href="#" class="btn btn-xs btn-success"><i class="fa fa-check"></i> Approve</a>
+    <a href="#" class="btn btn-xs btn-danger"><i class="fa fa-times"></i> Reject</a>
+    <a href="#" class="btn btn-xs btn-secondary"><i class="fa fa-envelope"></i> Email</a>
+  </div>
+</div>',
             $model->assessor, $collection->name, $model->getPlacement()->getUser()->name);
     }
 
