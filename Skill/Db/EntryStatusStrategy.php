@@ -79,6 +79,18 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
                     $message->addTo(\Tk\Mail\Message::joinEmail($placement->getCompany()->email, $placement->getCompany()->name));
                 }
                 break;
+            case \App\Db\MailTemplate::RECIPIENT_STAFF:
+                $staffList = $status->getCourse()->getStaffList();
+                if (count($staffList)) {
+                    /** @var \App\Db\User $s */
+                    foreach ($staffList as $s) {
+                        $message->addBcc(\Tk\Mail\Message::joinEmail($s->email, $s->name));
+                    }
+                    $message->addTo(\Tk\Mail\Message::joinEmail($status->getCourse()->getProfile()->email, $status->getCourseName()));
+                    $message->set('recipient::email', $status->getCourse()->getProfile()->email);
+                    $message->set('recipient::name', $status->getCourseName());
+                }
+                break;
         }
 
         return $message;
@@ -95,7 +107,7 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
 
         // TODO: get the icon from the entry collection
         $collection = $model->getCollection();
-        return sprintf('<div class="status-icon bg-secondary" title="Company"><i class="'.$collection->icon.'"></i></div>');
+        return sprintf('<div class="status-icon bg-secondary"><i class="'.$collection->icon.'"></i></div>');
     }
 
     /**
@@ -109,21 +121,25 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
 
         return sprintf('<div class="status-placement"><div><em>%s</em> submitted a %s Entry for <em>%s</em></div>
   <div class="status-actions">
-    <a href="#" class="btn btn-xs btn-default"><i class="fa fa-eye"></i> View</a>
-    <a href="#" class="btn btn-xs btn-primary"><i class="fa fa-pencil"></i> Edit</a>
-    <a href="#" class="btn btn-xs btn-success"><i class="fa fa-check"></i> Approve</a>
-    <a href="#" class="btn btn-xs btn-danger"><i class="fa fa-times"></i> Reject</a>
-    <a href="#" class="btn btn-xs btn-secondary"><i class="fa fa-envelope"></i> Email</a>
+    <a href="#" class=""><i class="fa fa-eye"></i> View</a> | 
+    <a href="#" class=""><i class="fa fa-pencil"></i> Edit</a> | 
+    <a href="#" class=""><i class="fa fa-check"></i> Approve</a> | 
+    <a href="#" class=""><i class="fa fa-times"></i> Reject</a> | 
+    <a href="#" class=""><i class="fa fa-envelope"></i> Email</a>
   </div>
 </div>',
             $model->assessor, $collection->name, $model->getPlacement()->getUser()->name);
     }
 
     /**
-     * @return null|\Tk\Uri
+     * @return string
      */
-    public function getPendingActionLink()
+    public function getLabel()
     {
-        // TODO: Implement getLinkHtml() method.
+        /** @var Entry $model */
+        $model = $this->getStatus()->getModel();
+        $collection = $model->getCollection();
+
+        return $collection->name . ' ' . \Tk\Object::basename($this->getStatus()->fkey);
     }
 }

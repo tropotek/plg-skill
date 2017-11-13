@@ -30,9 +30,9 @@ class StatusMailHandler implements Subscriber
                 $collections = \Skill\Db\CollectionMap::create()->findFiltered($filter);
 
                 $skillLinkHtml = '';
+                $skillLinkText = '';
                 /** @var \Skill\Db\Collection $collection */
                 foreach ($collections as $collection) {
-                    vd($message->all());
                     $url = \App\Uri::createInstitutionUrl('/skillEdit.html')->set('collectionId', $collection->getId())->
                         set('userId', $message->get('student::id'))->set('courseId', $message->get('course::id'));
                     if ($message->get('placement::id'))
@@ -40,9 +40,13 @@ class StatusMailHandler implements Subscriber
 
                     $skillLinkHtml .= sprintf('<a href="%s" title="%s">%s</a> | ', htmlentities($url->toString()),
                         htmlentities($collection->name), htmlentities($collection->name));
+                    $skillLinkText .= sprintf('%s: %s | ', htmlentities($collection->name), htmlentities($url->toString()));
                 }
-                $message->set('skill::editLink', rtrim($skillLinkHtml, ' | '));
-                $message->set('placement::goalsUrl', rtrim($skillLinkHtml, ' | '));
+                $message->set('skill::linkHtml', rtrim($skillLinkHtml, ' | '));
+                $message->set('skill::linkText', rtrim($skillLinkText, ' | '));
+
+                // Deprecated...
+//                /$message->set('placement::goalsUrl', rtrim($skillLinkHtml, ' | '));
             }
         }
 
