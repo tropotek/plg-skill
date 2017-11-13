@@ -55,8 +55,6 @@ class Plugin extends \App\Plugin\Iface
         $migrate = new \Tk\Util\SqlMigrate($db);
         $migrate->setTempPath($config->getTempPath());
         $migrate->migrate(dirname(__FILE__) . '/sql');
-        
-        // TODO: Implement doActivate() method.
 
         $stm = $db->prepare("INSERT INTO mail_template_type (event, name, description)
 VALUES
@@ -65,12 +63,6 @@ VALUES
   ('status.entry.not approved', 'Skill Entry - Not Approved', '')
 ");
         $stm->execute();
-
-        // Init Settings
-//        $data = \Tk\Db\Data::create($this->getName());
-//        $data->set('plugin.title', 'Day One Skills');
-//        $data->set('plugin.email', 'fvas-elearning@unimelb.edu.au');
-//        $data->save();
 
     }
 
@@ -88,6 +80,8 @@ VALUES
         $stm = $db->prepare("DELETE FROM mail_template_type WHERE event LIKE 'status.entry.%' ");
         $stm->execute();
 
+
+        // Keep all data at this point
 
         // Clear the data table of all plugin data
 //        $sql = sprintf('DELETE FROM %s WHERE %s LIKE %s', $db->quoteParameter(\Tk\Db\Data::$DB_TABLE), $db->quoteParameter('fkey'),
