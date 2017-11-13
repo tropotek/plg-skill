@@ -107,7 +107,7 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
 
         // TODO: get the icon from the entry collection
         $collection = $model->getCollection();
-        return sprintf('<div class="status-icon bg-secondary"><i class="'.$collection->icon.'"></i></div>');
+        return sprintf('<div class="status-icon bg-primary"><i class="'.$collection->icon.'"></i></div>');
     }
 
     /**
@@ -118,17 +118,26 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
         /** @var Entry $model */
         $model = $this->getStatus()->getModel();
         $collection = $model->getCollection();
+        $editUrl = \App\Uri::createCourseUrl('/skill/entryEdit.html')->set('collectionId', $model->collectionId)->set('courseId', $model->courseId)->
+            set('userId', $model->userId)->set('placementId', $model->placementId);
+        $from = '';
+        if ($model->getPlacement()) {
+            $editUrl = \App\Uri::createCourseUrl('/placementEdit.html')->set('placementId', $model->getPlacement()->getId());
+            $from = 'from <em>' . $model->getPlacement()->getCompany()->name . '</em>';
+        }
 
-        return sprintf('<div class="status-placement"><div><em>%s</em> submitted a %s Entry for <em>%s</em></div>
+        return sprintf('<div class="status-placement"><div><em>%s</em> %s submitted a %s Entry for <em>%s</em></div>
   <div class="status-actions">
-    <a href="#" class=""><i class="fa fa-eye"></i> View</a> | 
-    <a href="#" class=""><i class="fa fa-pencil"></i> Edit</a> | 
-    <a href="#" class=""><i class="fa fa-check"></i> Approve</a> | 
-    <a href="#" class=""><i class="fa fa-times"></i> Reject</a> | 
-    <a href="#" class=""><i class="fa fa-envelope"></i> Email</a>
+    <a href="%s" class="edit"><i class="fa fa-pencil"></i> Edit</a>
+   <!--  |
+    <a href="#" class="view"><i class="fa fa-eye"></i> View</a> |  
+    <a href="#" class="approve"><i class="fa fa-check"></i> Approve</a> | 
+    <a href="#" class="reject"><i class="fa fa-times"></i> Reject</a> | 
+    <a href="#" class="email"><i class="fa fa-envelope"></i> Email</a>
+    -->
   </div>
 </div>',
-            $model->assessor, $collection->name, $model->getPlacement()->getUser()->name);
+            $model->assessor, $from, $collection->name, $model->getPlacement()->getUser()->name, $editUrl);
     }
 
     /**
