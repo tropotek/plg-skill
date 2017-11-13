@@ -3,6 +3,7 @@ namespace Skill\Listener;
 
 use Tk\Event\Subscriber;
 use Tk\Event\Event;
+use Skill\Plugin;
 
 /**
  * Class StartupHandler
@@ -30,7 +31,7 @@ class ProfileEditHandler implements Subscriber
      */
     public function onControllerInit(Event $event)
     {
-        $plugin = \Skill\Plugin::getInstance();
+        $plugin = Plugin::getInstance();
         $config = $plugin->getConfig();
         //$config->getLog()->info($plugin->getName() . ': onControllerAccess(\'profile\', '.$this->profileId.') ');
 
@@ -55,7 +56,7 @@ class ProfileEditHandler implements Subscriber
      */
     public function onControllerShow(Event $event)
     {
-        $plugin = \Skill\Plugin::getInstance();
+        $plugin = Plugin::getInstance();
         $config = $plugin->getConfig();
         //$config->getLog()->info($plugin->getName() . ': onControllerShow(\'profile\', '.$this->profileId.') ');
     }

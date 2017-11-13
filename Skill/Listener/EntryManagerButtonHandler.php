@@ -3,10 +3,9 @@ namespace Skill\Listener;
 
 use Tk\Event\Subscriber;
 use Tk\Event\Event;
+use Skill\Plugin;
 
 /**
- * Class StartupHandler
- *
  * @author Michael Mifsud <info@tropotek.com>
  * @link http://www.tropotek.com/
  * @license Copyright 2015 Michael Mifsud
@@ -33,7 +32,7 @@ class EntryManagerButtonHandler implements Subscriber
      */
     public function onControllerInit(Event $event)
     {
-        $plugin = \Skill\Plugin::getInstance();
+        $plugin = Plugin::getInstance();
         $config = $plugin->getConfig();
         //$config->getLog()->info($plugin->getName() . ': onControllerAccess(\'profile\', '.$this->profileId.') ');
 
@@ -61,7 +60,7 @@ class EntryManagerButtonHandler implements Subscriber
      */
     public function onControllerShow(Event $event)
     {
-        $plugin = \Skill\Plugin::getInstance();
+        $plugin = Plugin::getInstance();
         $config = $plugin->getConfig();
         //$config->getLog()->info($plugin->getName() . ': onControllerShow(\'profile\', '.$this->profileId.') ');
     }
