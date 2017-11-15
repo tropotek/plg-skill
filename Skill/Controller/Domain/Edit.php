@@ -54,7 +54,7 @@ class Edit extends AdminEditIface
     protected function buildForm() 
     {
         $this->form = \App\Factory::createForm('domainEdit');
-        $this->form->setParam('renderer', \App\Factory::createFormRenderer($this->form));
+        $this->form->setRenderer(\App\Factory::createFormRenderer($this->form));
 
         // text, textblock, select, checkbox, date, file(????)
         $this->form->addField(new Field\Input('name'))->setNotes('');
@@ -98,7 +98,7 @@ class Edit extends AdminEditIface
         $template = parent::show();
 
         // Render the form
-        $template->insertTemplate('form', $this->form->getParam('renderer')->show()->getTemplate());
+        $template->insertTemplate('form', $this->form->getRenderer()->show()->getTemplate());
 
         return $template;
     }

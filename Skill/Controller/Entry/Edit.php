@@ -128,7 +128,7 @@ class Edit extends AdminEditIface
     protected function buildForm()
     {
         $this->form = \App\Factory::createForm('entryEdit');
-        $this->form->setParam('renderer', \App\Factory::createFormRenderer($this->form));
+        $this->form->setRenderer(\App\Factory::createFormRenderer($this->form));
 
 
         $f = $this->form->addField(new Field\Input('title'))->setFieldset('Entry Details');
@@ -269,7 +269,7 @@ class Edit extends AdminEditIface
         }
 
         // Render the form
-        $template->insertTemplate('form', $this->form->getParam('renderer')->show()->getTemplate());
+        $template->insertTemplate('form', $this->form->getRenderer()->show()->getTemplate());
         $template->appendCssUrl(\Tk\Uri::create('/plugin/ems-skill/assets/skill.less'));
         $template->appendJsUrl(\Tk\Uri::create('/plugin/ems-skill/assets/skill.js'));
 
