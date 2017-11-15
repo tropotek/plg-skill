@@ -10,7 +10,7 @@ use Skill\Plugin;
  * @link http://www.tropotek.com/
  * @license Copyright 2015 Michael Mifsud
  */
-class CourseUserListButtonHandler implements Subscriber
+class CourseDashboardHandler implements Subscriber
 {
 
     /**
@@ -44,8 +44,8 @@ class CourseUserListButtonHandler implements Subscriber
                 /** @var \Skill\Db\Collection $collection */
                 foreach ($collectionList as $collection) {
                     if (!$collection->active) continue;
-                    $placementTypeIdList = \Skill\Db\CollectionMap::create()->findPlacementTypes($collection->getId());
-                    $placementStatusList = $collection->available;
+//                    $placementTypeIdList = \Skill\Db\CollectionMap::create()->findPlacementTypes($collection->getId());
+//                    $placementStatusList = $collection->available;
                     // if user has a placement of at least one of the types and status
                     $entryList = \Skill\Db\EntryMap::create()->findFiltered(array(
                         'userId' => $user->getId(),

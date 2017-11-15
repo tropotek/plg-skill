@@ -10,7 +10,7 @@ use Skill\Plugin;
  * @link http://www.tropotek.com/
  * @license Copyright 2015 Michael Mifsud
  */
-class PlacementManagerButtonHandler implements Subscriber
+class PlacementEditHandler implements Subscriber
 {
 
     /**
