@@ -73,7 +73,7 @@ class Manager extends AdminManagerIface
             \App\Uri::create('/skill/entryView.html'), 'fa fa-eye'))->setAppendQuery();
 
         $this->table = \App\Factory::createTable(\Tk\Object::basename($this).'_entryList'.$this->collection->name);
-        $this->table->setParam('renderer', \App\Factory::createTableRenderer($this->table));
+        $this->table->setRenderer(\App\Factory::createTableRenderer($this->table));
 
         $this->table->addCell(new \Tk\Table\Cell\Checkbox('id'));
         $this->table->addCell($this->actionsCell);
@@ -118,7 +118,7 @@ class Manager extends AdminManagerIface
     {
         $template = parent::show();
 
-        $template->replaceTemplate('table', $this->table->getParam('renderer')->show());
+        $template->replaceTemplate('table', $this->table->getRenderer()->show());
 
         $template->insertText('title', $this->collection->name . ' entries for ' . $this->getCourse()->name);
 

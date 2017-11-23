@@ -95,7 +95,7 @@ class View extends AdminEditIface
         $template = parent::show();
 
         // Render the form
-        $template->insertTemplate('form', $this->form->getRenderer()->show()->getTemplate());
+        $template->insertTemplate('form', $this->form->getRenderer()->show());
 
         $template->appendCssUrl(\Tk\Uri::create('/plugin/ems-skill/assets/skill.less'));
         $template->appendJsUrl(\Tk\Uri::create('/plugin/ems-skill/assets/skill.js'));

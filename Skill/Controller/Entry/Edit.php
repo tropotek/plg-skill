@@ -262,14 +262,14 @@ class Edit extends AdminEditIface
                 $template->setChoice('edit');
 
                 if ($this->statusTable) {
-                    $template->replaceTemplate('statusTable', $this->statusTable->getTable()->getParam('renderer')->show());
+                    $template->replaceTemplate('statusTable', $this->statusTable->getTable()->getRenderer()->show());
                     $template->setChoice('statusLog');
                 }
             }
         }
 
         // Render the form
-        $template->insertTemplate('form', $this->form->getRenderer()->show()->getTemplate());
+        $template->insertTemplate('form', $this->form->getRenderer()->show());
         $template->appendCssUrl(\Tk\Uri::create('/plugin/ems-skill/assets/skill.less'));
         $template->appendJsUrl(\Tk\Uri::create('/plugin/ems-skill/assets/skill.js'));
 

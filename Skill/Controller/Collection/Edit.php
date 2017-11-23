@@ -142,7 +142,7 @@ class Edit extends AdminEditIface
         }
 
         // Render the form
-        $template->insertTemplate('form', $this->form->getRenderer()->show()->getTemplate());
+        $template->insertTemplate('form', $this->form->getRenderer()->show());
 
         return $template;
     }

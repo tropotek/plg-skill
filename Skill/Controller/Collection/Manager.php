@@ -57,7 +57,7 @@ class Manager extends AdminManagerIface
             $this->editUrl = \App\Uri::create('/skill/collectionEdit.html');
 
         $this->table = \App\Factory::createTable(\Tk\Object::basename($this).'_fieldList');
-        $this->table->setParam('renderer', \App\Factory::createTableRenderer($this->table));
+        $this->table->setRenderer(\App\Factory::createTableRenderer($this->table));
 
         $this->table->addCell(new \Tk\Table\Cell\Checkbox('id'));
         $this->table->addCell(new \Tk\Table\Cell\Text('name'))->addCss('key')->setUrl(clone $this->editUrl);
@@ -104,7 +104,7 @@ class Manager extends AdminManagerIface
         $this->getActionPanel()->addButton(\Tk\Ui\Button::create('New Collection',
             $u->set('profileId', $this->profile->getId()), 'fa fa-graduation-cap'));
 
-        $template->replaceTemplate('table', $this->table->getParam('renderer')->show());
+        $template->replaceTemplate('table', $this->table->getRenderer()->show());
 
         return $template;
     }
