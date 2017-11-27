@@ -56,6 +56,8 @@ class Manager extends AdminManagerIface
         if ($this->editUrl === null)
             $this->editUrl = \App\Uri::create('/skill/collectionEdit.html');
 
+
+
         $this->table = \App\Factory::createTable(\Tk\Object::basename($this).'_fieldList');
         $this->table->setRenderer(\App\Factory::createTableRenderer($this->table));
 
@@ -98,11 +100,13 @@ class Manager extends AdminManagerIface
      */
     public function show()
     {
-        $template = parent::show();
 
         $u = clone $this->editUrl;
         $this->getActionPanel()->addButton(\Tk\Ui\Button::create('New Collection',
-            $u->set('profileId', $this->profile->getId()), 'fa fa-graduation-cap'));
+            $u->set('profileId', $this->profile->getId()), 'fa fa-graduation-cap fa-add-action'));
+
+
+        $template = parent::show();
 
         $template->replaceTemplate('table', $this->table->getRenderer()->show());
 
