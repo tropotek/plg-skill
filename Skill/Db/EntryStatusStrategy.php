@@ -37,6 +37,7 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
      * @param \App\Db\Status $status
      * @param \App\Db\MailTemplate $mailTemplate
      * @return null|\Tk\Mail\CurlyMessage
+     * @throws \Tk\Exception
      */
     public function makeStatusMessage($status, $mailTemplate)
     {
@@ -99,19 +100,23 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
 
     /**
      * @return string
+     * @throws \Exception
      */
     public function getPendingIcon()
     {
         /** @var Entry $model */
         $model = $this->getStatus()->getModel();
+        $editUrl = \App\Uri::createCourseUrl('/skill/entryEdit.html')->set('collectionId', $model->collectionId)->set('courseId', $model->courseId)->
+            set('userId', $model->userId)->set('placementId', $model->placementId);
 
         // TODO: get the icon from the entry collection
         $collection = $model->getCollection();
-        return sprintf('<div class="status-icon bg-secondary"><i class="'.$collection->icon.'"></i></div>');
+        return sprintf('<a href="%s"><div class="status-icon bg-secondary"><i class="'.$collection->icon.'"></i></div></a>', $editUrl);
     }
 
     /**
      * @return string
+     * @throws \Exception
      */
     public function getPendingHtml()
     {
