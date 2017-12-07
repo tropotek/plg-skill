@@ -48,15 +48,12 @@ class Manager extends AdminManagerIface
 
     /**
      * @param Request $request
-     * @throws \Tk\Exception
      */
     public function doDefault(Request $request)
     {
         $this->profile = $this->findProfile($request);
         if ($this->editUrl === null)
             $this->editUrl = \App\Uri::create('/skill/collectionEdit.html');
-
-
 
         $this->table = \App\Factory::createTable(\Tk\Object::basename($this).'_fieldList');
         $this->table->setRenderer(\App\Factory::createTableRenderer($this->table));
