@@ -111,7 +111,7 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
 
         // TODO: get the icon from the entry collection
         $collection = $model->getCollection();
-        return sprintf('<a href="%s"><div class="status-icon bg-secondary"><i class="'.$collection->icon.'"></i></div></a>', $editUrl);
+        return sprintf('<a href="%s"><div class="status-icon bg-secondary"><i class="'.$collection->icon.'"></i></div></a>', htmlentities($editUrl));
     }
 
     /**
