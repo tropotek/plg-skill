@@ -51,8 +51,8 @@ class Manager extends AdminManagerIface
         $this->getActionPanel()->addButton(\Tk\Ui\Button::create('New Item',
             $u->set('collectionId', $this->collection->getId()), 'fa fa-question'));
 
-        $this->table = \App\Factory::createTable(\Tk\Object::basename($this).'_itemList');
-        $this->table->setRenderer(\App\Factory::createTableRenderer($this->table));
+        $this->table = \App\Config::getInstance()->createTable(\Tk\Object::basename($this).'_itemList');
+        $this->table->setRenderer(\App\Config::getInstance()->createTableRenderer($this->table));
 
         $this->table->addCell(new \Tk\Table\Cell\Checkbox('id'));
         $this->table->addCell(new \Tk\Table\Cell\Text('uid'));

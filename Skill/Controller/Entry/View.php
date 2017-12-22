@@ -52,8 +52,8 @@ class View extends AdminEditIface
      */
     protected function buildForm() 
     {
-        $this->form = \App\Factory::createForm('entryEdit');
-        $this->form->setRenderer(\App\Factory::createFormRenderer($this->form));
+        $this->form = \App\Config::getInstance()->createForm('entryEdit');
+        $this->form->setRenderer(\App\Config::getInstance()->createFormRenderer($this->form));
 
         $this->form->addField(new Field\Html('title'))->setFieldset('Entry Details');
         if($this->entry->getCollection()->gradable && ($this->getUser()->isStaff() || $this->entry->getCollection()->viewGrade)) {

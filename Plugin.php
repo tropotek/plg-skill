@@ -37,23 +37,26 @@ class Plugin extends \App\Plugin\Iface
         $this->getPluginFactory()->registerZonePlugin($this, self::ZONE_COURSE_PROFILE);
         //$this->getPluginFactory()->registerZonePlugin($this, self::ZONE_COURSE);
 
-        \App\Factory::getEventDispatcher()->addSubscriber(new \Skill\Listener\SetupHandler());
+        \App\Config::getInstance()->getEventDispatcher()->addSubscriber(new \Skill\Listener\SetupHandler());
     }
-    
+
     /**
      * Activate the plugin, essentially
      * installing any DB and settings required to run
      * Will only be called when activating the plugin in the
      * plugin control panel
+     *
+     * @throws \Exception
+     * @throws \Tk\Db\Exception
+     * @throws \Tk\Exception
      */
     function doActivate()
     {
         // Init Plugin Settings
-        $config = \Tk\Config::getInstance();
-        $db = \App\Factory::getDb();
+        $db = $this->getConfig()->getDb();
 
         $migrate = new \Tk\Util\SqlMigrate($db);
-        $migrate->setTempPath($config->getTempPath());
+        $migrate->setTempPath($this->getConfig()->getTempPath());
         $migrate->migrate(dirname(__FILE__) . '/sql');
 
         $stm = $db->prepare("INSERT INTO mail_template_type (event, name, description)
@@ -74,7 +77,7 @@ VALUES
     function doDeactivate()
     {
         // TODO: Implement doDeactivate() method.
-        $db = \App\Factory::getDb();
+        $db = $this->getConfig()->getDb();
 
         // Remove status types
         $stm = $db->prepare("DELETE FROM mail_template_type WHERE event LIKE 'status.entry.%' ");

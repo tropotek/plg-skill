@@ -72,8 +72,8 @@ class Manager extends AdminManagerIface
         $this->actionsCell->addButton(\Tk\Table\Cell\ActionButton::create('View Entry',
             \App\Uri::create('/skill/entryView.html'), 'fa fa-eye'))->setAppendQuery();
 
-        $this->table = \App\Factory::createTable(\Tk\Object::basename($this).'_entryList'.$this->collection->name);
-        $this->table->setRenderer(\App\Factory::createTableRenderer($this->table));
+        $this->table = \App\Config::getInstance()->createTable(\Tk\Object::basename($this).'_entryList'.$this->collection->name);
+        $this->table->setRenderer(\App\Config::getInstance()->createTableRenderer($this->table));
 
         $this->table->addCell(new \Tk\Table\Cell\Checkbox('id'));
         $this->table->addCell($this->actionsCell);

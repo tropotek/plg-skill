@@ -53,8 +53,8 @@ class Edit extends AdminEditIface
 
     protected function buildForm() 
     {
-        $this->form = \App\Factory::createForm('domainEdit');
-        $this->form->setRenderer(\App\Factory::createFormRenderer($this->form));
+        $this->form = \App\Config::getInstance()->createForm('domainEdit');
+        $this->form->setRenderer(\App\Config::getInstance()->createFormRenderer($this->form));
 
         // text, textblock, select, checkbox, date, file(????)
         $this->form->addField(new Field\Input('name'))->setNotes('');
@@ -64,7 +64,7 @@ class Edit extends AdminEditIface
 
         $this->form->addField(new Event\Button('update', array($this, 'doSubmit')));
         $this->form->addField(new Event\Button('save', array($this, 'doSubmit')));
-        $this->form->addField(new Event\Link('cancel', \App\Factory::getCrumbs()->getBackUrl()));
+        $this->form->addField(new Event\Link('cancel', \Uni\Ui\Crumbs::getInstance()->getBackUrl()));
 
     }
 
@@ -85,7 +85,7 @@ class Edit extends AdminEditIface
 
         \Tk\Alert::addSuccess('Record saved!');
         if ($form->getTriggeredEvent()->getName() == 'update') {
-            \App\Factory::getCrumbs()->getBackUrl()->redirect();
+            \Uni\Ui\Crumbs::getInstance()->getBackUrl()->redirect();
         }
         \Tk\Uri::create()->set('domainId', $this->domain->getId())->redirect();
     }

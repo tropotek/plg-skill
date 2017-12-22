@@ -55,8 +55,8 @@ class Manager extends AdminManagerIface
         if ($this->editUrl === null)
             $this->editUrl = \App\Uri::create('/skill/collectionEdit.html');
 
-        $this->table = \App\Factory::createTable(\Tk\Object::basename($this).'_fieldList');
-        $this->table->setRenderer(\App\Factory::createTableRenderer($this->table));
+        $this->table = \App\Config::getInstance()->createTable(\Tk\Object::basename($this).'_fieldList');
+        $this->table->setRenderer(\App\Config::getInstance()->createTableRenderer($this->table));
 
         $this->table->addCell(new \Tk\Table\Cell\Checkbox('id'));
         $this->table->addCell(new \Tk\Table\Cell\Text('name'))->addCss('key')->setUrl(clone $this->editUrl);
@@ -66,8 +66,8 @@ class Manager extends AdminManagerIface
         $this->table->addCell(new \Tk\Table\Cell\Text('entries'))->setOnPropertyValue(function ($cell, $obj) {
             /** @var \Skill\Db\Collection $obj */
             $filter = array('collectionId' => $obj->getId());
-            if (\App\Factory::getCourse()) {
-                $filter['courseId'] = \App\Factory::getCourse()->getId();
+            if (\Uni\Config::getInstance()->getCourse()) {
+                $filter['courseId'] = \Uni\Config::getInstance()->getCourse()->getId();
             }
             return \Skill\Db\EntryMap::create()->findFiltered($filter)->count();
         });

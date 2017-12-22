@@ -48,15 +48,15 @@ class SystemSettings extends Iface
      */
     public function doDefault(Request $request)
     {
-        $this->form = \App\Factory::createForm('formEdit');
-        $this->form->setRenderer(\App\Factory::createFormRenderer($this->form));
+        $this->form = \App\Config::getInstance()->createForm('formEdit');
+        $this->form->setRenderer(\App\Config::getInstance()->createFormRenderer($this->form));
 
         $this->form->addField(new Field\Input('plugin.title'))->setLabel('Site Title')->setRequired(true);
         $this->form->addField(new Field\Input('plugin.email'))->setLabel('Site Email')->setRequired(true);
         
         $this->form->addField(new Event\Button('update', array($this, 'doSubmit')));
         $this->form->addField(new Event\Button('save', array($this, 'doSubmit')));
-        $this->form->addField(new Event\LinkButton('cancel', \App\Factory::getCrumbs()->getBackUrl()));
+        $this->form->addField(new Event\LinkButton('cancel', \Uni\Ui\Crumbs::getInstance()->getBackUrl()));
 
         $this->form->load($this->data->toArray());
         $this->form->execute();

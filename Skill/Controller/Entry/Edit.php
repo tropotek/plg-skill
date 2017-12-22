@@ -127,8 +127,8 @@ class Edit extends AdminEditIface
      */
     protected function buildForm()
     {
-        $this->form = \App\Factory::createForm('entryEdit');
-        $this->form->setRenderer(\App\Factory::createFormRenderer($this->form));
+        $this->form = \App\Config::getInstance()->createForm('entryEdit');
+        $this->form->setRenderer(\App\Config::getInstance()->createFormRenderer($this->form));
 
 
         $f = $this->form->addField(new Field\Input('title'))->setFieldset('Entry Details');
@@ -175,7 +175,7 @@ class Edit extends AdminEditIface
         } else {
             $this->form->addField(new Event\Submit('update', array($this, 'doSubmit')));
             $this->form->addField(new Event\Submit('save', array($this, 'doSubmit')));
-            $this->form->addField(new Event\Link('cancel', \App\Factory::getCrumbs()->getBackUrl()));
+            $this->form->addField(new Event\Link('cancel', \Uni\Ui\Crumbs::getInstance()->getBackUrl()));
         }
 
     }
@@ -232,7 +232,7 @@ class Edit extends AdminEditIface
 
         \Tk\Alert::addSuccess('Record saved!');
         if ($form->getTriggeredEvent()->getName() == 'update') {
-            \App\Factory::getCrumbs()->getBackUrl()->redirect();
+            \Uni\Ui\Crumbs::getInstance()->getBackUrl()->redirect();
         }
         \Tk\Uri::create()->set('entryId', $this->entry->getId())->redirect();
     }

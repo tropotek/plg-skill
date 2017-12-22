@@ -28,7 +28,7 @@ class ReportingMap
      */
     public static function create($db = null) {
         if ($db == null) {
-            $db = \App\Factory::getDb();
+            $db = \App\Config::getInstance()->getDb();
         }
         $obj = new static($db);
         return $obj;
