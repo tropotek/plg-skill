@@ -160,7 +160,6 @@ class Collection extends \Tk\Db\Map\Model
         $b[] = in_array($placement->status, $this->available);
         $b[] = $this->active;
         $b[] = CollectionMap::create()->hasPlacementType($this->getId(), $placement->placementTypeId);
-        vd($b);
         return !in_array(false, $b, true);      // return false if a false is in any result
     }
 
