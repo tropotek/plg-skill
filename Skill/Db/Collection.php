@@ -151,12 +151,17 @@ class Collection extends \Tk\Db\Map\Model
     /**
      * Use this to test if the public user can submit an entry
      *
-     * @param string $placementStatus
+     * @param \App\Db\Placement $placement
      * @return bool
      */
-    public function isAvailable($placementStatus)
+    public function isAvailable($placement)
     {
-        return in_array($placementStatus, $this->available);
+        $b = array();
+        $b[] = in_array($placement->status, $this->available);
+        $b[] = $this->active;
+        $b[] = CollectionMap::create()->hasPlacementType($this->getId(), $placement->placementTypeId);
+        vd($b);
+        return !in_array(false, $b, true);      // return false if a false is in any result
     }
 
     /**

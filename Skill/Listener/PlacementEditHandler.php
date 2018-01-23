@@ -49,10 +49,10 @@ class PlacementEditHandler implements Subscriber
                 'placementTypeId' => $controller->getPlacement()->placementTypeId
             ));
 
-            $status = $controller->getPlacement()->status;
+            //$status = $controller->getPlacement()->status;
             /** @var \Skill\Db\Collection $collection */
             foreach ($collectionList as $collection) {
-                if (!$collection->isAvailable($status)) continue;
+                if (!$collection->isAvailable($controller->getPlacement())) continue;
 
                 $entry = \Skill\Db\EntryMap::create()->findFiltered(array('collectionId' => $collection->getId(),
                     'placementId' => $controller->getPlacement()->getId()))->current();

@@ -62,6 +62,7 @@ class Edit extends AdminEditIface
     /**
      *
      * @param Request $request
+     * @throws \Tk\Exception
      */
     public function doDefault(Request $request)
     {
@@ -86,7 +87,7 @@ class Edit extends AdminEditIface
                 $this->errors[] = 'This entry has already been submitted.';
                 return;
             }
-            if ($this->entry->getPlacement() && !$this->entry->getCollection()->isAvailable($this->entry->getPlacement()->status)) {
+            if ($this->entry->getPlacement() && !$this->entry->getCollection()->isAvailable($this->entry->getPlacement())) {
                 $this->errors[] = 'This entry is no longer available.';
                 return;
             }

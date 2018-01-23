@@ -37,31 +37,31 @@ class PlacementManagerButtonHandler implements Subscriber
         /** @var \App\Controller\Placement\Edit $controller */
         $controller = $event->get('controller');
         if ($controller instanceof \App\Controller\Placement\Manager) {
-            if (!$controller->getPlacement()->getId()) return;
-
-            /** @var \Tk\Ui\Admin\ActionPanel $actionPanel */
-            $actionPanel = $controller->getActionPanel();
 
             $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('profileId' => $this->course->profileId, 'active' => true));
-            $status = $controller->getPlacement()->status;
+            $actionsCell = $controller->getActionsCell();
+
             /** @var \Skill\Db\Collection $collection */
             foreach ($collectionList as $collection) {
-                if (!$collection->isAvailable($status)) continue;
+                $url = \App\Uri::create('/skill/entryEdit.html')->set('collectionId', $collection->getId());
+                $actionsCell->addButton(\Tk\Table\Cell\ActionButton::create($collection->name, $url, $collection->icon))
+                    ->setOnShow(function ($cell, $obj, $button) use ($collection) {
+                        /* @var $obj \App\Db\Placement */
+                        /* @var $button \Tk\Table\Cell\ActionButton */
+                        $button->getUrl()->set('placementId', $obj->getId());
+                        if (!$collection->isAvailable($obj)) {
+                            $button->setVisible(false);
+                            return;
+                        }
 
-                $entry = \Skill\Db\EntryMap::create()->findFiltered(array('collectionId' => $collection->getId(),
-                    'placementId' => $controller->getPlacement()->getId()))->current();
-
-                $btn = $actionPanel->addButton(\Tk\Ui\Button::create($collection->name,
-                    \App\Uri::create('/skill/entryEdit.html')->set('collectionId', $collection->getId())->
-                    set('placementId', $controller->getPlacement()->getId()), $collection->icon));
-                //$btn->setAttr('title', 'This is a test');
-                //$btn->addCss('disabled');
-
-                if ($entry) {
-                    $btn->addCss('btn-default');
-                } else {
-                    $btn->addCss('btn-primary');
-                }
+                        $entry = \Skill\Db\EntryMap::create()->findFiltered(array('collectionId' => $collection->getId(),
+                            'placementId' => $obj->getId()))->current();
+                        if ($entry) {
+                            $button->addCss('btn-default');
+                        } else {
+                            $button->addCss('btn-primary');
+                        }
+                    });
 
             }
         }
