@@ -28,11 +28,15 @@ $routes->add('skill-item-edit', new \Tk\Routing\Route('/skill/itemEdit.html', 'S
 
 $routes->add('skill-entry-collection-manager', new \Tk\Routing\Route('/skill/entryCollectionManager.html', 'Skill\Controller\Entry\CollectionManager::doDefault', $params));
 $routes->add('skill-entry-manager', new \Tk\Routing\Route('/skill/entryManager.html', 'Skill\Controller\Entry\Manager::doDefault', $params));
-$routes->add('skill-entry-edit', new \Tk\Routing\Route('/skill/entryEdit.html', 'Skill\Controller\Entry\Edit::doDefault', $params));
-$routes->add('skill-entry-view', new \Tk\Routing\Route('/skill/entryView.html', 'Skill\Controller\Entry\View::doDefault', $params));
 
+
+
+$routes->add('skill-course-entry-edit', new \Tk\Routing\Route('/staff/{courseCode}/entryEdit.html', 'Skill\Controller\Entry\Edit::doDefault', $params));
+$routes->add('skill-course-entry-view', new \Tk\Routing\Route('/staff/{courseCode}/entryView.html', 'Skill\Controller\Entry\View::doDefault', $params));
 $routes->add('skill-entry-results-staff', new \Tk\Routing\Route('/staff/{courseCode}/skillEntryResults.html', 'Skill\Controller\Entry\Results::doDefault', $params));
 $routes->add('skill-entry-results-student', new \Tk\Routing\Route('/student/{courseCode}/skillEntryResults.html', 'Skill\Controller\Entry\Results::doDefault', $params));
+
+
 
 
 // Staff Only

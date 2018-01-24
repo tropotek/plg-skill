@@ -106,7 +106,7 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
     {
         /** @var Entry $model */
         $model = $this->getStatus()->getModel();
-        $editUrl = \App\Uri::createCourseUrl('/skill/entryEdit.html')->set('collectionId', $model->collectionId)->set('courseId', $model->courseId)->
+        $editUrl = \App\Uri::createCourseUrl('/entryEdit.html')->set('collectionId', $model->collectionId)->
             set('userId', $model->userId)->set('placementId', $model->placementId);
 
         // TODO: get the icon from the entry collection
@@ -123,15 +123,15 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
         /** @var Entry $model */
         $model = $this->getStatus()->getModel();
         $collection = $model->getCollection();
-        $editUrl = \App\Uri::createCourseUrl('/skill/entryEdit.html')->set('collectionId', $model->collectionId)->set('courseId', $model->courseId)->
+        $editUrl = \App\Uri::createCourseUrl('/entryEdit.html')->set('collectionId', $model->collectionId)->
             set('userId', $model->userId)->set('placementId', $model->placementId);
         $from = '';
         if ($model->getPlacement()) {
-            $editUrl = \App\Uri::createCourseUrl('/placementEdit.html')->set('placementId', $model->getPlacement()->getId());
+            //$editUrl = \App\Uri::createCourseUrl('/skill/entryEdit.html')->set('placementId', $model->getPlacement()->getId());
             $from = 'from <em>' . $model->getPlacement()->getCompany()->name . '</em>';
         }
 
-        return sprintf('<div class="status-placement"><div><em>%s</em> %s submitted a %s Entry for <em>%s</em></div>
+        $html = sprintf('<div class="status-placement"><div><em>%s</em> %s submitted a %s Entry for <em>%s</em></div>
   <div class="status-actions">
     <a href="%s" class="edit"><i class="fa fa-pencil"></i> Edit</a>
    <!--  |
@@ -142,7 +142,9 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
     -->
   </div>
 </div>',
-            $model->assessor, $from, $collection->name, $model->getPlacement()->getUser()->name, $editUrl);
+            $model->assessor, $from, $collection->name, $model->getPlacement()->getUser()->name, htmlentities($editUrl));
+
+        return $html;
     }
 
     /**
