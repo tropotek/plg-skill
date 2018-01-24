@@ -80,6 +80,10 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
                     $message->addTo(\Tk\Mail\Message::joinEmail($placement->getCompany()->email, $placement->getCompany()->name));
                 }
                 break;
+            case \App\Db\MailTemplate::RECIPIENT_SUPERVISOR:
+                if ($placement->getSupervisor() && $placement->getSupervisor()->email)
+                    $message->addTo(\Tk\Mail\Message::joinEmail($placement->getSupervisor()->email, $placement->getSupervisor()->name));
+                break;
             case \App\Db\MailTemplate::RECIPIENT_STAFF:
                 $staffList = $status->getCourse()->getStaffList();
                 if (count($staffList)) {
@@ -128,16 +132,16 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
         $from = '';
         if ($model->getPlacement()) {
             //$editUrl = \App\Uri::createCourseUrl('/skill/entryEdit.html')->set('placementId', $model->getPlacement()->getId());
-            $from = 'from <em>' . $model->getPlacement()->getCompany()->name . '</em>';
+            $from = 'from <em>' . htmlentities($model->getPlacement()->getCompany()->name) . '</em>';
         }
 
         $html = sprintf('<div class="status-placement"><div><em>%s</em> %s submitted a %s Entry for <em>%s</em></div>
   <div class="status-actions">
     <a href="%s" class="edit"><i class="fa fa-pencil"></i> Edit</a>
    <!--  |
-    <a href="#" class="view"><i class="fa fa-eye"></i> View</a> |  
-    <a href="#" class="approve"><i class="fa fa-check"></i> Approve</a> | 
-    <a href="#" class="reject"><i class="fa fa-times"></i> Reject</a> | 
+    <a href="#" class="view"><i class="fa fa-eye"></i> View</a> |
+    <a href="#" class="approve"><i class="fa fa-check"></i> Approve</a> |
+    <a href="#" class="reject"><i class="fa fa-times"></i> Reject</a> |
     <a href="#" class="email"><i class="fa fa-envelope"></i> Email</a>
     -->
   </div>
