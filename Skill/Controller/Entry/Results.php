@@ -32,6 +32,9 @@ class Results extends AdminIface
     {
         parent::__construct();
         $this->setPageTitle('Results');
+        if ($this->getUser()->isStudent()) {
+            $this->getActionPanel()->setEnabled(false);
+        }
     }
 
     /**
@@ -58,6 +61,7 @@ class Results extends AdminIface
         if ($this->collection->icon) {
             $template->addCss('icon', $this->collection->icon);
         }
+        vd($this->user);
         $panelTitle = sprintf('%s Results for `%s`', $this->collection->name, $this->user->name);
         $template->insertText('panel-title', $panelTitle);
 

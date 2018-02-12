@@ -30,7 +30,6 @@ $routes->add('skill-entry-collection-manager', new \Tk\Routing\Route('/skill/ent
 $routes->add('skill-entry-manager', new \Tk\Routing\Route('/skill/entryManager.html', 'Skill\Controller\Entry\Manager::doDefault', $params));
 
 
-
 // Staff Only
 $params = array('role' => array('staff'));
 $routes->add('skill-course-entry-edit', new \Tk\Routing\Route('/staff/{courseCode}/entryEdit.html', 'Skill\Controller\Entry\Edit::doDefault', $params));
@@ -39,13 +38,9 @@ $routes->add('skill-entry-results-staff', new \Tk\Routing\Route('/staff/{courseC
 $routes->add('skill-collection-report', new \Tk\Routing\Route('/skill/collectionReport.html', 'Skill\Controller\Collection\Report::doDefault', $params));
 
 
-
 // student Only
 $params = array('role' => array('student'));
 $routes->add('skill-entry-results-student', new \Tk\Routing\Route('/student/{courseCode}/skillEntryResults.html', 'Skill\Controller\Entry\Results::doDefault', $params));
-
-
-
 
 
 // Guest Pages

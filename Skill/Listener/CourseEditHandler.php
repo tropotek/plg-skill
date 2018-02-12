@@ -32,39 +32,56 @@ class CourseEditHandler implements Subscriber
      */
     public function onControllerInit(Event $event)
     {
-        $plugin = Plugin::getInstance();
-        $config = $plugin->getConfig();
-        //$config->getLog()->info($plugin->getName() . ': onControllerAccess(\'profile\', '.$this->profileId.') ');
-
-        /** @var \Tk\Controller\Iface $controller */
+        /** @var \App\Controller\Course\Edit $controller */
         $controller = $event->get('controller');
-
-
         if ($controller instanceof \App\Controller\Course\Edit) {
-            if ($controller->getUser()->isStaff()) {
-                /** @var \Tk\Ui\Admin\ActionPanel $actionPanel */
-                $actionPanel = $controller->getActionPanel();
-                $actionPanel->addButton(\Tk\Ui\Button::create('Skill Collections',
-                    \App\Uri::create('/skill/entryCollectionManager.html')->set('courseId', $this->course->getId()),
-                    'fa fa-graduation-cap'));
-            }
+            if (!$controller->getUser()->isStaff()) return;
+            /** @var \Tk\Ui\Admin\ActionPanel $actionPanel */
+            $actionPanel = $controller->getActionPanel();
+            $actionPanel->addButton(\Tk\Ui\Button::create('Skill Collections',
+                \App\Uri::create('/skill/entryCollectionManager.html')->set('courseId', $this->course->getId()),
+                'fa fa-graduation-cap'));
         }
-
     }
-
 
     /**
-     * Check the user has access to this controller
-     *
-     * @param Event $event
+     * @param \Tk\Event\FormEvent $event
+     * @throws \Tk\Form\Exception
      */
-    public function onControllerShow(Event $event)
+    public function onFormInit($event)
     {
-        $plugin = Plugin::getInstance();
-        $config = $plugin->getConfig();
-        //$config->getLog()->info($plugin->getName() . ': onControllerShow(\'profile\', '.$this->profileId.') ');
+        $form = $event->getForm();
+        $data = $this->course->getData();
+
+        $list = \Skill\Db\CollectionMap::create()->findFiltered(
+            array('profileId' => $this->course->profileId, 'gradable' => true, 'view_grade' => true)
+        );
+
+        $field = $form->addField(new \Tk\Form\Field\Select(\Skill\Db\Collection::FIELD_ENABLE_RESULTS.'[]', \Tk\Form\Field\Option\ArrayObjectIterator::create($list)))->addCss('tk-dual-select')
+            ->setAttr('data-title', 'Enabled Skill Results')->setNotes('Enable/Disable what skill results students can access.');
+
+        $field->setValue($data->get(\Skill\Db\Collection::FIELD_ENABLE_RESULTS, ''));
+
+        $form->addEventCallback('update', array($this, 'doSubmit'));
+        $form->addEventCallback('save', array($this, 'doSubmit'));
     }
 
+    /**
+     * @param \Tk\Form $form
+     * @param \Tk\Form\Event\Iface $event
+     * @throws \Exception
+     */
+    public function doSubmit($form, $event)
+    {
+        $data = $this->course->getData();
+        if ($form->hasErrors()) {
+            return;
+        }
+        $data->set(\Skill\Db\Collection::FIELD_ENABLE_RESULTS, $form->getFieldValue(\Skill\Db\Collection::FIELD_ENABLE_RESULTS));
+        $data->save();
+
+
+    }
 
     /**
      * Returns an array of event names this subscriber wants to listen to.
@@ -90,7 +107,7 @@ class CourseEditHandler implements Subscriber
     {
         return array(
             \Tk\PageEvents::CONTROLLER_INIT => array('onControllerInit', 0),
-            \Tk\PageEvents::CONTROLLER_SHOW => array('onControllerShow', 0)
+            \Tk\Form\FormEvents::FORM_INIT => array('onFormInit', 0)
         );
     }
     

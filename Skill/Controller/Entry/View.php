@@ -35,6 +35,7 @@ class View extends AdminEditIface
     /**
      *
      * @param Request $request
+     * @throws \Tk\Exception
      */
     public function doDefault(Request $request)
     {

@@ -18,12 +18,21 @@ class CourseDashboardHandler implements Subscriber
      */
     private $course = null;
 
+    /**
+     * @var \App\Controller\Iface
+     */
+    protected $controller = null;
 
+
+
+    /**
+     * CourseDashboardHandler constructor.
+     * @param \App\Db\Course $course
+     */
     public function __construct($course)
     {
         $this->course = $course;
     }
-
 
     /**
      * Check the user has access to this controller
@@ -33,19 +42,16 @@ class CourseDashboardHandler implements Subscriber
     public function onControllerInit(Event $event)
     {
         /** @var \App\Controller\Staff\CourseDashboard $controller */
-        $controller = $event->get('controller');
-        if ($controller instanceof \App\Controller\Staff\CourseDashboard) {
-
-            $course = $controller->getCourse();
-            $userList = $controller->getCourseUserList();
+        $this->controller = $event->get('controller');
+        if ($this->controller instanceof \App\Controller\Staff\CourseDashboard) {
+            $course = $this->controller->getCourse();
+            $userList = $this->controller->getCourseUserList();
             $userList->setOnShowUser(function (\Dom\Template $template, \App\Db\User $user) use ($course) {
                 $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('profileId' => $course->profileId,
                     'gradable' => true, 'view_grade' => true));
                 /** @var \Skill\Db\Collection $collection */
                 foreach ($collectionList as $collection) {
                     if (!$collection->active) continue;
-//                    $placementTypeIdList = \Skill\Db\CollectionMap::create()->findPlacementTypes($collection->getId());
-//                    $placementStatusList = $collection->available;
                     // if user has a placement of at least one of the types and status
                     $entryList = \Skill\Db\EntryMap::create()->findFiltered(array(
                         'userId' => $user->getId(),
@@ -53,7 +59,6 @@ class CourseDashboardHandler implements Subscriber
                         'status' => \Skill\Db\Entry::STATUS_APPROVED
                     ));
                     if ($entryList->count()) {
-                    //if (\App\Db\PlacementMap::create()->userHasTypes($user->getId(), $placementTypeIdList, $placementStatusList)) {
                         $btn = \Tk\Ui\Button::create($collection->name . ' Results', \App\Uri::createCourseUrl('/skillEntryResults.html')->
                             set('userId', $user->getId())->set('collectionId', $collection->getId()), $collection->icon);
                         $btn->addCss('btn-success btn-xs');
@@ -65,17 +70,32 @@ class CourseDashboardHandler implements Subscriber
         }
     }
 
-
     /**
      * Check the user has access to this controller
      *
      * @param Event $event
      */
-    public function onControllerShow(Event $event)
+    public function onSidebarShow(Event $event)
     {
-        $plugin = Plugin::getInstance();
-        $config = $plugin->getConfig();
-        //$config->getLog()->info($plugin->getName() . ': onControllerShow(\'profile\', '.$this->profileId.') ');
+        if ($this->controller->getUser()->isStudent()) {
+            /** @var \App\Ui\Sidebar\Iface $sidebar */
+            $sidebar = $event->get('sidebar');
+            $course = $this->controller->getCourse();
+            $user = $this->controller->getUser();
+            if (!$user || !$user->isStudent()) return;
+
+            $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(
+                array('profileId' => $course->profileId, 'gradable' => true, 'view_grade' => true)
+            );
+
+            /** @var \Skill\Db\Collection $collection */
+            foreach ($collectionList as $collection) {
+                if (!$collection->isResultsEnabled($course)) continue;
+                $html = sprintf('<li><a href="%s">%s</a></li>', htmlentities(\App\Uri::createCourseUrl('/skillEntryResults.html')->
+                    set('userId', $user->getId())->set('collectionId', $collection->getId())->toString()), $collection->name);
+                $sidebar->getTemplate()->appendHtml('menu', $html);
+            }
+        }
     }
 
 
@@ -103,7 +123,7 @@ class CourseDashboardHandler implements Subscriber
     {
         return array(
             \Tk\PageEvents::CONTROLLER_INIT => array('onControllerInit', 0),
-            //\Tk\PageEvents::CONTROLLER_SHOW => array('onControllerShow', 0)
+            \App\UiEvents::SIDEBAR_SHOW => array('onSidebarShow', 0)
         );
     }
     
