@@ -52,7 +52,9 @@ class Edit extends AdminEditIface
         $this->form->execute($request);
     }
 
-
+    /**
+     * @throws \Tk\Form\Exception
+     */
     protected function buildForm() 
     {
         $this->form = \App\Config::getInstance()->createForm('collectionEdit');
@@ -82,7 +84,7 @@ class Edit extends AdminEditIface
         $ptiField->setValue($list);
 
         $this->form->addField(new Field\Checkbox('active'))->setNotes('Enable this collection for user submissions.');
-        $this->form->addField(new Field\Checkbox('viewGrade'))->setNotes('Allow students to view their course results from all entries from this collection.');
+        //$this->form->addField(new Field\Checkbox('viewGrade'))->setNotes('Allow students to view their course results from all entries from this collection.');
         $this->form->addField(new Field\Checkbox('includeZero'))->setNotes('Should the zero values be included in the weighted average calculation.');
 
         $this->form->addField(new Field\Input('confirm'))->setNotes('If enabled, the user will be prompted with the given text before they can submit their entry.');

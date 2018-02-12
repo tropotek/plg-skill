@@ -77,9 +77,10 @@ class Collection extends \Tk\Db\Map\Model
 
     /**
      * Enable students to view their final results of all compiled entry grades
+     * This is now a data variable in the course_data table as this is course
      * @var boolean
      */
-    public $viewGrade = false;
+    //public $viewGrade = false;
 
     /**
      * Should the zero values be included in the weighted average calculation

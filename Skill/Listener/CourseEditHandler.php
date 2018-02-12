@@ -18,7 +18,10 @@ class CourseEditHandler implements Subscriber
      */
     private $course = null;
 
-
+    /**
+     * CourseEditHandler constructor.
+     * @param $course
+     */
     public function __construct($course)
     {
         $this->course = $course;
@@ -79,8 +82,6 @@ class CourseEditHandler implements Subscriber
         }
         $data->set(\Skill\Db\Collection::FIELD_ENABLE_RESULTS, $form->getFieldValue(\Skill\Db\Collection::FIELD_ENABLE_RESULTS));
         $data->save();
-
-
     }
 
     /**

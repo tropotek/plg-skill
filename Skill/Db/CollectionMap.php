@@ -33,7 +33,7 @@ class CollectionMap extends \App\Db\Mapper
             $this->dbMap->addPropertyMap(new Db\Boolean('active'));
             $this->dbMap->addPropertyMap(new Db\Boolean('gradable'));
             $this->dbMap->addPropertyMap(new Db\Decimal('maxGrade', 'max_grade'));
-            $this->dbMap->addPropertyMap(new Db\Boolean('viewGrade', 'view_grade'));
+            //$this->dbMap->addPropertyMap(new Db\Boolean('viewGrade', 'view_grade'));
             $this->dbMap->addPropertyMap(new Db\Boolean('includeZero', 'include_zero'));
             $this->dbMap->addPropertyMap(new Db\Text('confirm'));
             $this->dbMap->addPropertyMap(new Db\Text('instructions'));

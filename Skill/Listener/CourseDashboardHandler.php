@@ -91,8 +91,8 @@ class CourseDashboardHandler implements Subscriber
             /** @var \Skill\Db\Collection $collection */
             foreach ($collectionList as $collection) {
                 if (!$collection->isResultsEnabled($course)) continue;
-                $html = sprintf('<li><a href="%s">%s</a></li>', htmlentities(\App\Uri::createCourseUrl('/skillEntryResults.html')->
-                    set('userId', $user->getId())->set('collectionId', $collection->getId())->toString()), $collection->name);
+                $html = sprintf('<li><a href="%s" title="View %s Results">%s</a></li>', htmlentities(\App\Uri::createCourseUrl('/skillEntryResults.html')->
+                    set('userId', $user->getId())->set('collectionId', $collection->getId())->toString()), $collection->name, $collection->name);
                 $sidebar->getTemplate()->appendHtml('menu', $html);
             }
         }
