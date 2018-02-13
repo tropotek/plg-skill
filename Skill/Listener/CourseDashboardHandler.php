@@ -85,7 +85,7 @@ class CourseDashboardHandler implements Subscriber
             if (!$user || !$user->isStudent()) return;
 
             $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(
-                array('profileId' => $course->profileId, 'gradable' => true, 'view_grade' => true)
+                array('profileId' => $course->profileId, 'gradable' => true, 'viewGrade' => true)
             );
 
             /** @var \Skill\Db\Collection $collection */

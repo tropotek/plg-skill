@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS skill_collection (
   available VARCHAR(255) DEFAULT '' NOT NULL,     -- A list of placement statuses that the collection is available for submission/editing by user
   active BOOL NOT NULL DEFAULT 1,                 -- enable/disable user submission/editing
   gradable BOOL DEFAULT 0 NOT NULL,               -- Is this collection gradable
+  require_placement BOOL DEFAULT 0 NOT NULL,      --
   max_grade DECIMAL(8,2) NOT NULL DEFAULT 10.0,   -- The max grade ratio 
   view_grade BOOL DEFAULT 0 NOT NULL,             -- Can the student view their grade results for this collection
   include_zero BOOL DEFAULT 1 NOT NULL,           -- Should the zero values be included in the weighted average calculation (Default: true)

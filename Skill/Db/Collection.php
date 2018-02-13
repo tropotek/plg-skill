@@ -71,6 +71,12 @@ class Collection extends \Tk\Db\Map\Model
     public $gradable = false;
 
     /**
+     * Is this collections Entries linked to a placement
+     * @var boolean
+     */
+    public $requirePlacement = false;
+
+    /**
      * @var float
      */
     public $maxGrade = 10.0;
@@ -209,8 +215,12 @@ class Collection extends \Tk\Db\Map\Model
         if (!$this->role) {
             $errors['role'] = 'Please enter a valid role for this collection';
         }
-        if (!$this->available) {
-            $errors['available'] = 'Please select at least one valid status for this collection to be available for.';
+
+        if($this->requirePlacement) {
+            if (!$this->available) {
+                $errors['available'] = 'Please select at least one valid status for this collection to be available for.';
+            }
+            // Also requires a placement type
         }
         
         return $errors;

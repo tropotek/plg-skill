@@ -32,7 +32,7 @@ class PlacementManagerButtonHandler implements Subscriber
     public function onControllerInit(Event $event)
     {
         $plugin = \Skill\Plugin::getInstance();
-        $config = $plugin->getConfig();
+        //$config = $plugin->getConfig();
 
         /** @var \App\Controller\Placement\Edit $controller */
         $controller = $event->get('controller');

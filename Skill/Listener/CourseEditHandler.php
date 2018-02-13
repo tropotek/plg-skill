@@ -19,6 +19,13 @@ class CourseEditHandler implements Subscriber
     private $course = null;
 
     /**
+     * @var \App\Controller\Course\Edit
+     */
+    protected $controller = null;
+
+
+
+    /**
      * CourseEditHandler constructor.
      * @param $course
      */
@@ -29,18 +36,29 @@ class CourseEditHandler implements Subscriber
 
 
     /**
+     * @param \Tk\Event\ControllerEvent $event
+     */
+    public function onKernelController(\Tk\Event\ControllerEvent $event)
+    {
+        /** @var \App\Controller\Course\Edit $controller */
+        $controller = $event->getController();
+        if ($controller instanceof \App\Controller\Course\Edit) {
+            $this->controller = $controller;
+        }
+    }
+
+
+    /**
      * Check the user has access to this controller
      *
      * @param Event $event
      */
     public function onControllerInit(Event $event)
     {
-        /** @var \App\Controller\Course\Edit $controller */
-        $controller = $event->get('controller');
-        if ($controller instanceof \App\Controller\Course\Edit) {
-            if (!$controller->getUser()->isStaff()) return;
+        if ($this->controller) {
+            if (!$this->controller->getUser()->isStaff()) return;
             /** @var \Tk\Ui\Admin\ActionPanel $actionPanel */
-            $actionPanel = $controller->getActionPanel();
+            $actionPanel = $this->controller->getActionPanel();
             $actionPanel->addButton(\Tk\Ui\Button::create('Skill Collections',
                 \App\Uri::create('/skill/entryCollectionManager.html')->set('courseId', $this->course->getId()),
                 'fa fa-graduation-cap'));
@@ -53,15 +71,21 @@ class CourseEditHandler implements Subscriber
      */
     public function onFormInit($event)
     {
+        if (!$this->controller) return;
+
         $form = $event->getForm();
         $data = $this->course->getData();
 
-        $list = \Skill\Db\CollectionMap::create()->findFiltered(
-            array('profileId' => $this->course->profileId, 'gradable' => true, 'view_grade' => true)
-        );
+        $list1 = \Skill\Db\CollectionMap::create()->findFiltered(
+            array('profileId' => $this->course->profileId, 'gradable' => true, 'viewGrade' => true)
+        )->toArray();
+        $list2 = \Skill\Db\CollectionMap::create()->findFiltered(
+            array('profileId' => $this->course->profileId, 'requirePlacement' => false)
+        )->toArray();
+        $list = array_merge($list1, $list2);
 
         $field = $form->addField(new \Tk\Form\Field\Select(\Skill\Db\Collection::FIELD_ENABLE_RESULTS.'[]', \Tk\Form\Field\Option\ArrayObjectIterator::create($list)))->addCss('tk-dual-select')
-            ->setAttr('data-title', 'Enabled Skill Results')->setNotes('Enable/Disable what skill results students can access.');
+            ->setAttr('data-title', 'Enabled Skill Collections')->setNotes('Enable/Disable the Skill Collections students can access.');
 
         $field->setValue($data->get(\Skill\Db\Collection::FIELD_ENABLE_RESULTS, ''));
 
@@ -107,8 +131,9 @@ class CourseEditHandler implements Subscriber
     public static function getSubscribedEvents()
     {
         return array(
+            \Tk\Kernel\KernelEvents::CONTROLLER => array('onKernelController', 0),
             \Tk\PageEvents::CONTROLLER_INIT => array('onControllerInit', 0),
-            \Tk\Form\FormEvents::FORM_INIT => array('onFormInit', 0)
+            \Tk\Form\FormEvents::FORM_LOAD => array('onFormInit', 0)
         );
     }
     

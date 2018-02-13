@@ -32,6 +32,7 @@ class CollectionMap extends \App\Db\Mapper
             $this->dbMap->addPropertyMap(new Db\ArrayObject('available'));
             $this->dbMap->addPropertyMap(new Db\Boolean('active'));
             $this->dbMap->addPropertyMap(new Db\Boolean('gradable'));
+            $this->dbMap->addPropertyMap(new Db\Boolean('requirePlacement', 'require_placement'));
             $this->dbMap->addPropertyMap(new Db\Decimal('maxGrade', 'max_grade'));
             //$this->dbMap->addPropertyMap(new Db\Boolean('viewGrade', 'view_grade'));
             $this->dbMap->addPropertyMap(new Db\Boolean('includeZero', 'include_zero'));
@@ -60,7 +61,8 @@ class CollectionMap extends \App\Db\Mapper
             $this->formMap->addPropertyMap(new Form\Object('available'));
             $this->formMap->addPropertyMap(new Form\Boolean('active'));
             $this->formMap->addPropertyMap(new Form\Boolean('gradable'));
-            $this->formMap->addPropertyMap(new Form\Boolean('maxGrade'));
+            $this->formMap->addPropertyMap(new Form\Boolean('requirePlacement'));
+            $this->formMap->addPropertyMap(new Form\Decimal('maxGrade'));
             $this->formMap->addPropertyMap(new Form\Boolean('viewGrade'));
             $this->formMap->addPropertyMap(new Form\Boolean('includeZero'));
             $this->formMap->addPropertyMap(new Form\Text('confirm'));
@@ -127,6 +129,10 @@ class CollectionMap extends \App\Db\Mapper
             $where .= sprintf('a.view_grade = %s AND ', (int)$filter['viewGrade']);
         }
 
+        if (isset($filter['requirePlacement']) && $filter['requirePlacement'] !== null && $filter['requirePlacement'] != '') {
+            $where .= sprintf('a.require_placement = %s AND ', (int)$filter['requirePlacement']);
+        }
+
         if (!empty($filter['active'])) {
             $where .= sprintf('a.active = %s AND ', (int)$filter['active']);
         }
@@ -167,6 +173,7 @@ class CollectionMap extends \App\Db\Mapper
         }
 
         $res = $this->selectFrom($from, $where, $tool);
+        vd($this->getDb()->getLastQuery());
         return $res;
     }
 
