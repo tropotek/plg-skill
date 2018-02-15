@@ -59,7 +59,7 @@ class View extends AdminEditIface
         $this->form = \App\Config::getInstance()->createForm('entryEdit');
         $this->form->setRenderer(\App\Config::getInstance()->createFormRenderer($this->form));
 
-        $this->form->addField(new Field\Html('title'))->setFieldset('Entry Details');
+        $this->form->addField(new Field\Html('title', htmlentities($this->entry->title)))->setFieldset('Entry Details');
         //if($this->entry->getCollection()->gradable && $this->getUser()->isStaff()) {
         if($this->entry->getCollection()->gradable) {
             $pct = round(($this->entry->average/($this->entry->getCollection()->getScaleLength()-1))*100);
@@ -81,7 +81,7 @@ class View extends AdminEditIface
             $this->form->addField(new Field\Html('confirm', $s))->setFieldset('Entry Details')->setNotes($this->entry->getCollection()->confirm);
         }
         if ($this->entry->notes)
-            $this->form->addField(new Field\Html('notes'))->setLabel('Comments')->setFieldset('Entry Details');
+            $this->form->addField(new Field\Html('notes'))->setLabel('Comments', htmlentities($this->entry->notes))->setFieldset('Entry Details');
 
         $items = \Skill\Db\ItemMap::create()->findFiltered(array('collectionId' => $this->entry->getCollection()->getId()),
             \Tk\Db\Tool::create('category_id, order_by'));
