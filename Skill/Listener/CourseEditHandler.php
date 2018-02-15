@@ -59,7 +59,7 @@ class CourseEditHandler implements Subscriber
             if (!$this->controller->getUser()->isStaff()) return;
             /** @var \Tk\Ui\Admin\ActionPanel $actionPanel */
             $actionPanel = $this->controller->getActionPanel();
-            $actionPanel->addButton(\Tk\Ui\Button::create('Skill Collections',
+            $actionPanel->add(\Tk\Ui\Button::create('Skill Collections',
                 \App\Uri::create('/skill/entryCollectionManager.html')->set('courseId', $this->course->getId()),
                 'fa fa-graduation-cap'));
         }
@@ -74,24 +74,22 @@ class CourseEditHandler implements Subscriber
         if (!$this->controller) return;
 
         $form = $event->getForm();
-        $data = $this->course->getData();
 
-        $list1 = \Skill\Db\CollectionMap::create()->findFiltered(
-            array('profileId' => $this->course->profileId, 'gradable' => true, 'viewGrade' => true)
-        )->toArray();
-        $list2 = \Skill\Db\CollectionMap::create()->findFiltered(
-            array('profileId' => $this->course->profileId, 'requirePlacement' => false)
-        )->toArray();
-        $list = array_merge($list1, $list2);
-
+        $list = \Skill\Db\CollectionMap::create()->findFiltered(
+            array('profileId' => $this->course->profileId)
+        );
         $field = $form->addField(new \Tk\Form\Field\Select(\Skill\Db\Collection::FIELD_ENABLE_RESULTS.'[]', \Tk\Form\Field\Option\ArrayObjectIterator::create($list)))->addCss('tk-dual-select')
             ->setAttr('data-title', 'Enabled Skill Collections')->setNotes('Enable/Disable the Skill Collections students can access.');
-
-        $field->setValue($data->get(\Skill\Db\Collection::FIELD_ENABLE_RESULTS, ''));
+        $selected = \Skill\Db\CollectionMap::create()->findFiltered(
+            array('courseId' => $this->course->getId())
+        );
+        $field->setValue($selected->toArray('id'));
 
         $form->addEventCallback('update', array($this, 'doSubmit'));
         $form->addEventCallback('save', array($this, 'doSubmit'));
     }
+
+
 
     /**
      * @param \Tk\Form $form
@@ -100,12 +98,21 @@ class CourseEditHandler implements Subscriber
      */
     public function doSubmit($form, $event)
     {
-        $data = $this->course->getData();
+        $list = $form->getFieldValue(\Skill\Db\Collection::FIELD_ENABLE_RESULTS);
+        if (!is_array($list)) {
+            $form->addFieldError(\Skill\Db\Collection::FIELD_ENABLE_RESULTS, 'Invalid collection values given.');
+        }
+
         if ($form->hasErrors()) {
             return;
         }
-        $data->set(\Skill\Db\Collection::FIELD_ENABLE_RESULTS, $form->getFieldValue(\Skill\Db\Collection::FIELD_ENABLE_RESULTS));
-        $data->save();
+
+        // Save collection links
+        \Skill\Db\CollectionMap::create()->removeCourse($this->course->getId());
+        foreach ($list as $collectionId) {
+            \Skill\Db\CollectionMap::create()->addCourse($this->course->getId(), $collectionId);
+        }
+
     }
 
     /**

@@ -28,6 +28,11 @@ class Category extends \Tk\Db\Map\Model
     /**
      * @var string
      */
+    public $label = '';
+
+    /**
+     * @var string
+     */
     public $description = '';
 
     /**

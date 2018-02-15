@@ -87,7 +87,7 @@ class CollectionMap extends \App\Db\Mapper
      *
      * @param array $filter
      * @param Tool $tool
-     * @return ArrayObject
+     * @return ArrayObject|Collection[]
      */
     public function findFiltered($filter = array(), $tool = null)
     {
@@ -125,15 +125,15 @@ class CollectionMap extends \App\Db\Mapper
             $where .= sprintf('a.gradable = %s AND ', (int)$filter['gradable']);
         }
 
-        if (!empty($filter['viewGrade'])) {
-            $where .= sprintf('a.view_grade = %s AND ', (int)$filter['viewGrade']);
-        }
-
         if (isset($filter['requirePlacement']) && $filter['requirePlacement'] !== null && $filter['requirePlacement'] != '') {
             $where .= sprintf('a.require_placement = %s AND ', (int)$filter['requirePlacement']);
         }
 
         if (!empty($filter['active'])) {
+            $where .= sprintf('a.active = %s AND ', (int)$filter['active']);
+        }
+
+        if (!empty($filter['studentCourseId'])) {
             $where .= sprintf('a.active = %s AND ', (int)$filter['active']);
         }
 
@@ -148,6 +148,11 @@ class CollectionMap extends \App\Db\Mapper
             if ($w) {
                 $where .= '('. $w . ') AND ';
             }
+        }
+
+        if (isset($filter['courseId'])) {
+            $from .= sprintf(', %s b', $this->quoteTable('skill_collection_course'));
+            $where .= sprintf('a.id = b.collection_id AND b.course_id = %s AND ', (int)$filter['courseId']);
         }
 
         // Find all collections that are enabled for the given placement statuses
@@ -216,6 +221,7 @@ class CollectionMap extends \App\Db\Mapper
      */
     public function addPlacementType($collectionId, $placementTypeId)
     {
+        if ($this->hasPlacementType($collectionId, $placementTypeId)) return;
         $stm = $this->getDb()->prepare('INSERT INTO skill_collection_placement_type (collection_id, placement_type_id)  VALUES (?, ?)');
         $stm->bindParam(1, $collectionId);
         $stm->bindParam(2, $placementTypeId);
@@ -239,10 +245,6 @@ class CollectionMap extends \App\Db\Mapper
     }
 
 
-
-
-
-
     public function findCourseAverage($collectionId, $courseId)
     {
         $stm = $this->getDb()->prepare('SELECT * 
@@ -257,6 +259,52 @@ class CollectionMap extends \App\Db\Mapper
         return $arr;
     }
 
+
+
+    // Link to courses
+
+    /**
+     * @param int $courseId
+     * @param int $collectionId
+     * @return boolean
+     */
+    public function hasCourse($courseId, $collectionId)
+    {
+        $stm = $this->getDb()->prepare('SELECT * FROM skill_collection_course WHERE course_id = ? AND collection_id = ?');
+        $stm->bindParam(1, $courseId);
+        $stm->bindParam(2, $collectionId);
+        $stm->execute();
+        return ($stm->rowCount() > 0);
+    }
+
+    /**
+     * @param int $courseId
+     * @param int $collectionId (optional) If null all are to be removed
+     */
+    public function removeCourse($courseId, $collectionId = null)
+    {
+        $stm = $this->getDb()->prepare('DELETE FROM skill_collection_course WHERE course_id = ?');
+        $stm->bindParam(1, $courseId);
+        if ($collectionId) {
+            $stm = $this->getDb()->prepare('DELETE FROM skill_collection_course WHERE course_id = ? AND collection_id = ?');
+            $stm->bindParam(1, $courseId);
+            $stm->bindParam(2, $collectionId);
+        }
+        $stm->execute();
+    }
+
+    /**
+     * @param int $courseId
+     * @param int $collectionId
+     */
+    public function addCourse($courseId, $collectionId)
+    {
+        if ($this->hasCourse($courseId, $collectionId)) return;
+        $stm = $this->getDb()->prepare('INSERT INTO skill_collection_course (course_id, collection_id)  VALUES (?, ?)');
+        $stm->bindParam(1, $courseId);
+        $stm->bindParam(2, $collectionId);
+        $stm->execute();
+    }
 
 
 

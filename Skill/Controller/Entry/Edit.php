@@ -44,12 +44,15 @@ class Edit extends AdminEditIface
     {
         parent::__construct();
         $this->setPageTitle('Skill Entry Edit');
+        if ($this->getUser()->isStudent()) {
+            $this->getActionPanel()->setEnabled(false);
+        }
     }
 
     /**
      * @param Request $request
-     * @return string
-     * @throws \Tk\Exception
+     * @throws \Exception
+     * @throws \Tk\Form\Exception
      */
     public function doPublicSubmission(Request $request)
     {
@@ -60,24 +63,47 @@ class Edit extends AdminEditIface
     }
 
     /**
-     *
+     * @param \Skill\Db\Entry $entry
+     * @return bool
+     */
+    public function isSelfAssessment($entry)
+    {
+        if (!$entry->getCollection()->gradable && !$entry->getCollection()->requirePlacement &&
+            $entry->getCollection()->role == \Skill\Db\Collection::ROLE_STUDENT) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * @param Request $request
-     * @throws \Tk\Exception
+     * @throws \Exception
+     * @throws \Tk\Form\Exception
      */
     public function doDefault(Request $request)
     {
         $this->entry = new \Skill\Db\Entry();
-        $this->entry->userId = (int)$request->get('userId');
-        $this->entry->courseId = (int)$request->get('courseId');
+        $this->entry->userId = ($request->has('userId')) ? (int)$request->get('userId') : $this->getUser()->getId();
+        $this->entry->courseId = ($request->has('courseId')) ? (int)$request->get('courseId') : $this->getCourse()->getId();
         $this->entry->collectionId = (int)$request->get('collectionId');
         $this->entry->placementId = (int)$request->get('placementId');
-
         if ($request->get('entryId')) {
             $this->entry = \Skill\Db\EntryMap::create()->find($request->get('entryId'));
         }
         if ($request->get('collectionId') && $request->get('placementId')) {
-            $e = \Skill\Db\EntryMap::create()->findFiltered(array('collectionId' => $request->get('collectionId'),
-                'placementId' => $request->get('placementId')))->current();
+            $e = \Skill\Db\EntryMap::create()->findFiltered(array(
+                'collectionId' => $request->get('collectionId'),
+                'placementId' => $request->get('placementId'))
+            )->current();
+            if ($e)
+                $this->entry = $e;
+        }
+        if (!$request->has('userId') && !$request->has('courseId') && $this->getUser()->isStudent()) {       // Assumed to be student self assessment form
+            $e = \Skill\Db\EntryMap::create()->findFiltered(array(
+                'collectionId' => $this->entry->collectionId,
+                'courseId' => $this->entry->courseId,
+                'userId' => $this->entry->userId)
+            )->current();
             if ($e)
                 $this->entry = $e;
         }
@@ -94,7 +120,7 @@ class Edit extends AdminEditIface
         }
 
         if ($this->entry->getId()) {
-            $this->getActionPanel()->addButton(\Tk\Ui\Button::create('View', \App\Uri::create('/skill/entryView.html')->set('entryId', $this->entry->getId()), 'fa fa-eye'));
+            $this->getActionPanel()->add(\Tk\Ui\Button::create('View', \App\Uri::create('/skill/entryView.html')->set('entryId', $this->entry->getId()), 'fa fa-eye'));
         }
         if (!$this->entry->getId() && $this->entry->getPlacement()) {
             $this->entry->title = $this->entry->getPlacement()->getTitle(true);
@@ -104,6 +130,15 @@ class Edit extends AdminEditIface
             if ($this->entry->getPlacement()->getSupervisor())
                 $this->entry->assessor = $this->entry->getPlacement()->getSupervisor()->name;
         }
+
+
+        if ($this->isSelfAssessment($this->entry) && !$this->entry->getId()) {
+            $this->entry->title = $this->entry->getCollection()->name . ' for ' . $this->entry->getUser()->getDisplayName();
+            $this->entry->assessor = $this->entry->getUser()->getName();
+        }
+
+
+
 
         $this->buildForm();
 
@@ -124,17 +159,20 @@ class Edit extends AdminEditIface
     }
 
     /**
-     * buildForm
+     * @throws \Tk\Form\Exception
      */
     protected function buildForm()
     {
         $this->form = \App\Config::getInstance()->createForm('entryEdit');
         $this->form->setRenderer(\App\Config::getInstance()->createFormRenderer($this->form));
 
-
-        $f = $this->form->addField(new Field\Input('title'))->setFieldset('Entry Details');
-        if ($this->entry->getPlacement() && $this->isPublic) {
-            $f->setReadonly();
+        if ($this->isSelfAssessment($this->entry)) {
+            $this->form->addField(new Field\Html('title'))->setFieldset('Entry Details');
+        } else {
+            $f = $this->form->addField(new Field\Input('title'))->setFieldset('Entry Details');
+            if ($this->entry->getPlacement() && $this->isPublic) {
+                $f->setReadonly();
+            }
         }
 
         if ($this->entry->getId() && $this->entry->getCollection()->gradable && !$this->isPublic) {
@@ -144,14 +182,16 @@ class Edit extends AdminEditIface
             $this->form->addField(new Field\Html('weightedAverage', sprintf('%.2f &nbsp; (%d%%)', $this->entry->weightedAverage, $pct)))->setFieldset('Entry Details');
         }
 
-        if ($this->getUser()->isStaff() && !$this->isPublic) {
+        if ($this->getUser()->isStaff()) {
             $this->form->addField(new \App\Form\Field\CheckSelect('status', \Skill\Db\Entry::getStatusList()))
                 ->setRequired()->prependOption('-- Status --', '')->setNotes('Set the status. Use the checkbox to disable notification emails.')->setFieldset('Entry Details');
         }
 
-        $this->form->addField(new Field\Input('assessor'))->setFieldset('Entry Details')->setRequired();
-        $this->form->addField(new Field\Input('absent'))->setFieldset('Entry Details');
-        $this->form->addField(new Field\Textarea('notes'))->addCss('tkTextareaTool')->setFieldset('Entry Details');
+        if (!$this->isSelfAssessment($this->entry)) {
+            $this->form->addField(new Field\Input('assessor'))->setFieldset('Entry Details')->setRequired();
+            $this->form->addField(new Field\Input('absent'))->setFieldset('Entry Details');
+        }
+        $this->form->addField(new Field\Textarea('notes'))->addCss('tkTextareaTool')->setLabel('Comments')->setFieldset('Entry Details');
 
 
         $items = \Skill\Db\ItemMap::create()->findFiltered(array('collectionId' => $this->entry->getCollection()->getId()),
@@ -183,15 +223,16 @@ class Edit extends AdminEditIface
 
     /**
      * @param \Tk\Form $form
+     * @param \Tk\Form\Event\Iface $event
      */
-    public function doSubmit($form)
+    public function doSubmit($form, $event)
     {
         // Load the object with data from the form using a helper object
         \Skill\Db\EntryMap::create()->mapForm($form->getValues(), $this->entry);
 
         if (!$this->isPublic) {
-            if (!$form->getFieldValue('status') || !in_array($form->getFieldValue('status'),
-                    \Tk\Object::getClassConstants($this->entry, 'STATUS'))) {
+            if ($form->getField('status') && (!$form->getFieldValue('status') || !in_array($form->getFieldValue('status'),
+                    \Tk\Object::getClassConstants($this->entry, 'STATUS'))) ) {
                 $form->addFieldError('status', 'Please Select a valid status');
             }
         } else {
@@ -223,7 +264,7 @@ class Edit extends AdminEditIface
         $this->entry->save();
 
         // Create status if changed and trigger notifications
-        if (!$this->isPublic) {
+        if (!$this->isPublic && $form->getField('status')) {
             \App\Db\Status::createFromField($this->entry, $form->getField('status'),
                 $this->entry->getCourse()->getProfile(), $this->entry->getCourse());
         } else {
@@ -232,10 +273,15 @@ class Edit extends AdminEditIface
         }
 
         \Tk\Alert::addSuccess('Record saved!');
+        $url = \Tk\Uri::create()->set('entryId', $this->entry->getId());
         if ($form->getTriggeredEvent()->getName() == 'update') {
-            \Uni\Ui\Crumbs::getInstance()->getBackUrl()->redirect();
+            if ($this->entry->getPlacement() && $this->getUser()->isStaff()) {
+                $url = \App\Uri::createCourseUrl('/placementEdit.html')->set('placementId', $this->entry->getPlacement()->getId());
+            } else {
+                $url = \Uni\Ui\Crumbs::getInstance()->getBackUrl();
+            }
         }
-        \Tk\Uri::create()->set('entryId', $this->entry->getId())->redirect();
+        $event->setRedirect($url);
     }
 
     /**
@@ -244,6 +290,11 @@ class Edit extends AdminEditIface
     public function show()
     {
         $template = parent::show();
+
+        $template->insertText('panel-title', $this->entry->getCollection()->name . ' Edit');
+        if ($this->entry->getCollection()->icon) {
+            $template->setAttr('icon', 'class', $this->entry->getCollection()->icon);
+        }
 
 
         if ($this->isPublic) {
@@ -259,13 +310,17 @@ class Edit extends AdminEditIface
             }
             $template->insertHtml('instructions', $this->entry->getCollection()->instructions);
         } else {
-            if ($this->entry->getId()) {
-                $template->setChoice('edit');
-
-                if ($this->statusTable) {
-                    $template->replaceTemplate('statusTable', $this->statusTable->getTable()->getRenderer()->show());
-                    $template->setChoice('statusLog');
+            $template->setChoice('edit');
+            if ($this->getUser()->isStaff()) {
+                vd();
+                if ($this->entry->getId()) {
+                    if ($this->statusTable) {
+                        $template->replaceTemplate('statusTable', $this->statusTable->getTable()->getRenderer()->show());
+                        $template->setChoice('statusLog');
+                    }
                 }
+            } else {        // For students here
+                $template->insertHtml('instructions', $this->entry->getCollection()->instructions);
             }
         }
 
@@ -300,7 +355,7 @@ CSS;
 
   <div class="panel panel-default">
     <div class="panel-heading">
-      <h4 class="panel-title"><i class="fa fa-pencil"></i> <span var="panel-title">Skill Entry Edit</span></h4>
+      <h4 class="panel-title"><i class="fa fa-pencil" var="icon"></i> <span var="panel-title">Skill Entry Edit</span></h4>
     </div>
     <div class="panel-body">
       <div var="instructions"></div>
@@ -308,7 +363,7 @@ CSS;
     </div>
   </div>
 
-  <div class="panel panel-default" choice="edit">
+  <div class="panel panel-default" choice="statusLog">
     <div class="panel-heading">
       <h4 class="panel-title"><i class="fa fa-sitemap"></i> <span>Status Log</span></h4>
     </div>

@@ -63,7 +63,8 @@ class Edit extends AdminEditIface
         $tab = 'Details';
         $this->form->addField(new Field\Input('name'))->setTabGroup($tab)->setNotes('Create a label for this collection');
         $list = \Tk\Form\Field\Select::arrayToSelectList(\Tk\Object::getClassConstants('\Skill\Db\Collection', 'ROLE'));
-        $this->form->addField(new Field\Select('role', $list))->setTabGroup($tab)->prependOption('-- Select --', '');
+        $this->form->addField(new Field\Select('role', $list))->setTabGroup($tab)->prependOption('-- Select --', '')
+            ->setNotes('');
 
         $this->form->addField(new Field\Input('icon'))->setTabGroup($tab)
             ->setNotes('TODO: Create a jquery plugin to select icons.... Select an Icon for this collection.');
@@ -79,8 +80,10 @@ class Edit extends AdminEditIface
         $this->form->addField(new Field\Select('color', Field\Select::arrayToSelectList($list, false)))->setTabGroup($tab)
             ->addCss('colorpicker')->setNotes('Select a color scheme for this collection');
 
-        $this->form->addField(new Field\Checkbox('active'))->setTabGroup($tab)->setNotes('Enable this collection for user submissions.');
-        //$this->form->addField(new Field\Checkbox('viewGrade'))->setNotes('Allow students to view their course results from all entries from this collection.');
+        $this->form->addField(new Field\Checkbox('active'))->setTabGroup($tab)
+            ->setNotes('Enable this collection for user submissions.');
+        $this->form->addField(new Field\Checkbox('gradable'))->setTabGroup($tab)
+            ->setNotes('Calculate totals for all results. If enabled then the student can view a summary of the results. (This can be enabled in the course settings page)');
         $this->form->addField(new Field\Checkbox('includeZero'))->setTabGroup($tab)
             ->setNotes('Should the zero values be included in the weighted average calculation.');
 
@@ -94,7 +97,8 @@ class Edit extends AdminEditIface
 
         $tab = 'Placement';
 
-        $this->form->addField(new Field\Checkbox('requirePlacement'))->addCss('tk-input-toggle')->setTabGroup($tab)->setNotes('If a collection entry requires a placement to be associated with.');
+        $this->form->addField(new Field\Checkbox('requirePlacement'))->addCss('tk-input-toggle')->setTabGroup($tab)
+            ->setNotes('If a collection entry requires a placement to be associated with.');
 
         $list = \Tk\Form\Field\Select::arrayToSelectList(\Tk\Object::getClassConstants('\App\Db\Placement', 'STATUS'));
         $this->form->addField(new Field\Select('available[]', $list))->setTabGroup($tab)

@@ -263,14 +263,17 @@ SQL;
             $stm->bindParam(3, $userId);
         $stm->execute();
         $arr = $stm->fetchAll();
-        if ($valueOnly) {
-            $arr1 = array();
-            foreach ($arr as $obj) {
+
+        $arr1 = array();
+        foreach ($arr as $obj) {
+            if ($valueOnly) {
                 $arr1[$obj->item_id] = $obj->avg;
+            } else {
+                $arr1[$obj->item_id] = $obj;
             }
-            $arr = $arr1;
+
         }
-        return $arr;
+        return $arr1;
     }
     
 }

@@ -44,6 +44,10 @@ class Results extends AdminIface
     public function doDefault(Request $request)
     {
         $this->user = \App\Db\UserMap::create()->find($request->get('userId'));
+        if (!$this->user) {
+            $this->user = $this->getUser();
+        }
+
         $this->collection = \Skill\Db\CollectionMap::create()->find($request->get('collectionId'));
 
         if (!$this->collection->active && !$this->getUser()->isStaff()) {
@@ -61,16 +65,18 @@ class Results extends AdminIface
         if ($this->collection->icon) {
             $template->addCss('icon', $this->collection->icon);
         }
-        vd($this->user);
+
         $panelTitle = sprintf('%s Results for `%s`', $this->collection->name, $this->user->name);
         $template->insertText('panel-title', $panelTitle);
 
-        $entryList = \Skill\Db\EntryMap::create()->findFiltered(array(
+        $filter = array(
             'userId' => $this->user->getId(),
             'collectionId' => $this->collection->getId(),
             'courseId' => $this->getCourse()->getId(),
             'status' => \Skill\Db\Entry::STATUS_APPROVED
-        ), \Tk\Db\Tool::create('created DESC'));
+        );
+        $entryList = \Skill\Db\EntryMap::create()->findFiltered($filter, \Tk\Db\Tool::create('created DESC'));
+
         $template->insertText('entryCount', $entryList->count());
         $studentResult =  \Skill\Db\ReportingMap::create()->findStudentResult($this->collection->getId(), $this->getCourse()->getId(), $this->user->getId(), true);
 
@@ -91,32 +97,46 @@ class Results extends AdminIface
             $row->insertText('weight', round($obj->weight*100) . '%');
             $row->appendRepeat();
         }
-        
-        $itemResults = \Skill\Db\ReportingMap::create()->findItemAverages($this->collection->getId(), $this->getCourse()->getId(), $this->user->getId());
-        /** @var \Skill\Db\Category $category */
-        $category = null;
-        /** @var \Dom\Repeat $catRow */
-        $catRow = null;
-        foreach ($itemResults as $i => $obj) {
-            if (!$category || $category->getId() != $obj->category_id) {
-                $category = \Skill\Db\CategoryMap::create()->find($obj->category_id);
-                if (!$category) continue;
-                if ($catRow) $catRow->appendRepeat();
-                $catRow = $template->getRepeat('category-row');
 
-                $catRow->insertText('name', $category->name . '(' . $obj->label . ')');
-                // TODO: The label should not be here but on individual questions, fix it when it becomes an issue 
-                // $catRow->insertText('name', $category->name);
+
+        $itemResults = \Skill\Db\ReportingMap::create()->findItemAverages($this->collection->getId(), $this->getCourse()->getId(), $this->user->getId());
+        $catList = \Skill\Db\CategoryMap::create()->findFiltered(array(
+            'collectionId' => $this->collection->getId()
+        ));
+
+        $i = 0;
+        foreach ($catList as $category) {
+            $catRow = $template->getRepeat('category-row');
+            $catRow->insertText('name', $category->name . ' (' . $category->label . ')');
+
+            $itemList = \Skill\Db\ItemMap::create()->findFiltered(array(
+                'collectionId' => $this->collection->getId(),
+                'categoryId' => $category->getId()
+            ));
+            if (!$itemList->count()) continue;
+            foreach ($itemList as $item) {
+                $obj = null;
+                if (isset($itemResults[$item->getId()]))
+                    $obj = $itemResults[$item->getId()];
+
+                $row = $catRow->getRepeat('item-row');
+                $row->insertText('lineNo', ($i+1).'. ');
+                $row->insertText('question', $item->question);
+
+                $avg = 0;
+                if($obj)
+                    $avg = $obj->avg;
+
+                $row->insertText('result', $avg);
+                if ($avg <= 0) {
+                    $row->addCss('result', 'zero');
+                }
+                $row->appendRepeat();
+                $i++;
             }
-            $row = $catRow->getRepeat('item-row');
-            $row->insertText('lineNo', $i.'. ');
-            $row->insertText('question', $obj->question);
-            $row->insertText('result', $obj->avg);
-            if ($obj->avg <= 0) {
-                $row->addCss('result', 'zero');
-            }
-            $row->appendRepeat();
+            $catRow->appendRepeat();
         }
+
         
         
         // TODO: plot a graph of all completed entry averages

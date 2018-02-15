@@ -127,12 +127,15 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
         /** @var Entry $model */
         $model = $this->getStatus()->getModel();
         $collection = $model->getCollection();
-        $editUrl = \App\Uri::createCourseUrl('/entryEdit.html')->set('collectionId', $model->collectionId)->
-            set('userId', $model->userId)->set('placementId', $model->placementId);
+//        $editUrl = \App\Uri::createCourseUrl('/entryEdit.html')->set('collectionId', $model->collectionId)->
+//        set('userId', $model->userId)->set('placementId', $model->placementId);
+        $editUrl = \App\Uri::createCourseUrl('/entryEdit.html')->set('entryId', $model->getId());
         $from = '';
+        $userName = $model->getUser()->name;
         if ($model->getPlacement()) {
             //$editUrl = \App\Uri::createCourseUrl('/skill/entryEdit.html')->set('placementId', $model->getPlacement()->getId());
             $from = 'from <em>' . htmlentities($model->getPlacement()->getCompany()->name) . '</em>';
+            //$userName = $model->getPlacement()->getUser()->name;
         }
 
         $html = sprintf('<div class="status-placement"><div><em>%s</em> %s submitted a %s Entry for <em>%s</em></div>
@@ -146,7 +149,7 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
     -->
   </div>
 </div>',
-            $model->assessor, $from, $collection->name, $model->getPlacement()->getUser()->name, htmlentities($editUrl));
+            $model->assessor, $from, $collection->name, $userName, htmlentities($editUrl));
 
         return $html;
     }

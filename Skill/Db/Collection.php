@@ -185,21 +185,6 @@ class Collection extends \Tk\Db\Map\Model
     }
 
     /**
-     * @param int|\App\Db\Course $course
-     * @return bool
-     */
-    public function isResultsEnabled($course)
-    {
-        if (is_integer($course)) {
-            $course = \App\Db\CourseMap::create()->find($course);
-        }
-        if (!$course) return false;
-        $data = $course->getData();
-        $enabled = $data->get(self::FIELD_ENABLE_RESULTS, array());
-        return in_array($this->id, $enabled);
-    }
-
-    /**
      *
      */
     public function validate()

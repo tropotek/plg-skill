@@ -26,6 +26,7 @@ class CategoryMap extends \App\Db\Mapper
             $this->dbMap->addPropertyMap(new Db\Integer('id'), 'key');
             $this->dbMap->addPropertyMap(new Db\Integer('collectionId', 'collection_id'));
             $this->dbMap->addPropertyMap(new Db\Text('name'));
+            $this->dbMap->addPropertyMap(new Db\Text('label'));
             $this->dbMap->addPropertyMap(new Db\Text('description'));
             $this->dbMap->addPropertyMap(new Db\Boolean('publish'));
             $this->dbMap->addPropertyMap(new Db\Integer('orderBy', 'order_by'));
@@ -45,6 +46,7 @@ class CategoryMap extends \App\Db\Mapper
             $this->formMap->addPropertyMap(new Form\Integer('id'), 'key');
             $this->formMap->addPropertyMap(new Form\Integer('collectionId'));
             $this->formMap->addPropertyMap(new Form\Text('name'));
+            $this->formMap->addPropertyMap(new Form\Text('label'));
             $this->formMap->addPropertyMap(new Form\Text('description'));
             $this->formMap->addPropertyMap(new Form\Boolean('publish'));
         }
@@ -66,7 +68,7 @@ class CategoryMap extends \App\Db\Mapper
      *
      * @param array $filter
      * @param Tool $tool
-     * @return ArrayObject
+     * @return ArrayObject|Category[]
      */
     public function findFiltered($filter = array(), $tool = null)
     {
@@ -94,6 +96,10 @@ class CategoryMap extends \App\Db\Mapper
 
         if (!empty($filter['name'])) {
             $where .= sprintf('a.name = %s AND ', $this->quote($filter['name']));
+        }
+
+        if (!empty($filter['label'])) {
+            $where .= sprintf('a.label = %s AND ', $this->quote($filter['label']));
         }
 
         if (!empty($filter['publish'])) {

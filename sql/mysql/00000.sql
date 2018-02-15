@@ -46,6 +46,13 @@ CREATE TABLE IF NOT EXISTS skill_collection (
   KEY del (del)
 ) ENGINE=InnoDB;
 
+-- A place to enable entry views on a per course level
+CREATE TABLE IF NOT EXISTS skill_collection_course (
+  collection_id INT UNSIGNED NOT NULL DEFAULT 0,
+  course_id INT UNSIGNED NOT NULL DEFAULT 0,
+  PRIMARY KEY (collection_id, course_id)
+) ENGINE=InnoDB;
+
 CREATE TABLE IF NOT EXISTS skill_collection_placement_type (
   collection_id INT UNSIGNED NOT NULL DEFAULT 0,
   placement_type_id INT UNSIGNED NOT NULL DEFAULT 0,
@@ -58,7 +65,7 @@ CREATE TABLE IF NOT EXISTS skill_domain (
   collection_id INT UNSIGNED NOT NULL DEFAULT 0,
   name VARCHAR(255) NOT NULL DEFAULT '',
   description TEXT,
-  label VARCHAR(10) NOT NULL,                                 -- abbreviated label, parent will be used if none
+  label VARCHAR(32) NOT NULL,                                 -- abbreviated label
   weight FLOAT DEFAULT '1' NOT NULL,                          -- grade weight as a ratio, parent will be used if none
   order_by INT UNSIGNED NOT NULL DEFAULT 0,
   del BOOL NOT NULL DEFAULT 0,
@@ -96,6 +103,7 @@ CREATE TABLE IF NOT EXISTS skill_category (
   uid VARCHAR(128) NOT NULL DEFAULT '',
   collection_id INT UNSIGNED NOT NULL DEFAULT 0,
   name VARCHAR(255) NOT NULL DEFAULT '',
+  label VARCHAR(32) NOT NULL,                                 -- abbreviated label
   description TEXT,
   publish BOOL NOT NULL DEFAULT 1,
   order_by INT UNSIGNED NOT NULL DEFAULT 0,

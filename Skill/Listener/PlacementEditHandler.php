@@ -57,9 +57,10 @@ class PlacementEditHandler implements Subscriber
                 $entry = \Skill\Db\EntryMap::create()->findFiltered(array('collectionId' => $collection->getId(),
                     'placementId' => $controller->getPlacement()->getId()))->current();
 
-                $btn = $actionPanel->addButton(\Tk\Ui\Button::create($collection->name,
-                    \App\Uri::create('/skill/entryEdit.html')->set('collectionId', $collection->getId())->
-                    set('placementId', $controller->getPlacement()->getId())->set('courseId', $this->course->getId())->set('userId', $controller->getPlacement()->getId()), $collection->icon));
+                $btn = $actionPanel->add(\Tk\Ui\Button::create($collection->name,
+                    \App\Uri::createCourseUrl('/entryEdit.html')->set('collectionId', $collection->getId())
+                        ->set('placementId', $controller->getPlacement()->getId())->set('courseId', $this->course->getId())
+                        ->set('userId', $controller->getPlacement()->getId()), $collection->icon));
                 //$btn->setAttr('title', 'This is a test');
                 //$btn->addCss('disabled');
 
@@ -68,7 +69,6 @@ class PlacementEditHandler implements Subscriber
                 } else {
                     $btn->addCss('btn-primary');
                 }
-
             }
         }
     }

@@ -76,7 +76,7 @@ class ItemMap extends \App\Db\Mapper
      *
      * @param array $filter
      * @param Tool $tool
-     * @return ArrayObject
+     * @return ArrayObject|Item[]
      */
     public function findFiltered($filter = array(), $tool = null)
     {

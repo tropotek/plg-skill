@@ -71,7 +71,7 @@ class EntryMap extends \App\Db\Mapper
      *
      * @param array $filter
      * @param Tool $tool
-     * @return ArrayObject
+     * @return ArrayObject|Entry[]
      */
     public function findFiltered($filter = array(), $tool = null)
     {

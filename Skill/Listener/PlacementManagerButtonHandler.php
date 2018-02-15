@@ -43,7 +43,7 @@ class PlacementManagerButtonHandler implements Subscriber
 
             /** @var \Skill\Db\Collection $collection */
             foreach ($collectionList as $collection) {
-                $url = \App\Uri::create('/skill/entryEdit.html')->set('collectionId', $collection->getId());
+                $url = \App\Uri::createCourseUrl('/entryEdit.html')->set('collectionId', $collection->getId());
                 $actionsCell->addButton(\Tk\Table\Cell\ActionButton::create($collection->name, $url, $collection->icon))
                     ->setOnShow(function ($cell, $obj, $button) use ($collection) {
                         /* @var $obj \App\Db\Placement */

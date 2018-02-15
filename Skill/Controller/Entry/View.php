@@ -30,12 +30,15 @@ class View extends AdminEditIface
     {
         parent::__construct();
         $this->setPageTitle('Skill Entry View');
+        if ($this->getUser()->isStudent()) {
+            $this->getActionPanel()->setEnabled(false);
+        }
     }
 
     /**
      *
      * @param Request $request
-     * @throws \Tk\Exception
+     * @throws \Exception
      */
     public function doDefault(Request $request)
     {
@@ -57,23 +60,28 @@ class View extends AdminEditIface
         $this->form->setRenderer(\App\Config::getInstance()->createFormRenderer($this->form));
 
         $this->form->addField(new Field\Html('title'))->setFieldset('Entry Details');
-        if($this->entry->getCollection()->gradable && ($this->getUser()->isStaff() || $this->entry->getCollection()->viewGrade)) {
+        //if($this->entry->getCollection()->gradable && $this->getUser()->isStaff()) {
+        if($this->entry->getCollection()->gradable) {
             $pct = round(($this->entry->average/($this->entry->getCollection()->getScaleLength()-1))*100);
             $this->form->addField(new Field\Html('average', sprintf('%.2f &nbsp; (%d%%)', $this->entry->average, $pct)))->setFieldset('Entry Details');
-            $pct = round(($this->entry->weightedAverage/($this->entry->getCollection()->getScaleLength()-1))*100);
-            $this->form->addField(new Field\Html('weightedAverage', sprintf('%.2f &nbsp; (%d%%)', $this->entry->weightedAverage, $pct)))->setFieldset('Entry Details');
+            if ($this->getUser()->isStaff()) {
+                $pct = round(($this->entry->weightedAverage / ($this->entry->getCollection()->getScaleLength() - 1)) * 100);
+                $this->form->addField(new Field\Html('weightedAverage', sprintf('%.2f &nbsp; (%d%%)', $this->entry->weightedAverage, $pct)))->setFieldset('Entry Details');
+            }
         }
 
 
         $this->form->addField(new Field\Html('status'))->setFieldset('Entry Details');
         $this->form->addField(new Field\Html('assessor'))->setFieldset('Entry Details');
-        $this->form->addField(new Field\Html('absent'))->setLabel('Days Absent')->setFieldset('Entry Details');
-        if ($this->entry->getCollection()->confirm) {
-            $s = ($this->entry->confirm === null ? '' : ($this->entry->confirm ? 'Yes' : 'No'));
+        if ($this->entry->getCollection()->requirePlacement)
+            $this->form->addField(new Field\Html('absent'))->setLabel('Days Absent')->setFieldset('Entry Details');
+
+        if ($this->entry->getCollection()->confirm && $this->getUser()->isStaff()) {
+            $s = ($this->entry->confirm === null) ? '' : ($this->entry->confirm ? 'Yes' : 'No');
             $this->form->addField(new Field\Html('confirm', $s))->setFieldset('Entry Details')->setNotes($this->entry->getCollection()->confirm);
         }
         if ($this->entry->notes)
-            $this->form->addField(new Field\Html('notes'))->setFieldset('Entry Details');
+            $this->form->addField(new Field\Html('notes'))->setLabel('Comments')->setFieldset('Entry Details');
 
         $items = \Skill\Db\ItemMap::create()->findFiltered(array('collectionId' => $this->entry->getCollection()->getId()),
             \Tk\Db\Tool::create('category_id, order_by'));
@@ -94,6 +102,10 @@ class View extends AdminEditIface
     public function show()
     {
         $template = parent::show();
+        $template->insertText('panel-title', $this->entry->getCollection()->name . ' View');
+        if ($this->entry->getCollection()->icon) {
+            $template->setAttr('icon', 'class', $this->entry->getCollection()->icon);
+        }
 
         // Render the form
         $template->insertTemplate('form', $this->form->getRenderer()->show());
@@ -126,7 +138,7 @@ CSS;
   
   <div class="panel panel-default">
     <div class="panel-heading">
-      <h4 class="panel-title"><i class="fa fa-eye"></i> <span var="panel-title">Skill Entry View</span></h4>
+      <h4 class="panel-title"><i class="fa fa-eye" var="icon"></i> <span var="panel-title">Skill Entry View</span></h4>
     </div>
     <div class="panel-body">
       <div var="instructions"></div>
