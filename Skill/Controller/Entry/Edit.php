@@ -137,9 +137,6 @@ class Edit extends AdminEditIface
             $this->entry->assessor = $this->entry->getUser()->getName();
         }
 
-
-
-
         $this->buildForm();
 
         $this->form->load(\Skill\Db\EntryMap::create()->unmapForm($this->entry));
@@ -312,7 +309,6 @@ class Edit extends AdminEditIface
         } else {
             $template->setChoice('edit');
             if ($this->getUser()->isStaff()) {
-                vd();
                 if ($this->entry->getId()) {
                     if ($this->statusTable) {
                         $template->replaceTemplate('statusTable', $this->statusTable->getTable()->getRenderer()->show());
