@@ -119,9 +119,10 @@ class Edit extends AdminEditIface
             }
         }
 
-        if ($this->entry->getId()) {
-            $this->getActionPanel()->add(\Tk\Ui\Button::create('View', \App\Uri::create('/skill/entryView.html')->set('entryId', $this->entry->getId()), 'fa fa-eye'));
-        }
+//        if ($this->entry->getId()) {
+//            $this->getActionPanel()->add(\Tk\Ui\Button::create('View', \App\Uri::createCourseUrl('/entryView.html')->set('entryId', $this->entry->getId()), 'fa fa-eye'));
+//        }
+
         if (!$this->entry->getId() && $this->entry->getPlacement()) {
             $this->entry->title = $this->entry->getPlacement()->getTitle(true);
             if ($this->entry->getPlacement()->getCompany()) {

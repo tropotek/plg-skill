@@ -48,7 +48,7 @@ class Manager extends AdminManagerIface
         $this->editUrl = \App\Uri::create('/skill/scaleEdit.html');
 
         $u = clone $this->editUrl;
-        $this->getActionPanel()->addButton(\Tk\Ui\Button::create('New Scale',
+        $this->getActionPanel()->add(\Tk\Ui\Button::create('New Scale',
             $u->set('collectionId', $this->collection->getId()), 'fa fa-balance-scale'));
 
         $this->table = \App\Config::getInstance()->createTable(\Tk\Object::basename($this).'_scaleList');

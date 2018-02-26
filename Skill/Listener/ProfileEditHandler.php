@@ -31,8 +31,8 @@ class ProfileEditHandler implements Subscriber
      */
     public function onControllerInit(Event $event)
     {
-        $plugin = Plugin::getInstance();
-        $config = $plugin->getConfig();
+        //$plugin = Plugin::getInstance();
+        //$config = $plugin->getConfig();
         //$config->getLog()->info($plugin->getName() . ': onControllerAccess(\'profile\', '.$this->profileId.') ');
 
         /** @var \Tk\Controller\Iface $controller */
@@ -41,7 +41,7 @@ class ProfileEditHandler implements Subscriber
             if ($controller->getUser()->isStaff()) {
                 /** @var \Tk\Ui\Admin\ActionPanel $actionPanel */
                 $actionPanel = $controller->getActionPanel();
-                $actionPanel->addButton(\Tk\Ui\Button::create('Skill Collections',
+                $actionPanel->add(\Tk\Ui\Button::create('Skill Collections',
                     \App\Uri::create('/skill/collectionManager.html')->set('profileId', $this->profileId), 'fa fa-graduation-cap'));
             }
         }
@@ -56,8 +56,8 @@ class ProfileEditHandler implements Subscriber
      */
     public function onControllerShow(Event $event)
     {
-        $plugin = Plugin::getInstance();
-        $config = $plugin->getConfig();
+        //$plugin = Plugin::getInstance();
+        //$config = $plugin->getConfig();
         //$config->getLog()->info($plugin->getName() . ': onControllerShow(\'profile\', '.$this->profileId.') ');
     }
 

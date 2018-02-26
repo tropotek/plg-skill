@@ -162,10 +162,10 @@ class Edit extends AdminEditIface
     {
         $template = parent::show();
         if ($this->collection->getId()) {
-            $this->getActionPanel()->addButton(\Tk\Ui\Button::create('Domains', \Tk\Uri::create('/skill/domainManager.html')->set('collectionId', $this->collection->getId()), 'fa fa-black-tie'));
-            $this->getActionPanel()->addButton(\Tk\Ui\Button::create('Categories', \Tk\Uri::create('/skill/categoryManager.html')->set('collectionId', $this->collection->getId()), 'fa fa-folder-o'));
-            $this->getActionPanel()->addButton(\Tk\Ui\Button::create('Scale', \Tk\Uri::create('/skill/scaleManager.html')->set('collectionId', $this->collection->getId()), 'fa fa-balance-scale'));
-            $this->getActionPanel()->addButton(\Tk\Ui\Button::create('Items', \Tk\Uri::create('/skill/itemManager.html')->set('collectionId', $this->collection->getId()), 'fa fa-question'));
+            $this->getActionPanel()->add(\Tk\Ui\Button::create('Domains', \Tk\Uri::create('/skill/domainManager.html')->set('collectionId', $this->collection->getId()), 'fa fa-black-tie'));
+            $this->getActionPanel()->add(\Tk\Ui\Button::create('Categories', \Tk\Uri::create('/skill/categoryManager.html')->set('collectionId', $this->collection->getId()), 'fa fa-folder-o'));
+            $this->getActionPanel()->add(\Tk\Ui\Button::create('Scale', \Tk\Uri::create('/skill/scaleManager.html')->set('collectionId', $this->collection->getId()), 'fa fa-balance-scale'));
+            $this->getActionPanel()->add(\Tk\Ui\Button::create('Items', \Tk\Uri::create('/skill/itemManager.html')->set('collectionId', $this->collection->getId()), 'fa fa-question'));
         }
 
         // Render the form

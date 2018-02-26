@@ -26,7 +26,7 @@ class CollectionManager extends \Skill\Controller\Collection\Manager
     {
         parent::__construct();
         $this->setPageTitle('Skill Entry Collections');
-        $this->editUrl = \App\Uri::create('/skill/entryManager.html');
+        $this->editUrl = \App\Uri::createCourseUrl('/entryManager.html');
     }
 
     /**
@@ -35,10 +35,10 @@ class CollectionManager extends \Skill\Controller\Collection\Manager
      */
     protected function findProfile(Request $request)
     {
-        $this->course = \App\Db\CourseMap::create()->find($request->get('courseId'));
-        $this->editUrl->set('courseId', $this->course->getId());
-        $profile = $this->course->getProfile();
-        return $profile;
+//        $this->course = \App\Db\CourseMap::create()->find($request->get('courseId'));
+//        //$this->editUrl->set('courseId', $this->course->getId());
+//        $profile = $this->course->getProfile();
+        return $this->getConfig()->getProfile();
     }
 
     /**
@@ -48,7 +48,7 @@ class CollectionManager extends \Skill\Controller\Collection\Manager
     {
         $template = parent::show();
 
-        $this->getActionPanel()->removeButton($this->getActionPanel()->findButtonByTitle('New Collection'));
+        $this->getActionPanel()->remove($this->getActionPanel()->findByTitle('New Collection'));
 
         return $template;
     }

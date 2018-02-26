@@ -133,7 +133,7 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
         $from = '';
         $userName = $model->getUser()->name;
         if ($model->getPlacement()) {
-            //$editUrl = \App\Uri::createCourseUrl('/skill/entryEdit.html')->set('placementId', $model->getPlacement()->getId());
+            //$editUrl = \App\Uri::createCourseUrl('/entryEdit.html')->set('placementId', $model->getPlacement()->getId());
             $from = 'from <em>' . htmlentities($model->getPlacement()->getCompany()->name) . '</em>';
             //$userName = $model->getPlacement()->getUser()->name;
         }

@@ -69,7 +69,7 @@ class SidebarHandler implements Subscriber
                 if ($collection->requirePlacement) {        // Results views
                     if ($collection->gradable) {
                         $html = sprintf('<li><a href="%s" title="View %s Results">%s</a></li>',
-                            htmlentities(\App\Uri::createCourseUrl('/skillEntryResults.html')->set('collectionId', $collection->getId())->toString()),
+                            htmlentities(\App\Uri::createCourseUrl('/entryResults.html')->set('collectionId', $collection->getId())->toString()),
                             $collection->name, $collection->name);
                     }
                 } else if ($collection->role == \Skill\Db\Collection::ROLE_STUDENT) {

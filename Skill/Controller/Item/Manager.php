@@ -48,7 +48,7 @@ class Manager extends AdminManagerIface
         $this->editUrl = \App\Uri::create('/skill/itemEdit.html');
 
         $u = clone $this->editUrl;
-        $this->getActionPanel()->addButton(\Tk\Ui\Button::create('New Item',
+        $this->getActionPanel()->add(\Tk\Ui\Button::create('New Item',
             $u->set('collectionId', $this->collection->getId()), 'fa fa-question'));
 
         $this->table = \App\Config::getInstance()->createTable(\Tk\Object::basename($this).'_itemList');

@@ -125,7 +125,7 @@ class CollectionMap extends \App\Db\Mapper
             $where .= sprintf('a.gradable = %s AND ', (int)$filter['gradable']);
         }
 
-        if (isset($filter['requirePlacement']) && $filter['requirePlacement'] !== null && $filter['requirePlacement'] != '') {
+        if (isset($filter['requirePlacement']) && $filter['requirePlacement'] !== null && $filter['requirePlacement'] !== '') {
             $where .= sprintf('a.require_placement = %s AND ', (int)$filter['requirePlacement']);
         }
 

@@ -52,25 +52,27 @@ class Manager extends AdminManagerIface
 
     /**
      * @param Request $request
-     * @throws \Tk\Exception
+     * @throws \Exception
+     * @throws \Tk\Form\Exception
      */
     public function doDefault(Request $request)
     {
         $this->collection = \Skill\Db\CollectionMap::create()->find($request->get('collectionId'));
 
         if ($this->editUrl === null)
-            $this->editUrl = \App\Uri::create('/skill/entryEdit.html');
+            $this->editUrl = \App\Uri::createCourseUrl('/entryEdit.html');
 
 
-        $this->getActionPanel()->addButton(\Tk\Ui\Button::create('Setup',
-            \App\Uri::create('/skill/collectionEdit.html')->set('collectionId', $this->collection->getId()), 'fa fa-gears'));
-        $this->getActionPanel()->addButton(\Tk\Ui\Button::create('Grade Report',
-            \App\Uri::create('/skill/collectionReport.html')->set('collectionId', $this->collection->getId()), 'fa fa-pie-chart'));
-
+        $this->getActionPanel()->add(\Tk\Ui\Button::create('Setup',
+            \App\Uri::createCourseUrl('/collectionEdit.html')->set('collectionId', $this->collection->getId()), 'fa fa-gears'));
+        if ($this->collection->gradable) {
+            $this->getActionPanel()->add(\Tk\Ui\Button::create('Grade Report',
+                \App\Uri::createCourseUrl('/collectionReport.html')->set('collectionId', $this->collection->getId()), 'fa fa-pie-chart'));
+        }
 
         $this->actionsCell = new \Tk\Table\Cell\Actions();
         $this->actionsCell->addButton(\Tk\Table\Cell\ActionButton::create('View Entry',
-            \App\Uri::create('/skill/entryView.html'), 'fa fa-eye'))->setAppendQuery();
+            \App\Uri::createCourseUrl('/entryView.html'), 'fa fa-eye'))->setAppendQuery();
 
         $this->table = \App\Config::getInstance()->createTable(\Tk\Object::basename($this).'_entryList'.$this->collection->name);
         $this->table->setRenderer(\App\Config::getInstance()->createTableRenderer($this->table));
@@ -103,6 +105,10 @@ class Manager extends AdminManagerIface
 
     }
 
+    /**
+     * @return \Skill\Db\Entry[]|\Tk\Db\Map\ArrayObject
+     * @throws \Exception
+     */
     protected function getList()
     {
         $filter = $this->table->getFilterValues();

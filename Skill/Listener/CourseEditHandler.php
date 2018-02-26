@@ -60,8 +60,7 @@ class CourseEditHandler implements Subscriber
             /** @var \Tk\Ui\Admin\ActionPanel $actionPanel */
             $actionPanel = $this->controller->getActionPanel();
             $actionPanel->add(\Tk\Ui\Button::create('Skill Collections',
-                \App\Uri::create('/skill/entryCollectionManager.html')->set('courseId', $this->course->getId()),
-                'fa fa-graduation-cap'));
+                \App\Uri::createCourseUrl('/entryCollectionManager.html'), 'fa fa-graduation-cap'));
         }
     }
 

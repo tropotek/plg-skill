@@ -52,7 +52,8 @@ class CourseDashboardHandler implements Subscriber
                 $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('profileId' => $course->profileId, 'gradable' => true));
                 /** @var \Skill\Db\Collection $collection */
                 foreach ($collectionList as $collection) {
-                    if (!$collection->active) continue;
+                    if (!$collection->isAvailable() || !$collection->isAvailableToCourse($course)) continue;
+
                     // if user has a placement of at least one of the types and status
                     $entryList = \Skill\Db\EntryMap::create()->findFiltered(array(
                         'userId' => $user->getId(),
@@ -60,16 +61,44 @@ class CourseDashboardHandler implements Subscriber
                         'status' => \Skill\Db\Entry::STATUS_APPROVED
                     ));
                     if ($entryList->count()) {
-                        $btn = \Tk\Ui\Button::create($collection->name . ' Results', \App\Uri::createCourseUrl('/skillEntryResults.html')->
+                        $btn = \Tk\Ui\Button::create($collection->name . ' Results', \App\Uri::createCourseUrl('/entryResults.html')->
                             set('userId', $user->getId())->set('collectionId', $collection->getId()), $collection->icon);
-                        $btn->addCss('btn-success btn-xs');
+                        $btn->addCss('btn-primary btn-xs');
                         $btn->setAttr('title', 'View Student ' . $collection->name . ' Results');
                         $template->prependTemplate('utr-row2', $btn->show());
                     }
                 }
+
+                $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('profileId' => $course->profileId, 'requirePlacement' => false));
+                /** @var \Skill\Db\Collection $collection */
+                foreach ($collectionList as $collection) {
+                    if (!$collection->isAvailable() || !$collection->isAvailableToCourse($course)) continue;
+                    $btn = \Tk\Ui\Button::create($collection->name, \App\Uri::createCourseUrl('/entryEdit.html')->
+                        set('userId', $user->getId())->set('collectionId', $collection->getId()), $collection->icon);
+                    $entry = \Skill\Db\EntryMap::create()->findFiltered(
+                        array(
+                            'collectionId' => $collection->getId(),
+                            'courseId' => $course->getId(),
+                            'userId' => $user->getId(),
+                            'placementId' => 0
+                        )
+                    )->current();
+
+                    if ($entry) {
+                        $btn->addCss('btn-primary btn-xs');
+                        $btn->setAttr('title', 'View Student ' . $collection->name . ' Results');
+                    } else {
+                        $btn->addCss('btn-success btn-xs');
+                        $btn->setAttr('title', 'Create Student ' . $collection->name . ' Results');
+                    }
+
+                    $template->prependTemplate('utr-row2', $btn->show());
+                }
+
             });
 
         }
+
         // STUDENT Course Dashboard
         if ($this->controller instanceof \App\Controller\Student\CourseDashboard) {
             $placementList = $this->controller->getPlacementList();
@@ -77,6 +106,7 @@ class CourseDashboardHandler implements Subscriber
 
             $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('profileId' => $course->profileId, 'requirePlacement' => true));
             foreach ($collectionList as $collection) {
+                if (!$collection->isAvailable()) continue;
                 $actionsCell->addButton(\Tk\Table\Cell\ActionButton::create($collection->name,
                     \App\Uri::createCourseUrl('/entryView.html'), $collection->icon))
                     ->setShowLabel()
@@ -84,10 +114,6 @@ class CourseDashboardHandler implements Subscriber
                         /** @var \Tk\Table\Cell\Actions $cell */
                         /** @var \App\Db\Placement $obj */
                         /** @var \Tk\Table\Cell\ActionButton $btn */
-//                        if (!$collection->isAvailable($obj)) {
-//                            $btn->setVisible(false);
-//                            return '';
-//                        }
                         $entry = \Skill\Db\EntryMap::create()->findFiltered(array(
                             'collectionId' => $collection->getId(),
                             'placementId' => $obj->getId(),

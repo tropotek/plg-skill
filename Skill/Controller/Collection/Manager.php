@@ -37,6 +37,10 @@ class Manager extends AdminManagerIface
         $this->setPageTitle('Skill Collection Manager');
     }
 
+    /**
+     * @param Request $request
+     * @return null|\Tk\Db\Map\Model|\Tk\Db\ModelInterface
+     */
     protected function findProfile(Request $request)
     {
         $profile = \App\Db\ProfileMap::create()->find($request->get('zoneId'));
@@ -48,6 +52,8 @@ class Manager extends AdminManagerIface
 
     /**
      * @param Request $request
+     * @throws \Exception
+     * @throws \Tk\Form\Exception
      */
     public function doDefault(Request $request)
     {
@@ -88,6 +94,10 @@ class Manager extends AdminManagerIface
 
     }
 
+    /**
+     * @return \Skill\Db\Collection[]|\Tk\Db\Map\ArrayObject
+     * @throws \Exception
+     */
     protected function getList()
     {
         $filter = $this->table->getFilterValues();
@@ -100,11 +110,9 @@ class Manager extends AdminManagerIface
      */
     public function show()
     {
-
         $u = clone $this->editUrl;
-        $this->getActionPanel()->addButton(\Tk\Ui\Button::create('New Collection',
+        $this->getActionPanel()->add(\Tk\Ui\Button::create('New Collection',
             $u->set('profileId', $this->profile->getId()), 'fa fa-graduation-cap fa-add-action'));
-
 
         $template = parent::show();
 

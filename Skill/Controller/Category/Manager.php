@@ -48,7 +48,7 @@ class Manager extends AdminManagerIface
         $this->editUrl = \App\Uri::create('/skill/categoryEdit.html');
 
         $u = clone $this->editUrl;
-        $this->getActionPanel()->addButton(\Tk\Ui\Button::create('New Category',
+        $this->getActionPanel()->add(\Tk\Ui\Button::create('New Category',
             $u->set('collectionId', $this->collection->getId()), 'fa fa-folder-o'));
 
         $this->table = \App\Config::getInstance()->createTable(\Tk\Object::basename($this).'_categoryList');

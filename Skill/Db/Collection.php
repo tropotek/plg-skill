@@ -160,16 +160,29 @@ class Collection extends \Tk\Db\Map\Model
     /**
      * Use this to test if the public user can submit an entry
      *
-     * @param \App\Db\Placement $placement
+     * @param \App\Db\Placement $placement (optional)
      * @return bool
      */
-    public function isAvailable($placement)
+    public function isAvailable($placement = null)
     {
-        $b = array();
-        $b[] = in_array($placement->status, $this->available);
-        $b[] = $this->active;
-        $b[] = CollectionMap::create()->hasPlacementType($this->getId(), $placement->placementTypeId);
-        return !in_array(false, $b, true);      // return false if a false is in any result
+        $b = true;
+        $b &= $this->active;
+        if ($placement) {
+            $b &= in_array($placement->status, $this->available);
+            $b &= CollectionMap::create()->hasPlacementType($this->getId(), $placement->placementTypeId);
+        }
+        return $b;
+    }
+
+    /**
+     * @param \App\Db\Course|int $courseId
+     * @return bool
+     */
+    public function isAvailableToCourse($courseId)
+    {
+        if ($courseId instanceof \App\Db\Course) $courseId = $courseId->getId();
+        $b = \Skill\Db\CollectionMap::create()->hasCourse($courseId, $this->getId());
+        return $b;
     }
 
     /**
