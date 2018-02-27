@@ -78,7 +78,7 @@ class Manager extends AdminManagerIface
     {
         $filter = $this->table->getFilterValues();
         $filter['collectionId'] = $this->collection->getId();
-        return \Skill\Db\ItemMap::create()->findFiltered($filter, $this->table->makeDbTool('orderBy', 100));
+        return \Skill\Db\ItemMap::create()->findFiltered($filter, $this->table->getTool('orderBy', 100));
     }
 
     /**

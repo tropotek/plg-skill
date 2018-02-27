@@ -58,7 +58,7 @@ class DomainMap extends \App\Db\Mapper
      *
      * @param array $filter
      * @param Tool $tool
-     * @return ArrayObject
+     * @return ArrayObject|Domain[]
      */
     public function findFiltered($filter = array(), $tool = null)
     {

@@ -121,7 +121,68 @@ SQL;
         }
         return $arr;
     }
-    
+
+
+    /**
+     *
+     * @param $collectionId
+     * @param $courseId
+     * @param bool $valueOnly
+     * @return array
+     */
+    public function findCourseAverages($collectionId, $courseId, $valueOnly = false)
+    {
+        // Faster query
+        $sql = <<<SQL
+SELECT * 
+FROM (
+    SELECT a.domain_id, a.label, c.scale, a.weight, SUM(a.average)/b.count as 'avg', (SUM(a.average)/b.count)*a.weight as 'weighted_avg'
+    FROM
+      (
+        SELECT c.id as 'item_id', a.collection_id, a.id as 'entry_id', d.id as 'domain_id', 
+            d.label, c.question, ROUND(AVG(b.value), 2) as 'average', d.order_by, d.weight
+        FROM skill_entry a, skill_value b, skill_item c, skill_domain d
+        WHERE a.del = 0 AND c.del = 0 AND d.del = 0 AND
+            a.id = b.entry_id AND b.value > 0 AND
+            a.collection_id = ? AND a.course_id = ? AND a.status = 'approved' AND
+            b.item_id = c.id AND
+            c.domain_id = d.id
+        GROUP BY b.item_id
+        ORDER BY d.order_by, c.order_by
+      ) a,
+      (
+        SELECT a.domain_id, COUNT(a.id) as 'count'
+        FROM skill_item a
+        GROUP BY a.domain_id
+      ) b,
+      (
+        SELECT a.collection_id, COUNT(a.id)-1 as 'scale'
+        FROM skill_scale a
+        GROUP BY a.collection_id
+      ) c
+    WHERE
+      a.domain_id = b.domain_id AND
+      c.collection_id = a.collection_id
+    GROUP BY a.domain_id
+    ORDER BY a.order_by ) a
+
+SQL;
+
+        $stm = $this->getDb()->prepare($sql);
+        $stm->bindParam(1, $collectionId);
+        $stm->bindParam(2, $courseId);
+
+        $stm->execute();
+        $arr = $stm->fetchAll();
+        if ($valueOnly) {
+            $arr1 = array();
+            foreach ($arr as $obj) {
+                $arr1[$obj->domain_id] = $obj->avg;
+            }
+            $arr = $arr1;
+        }
+        return $arr;
+    }
     
     
     

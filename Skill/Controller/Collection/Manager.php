@@ -40,6 +40,7 @@ class Manager extends AdminManagerIface
     /**
      * @param Request $request
      * @return null|\Tk\Db\Map\Model|\Tk\Db\ModelInterface
+     * @throws \Tk\Db\Exception
      */
     protected function findProfile(Request $request)
     {
@@ -102,7 +103,7 @@ class Manager extends AdminManagerIface
     {
         $filter = $this->table->getFilterValues();
         $filter['profileId'] = $this->profile->getId();
-        return \Skill\Db\CollectionMap::create()->findFiltered($filter, $this->table->makeDbTool());
+        return \Skill\Db\CollectionMap::create()->findFiltered($filter, $this->table->getTool());
     }
 
     /**

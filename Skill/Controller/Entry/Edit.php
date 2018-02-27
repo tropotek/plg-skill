@@ -149,7 +149,7 @@ class Edit extends AdminEditIface
                 $filter = $this->statusTable->getTable()->getFilterValues();
                 $filter['model'] = $this->entry;
                 $filter['courseId'] = $this->entry->courseId;
-                $list = \App\Db\StatusMap::create()->findFiltered($filter, $this->statusTable->getTable()->makeDbTool('created DESC'));
+                $list = \App\Db\StatusMap::create()->findFiltered($filter, $this->statusTable->getTable()->getTool('created DESC'));
                 $this->statusTable->setList($list);
             }
         }

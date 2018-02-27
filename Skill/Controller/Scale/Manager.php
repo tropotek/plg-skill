@@ -79,7 +79,7 @@ class Manager extends AdminManagerIface
     {
         $filter = $this->table->getFilterValues();
         $filter['collectionId'] = $this->collection->getId();
-        return \Skill\Db\ScaleMap::create()->findFiltered($filter, $this->table->makeDbTool());
+        return \Skill\Db\ScaleMap::create()->findFiltered($filter, $this->table->getTool());
     }
 
     /**

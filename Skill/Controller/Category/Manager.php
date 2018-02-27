@@ -76,7 +76,7 @@ class Manager extends AdminManagerIface
     {
         $filter = $this->table->getFilterValues();
         $filter['collectionId'] = $this->collection->getId();
-        return \Skill\Db\CategoryMap::create()->findFiltered($filter, $this->table->makeDbTool());
+        return \Skill\Db\CategoryMap::create()->findFiltered($filter, $this->table->getTool());
     }
 
     /**

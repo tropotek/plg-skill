@@ -114,7 +114,7 @@ class Manager extends AdminManagerIface
         $filter = $this->table->getFilterValues();
         $filter['collectionId'] = $this->collection->getId();
         $filter['courseId'] = $this->getCourse()->getId();
-        return \Skill\Db\EntryMap::create()->findFiltered($filter, $this->table->makeDbTool('created DESC'));
+        return \Skill\Db\EntryMap::create()->findFiltered($filter, $this->table->getTool('created DESC'));
     }
 
     /**

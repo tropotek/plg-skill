@@ -57,6 +57,7 @@ class Results extends AdminIface
 
     /**
      * @return \Dom\Template
+     * @throws \Tk\Db\Exception
      */
     public function show()
     {
