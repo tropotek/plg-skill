@@ -81,7 +81,7 @@ class View extends AdminEditIface
             $this->form->addField(new Field\Html('confirm', $s))->setFieldset('Entry Details')->setNotes($this->entry->getCollection()->confirm);
         }
         if ($this->entry->notes)
-            $this->form->addField(new Field\Html('notes'))->setLabel('Comments', htmlentities($this->entry->notes))->setFieldset('Entry Details');
+            $this->form->addField(new Field\Html('notes', htmlentities($this->entry->notes)))->setLabel('Comments')->setFieldset('Entry Details');
 
         $items = \Skill\Db\ItemMap::create()->findFiltered(array('collectionId' => $this->entry->getCollection()->getId()),
             \Tk\Db\Tool::create('category_id, order_by'));
