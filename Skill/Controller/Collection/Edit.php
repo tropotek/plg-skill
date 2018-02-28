@@ -33,8 +33,10 @@ class Edit extends AdminEditIface
     }
 
     /**
-     *
      * @param Request $request
+     * @throws \Exception
+     * @throws \Tk\Db\Exception
+     * @throws \Tk\Form\Exception
      */
     public function doDefault(Request $request)
     {
@@ -74,11 +76,9 @@ class Edit extends AdminEditIface
         $this->form->addField(new Field\Select('icon', Field\Select::arrayToSelectList($list, false)))->setTabGroup($tab)
             ->addCss('iconpicker')->setNotes('Select an icon for this collection');
 
-        $list = array('#ffffcc', '#e8fdff', '#ac725e', '#d06b64', '#f83a22', '#fa573c', '#ff7537', '#ffad46', '#42d692',
-            '#16a765', '#7bd148', '#b3dc6c', '#fbe983', '#fad165', '#92e1c0', '#9fe1e7', '#9fc6e7', '#4986e7', '#9a9cff', '#b99aff',
-            '#c2c2c2', '#cabdbf', '#cca6ac', '#f691b2', '#cd74e6', '#a47ae2');
-        $this->form->addField(new Field\Select('color', Field\Select::arrayToSelectList($list, false)))->setTabGroup($tab)
-            ->addCss('colorpicker')->setNotes('Select a color scheme for this collection');
+
+        $this->form->addField(new Field\Input('color'))->setAttr('type', 'color')->setTabGroup($tab)
+            ->setNotes('Select a color scheme for this collection');
 
         $this->form->addField(new Field\Checkbox('active'))->setTabGroup($tab)
             ->setNotes('Enable this collection for user submissions.');
@@ -170,9 +170,6 @@ class Edit extends AdminEditIface
 
         // Render the form
         $template->insertTemplate('form', $this->form->getRenderer()->show());
-
-
-
 
 
 

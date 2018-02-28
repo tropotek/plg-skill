@@ -283,7 +283,8 @@ class Edit extends AdminEditIface
     }
 
     /**
-     * @return \Dom\Template
+     * @return Template
+     * @throws \Dom\Exception
      */
     public function show()
     {
@@ -295,6 +296,7 @@ class Edit extends AdminEditIface
         }
 
 
+            $template->insertHtml('instructions', $this->entry->getCollection()->instructions);
         if ($this->isPublic) {
             if(count($this->errors)) {
                 foreach ($this->errors as $error) {
@@ -306,7 +308,6 @@ class Edit extends AdminEditIface
             } else {
                 $template->setChoice('available');
             }
-            $template->insertHtml('instructions', $this->entry->getCollection()->instructions);
         } else {
             $template->setChoice('edit');
             if ($this->getUser()->isStaff()) {
@@ -317,7 +318,7 @@ class Edit extends AdminEditIface
                     }
                 }
             } else {        // For students here
-                $template->insertHtml('instructions', $this->entry->getCollection()->instructions);
+                //$template->insertHtml('instructions', $this->entry->getCollection()->instructions);
             }
         }
 
@@ -355,7 +356,8 @@ CSS;
       <h4 class="panel-title"><i class="fa fa-pencil" var="icon"></i> <span var="panel-title">Skill Entry Edit</span></h4>
     </div>
     <div class="panel-body">
-      <div var="instructions"></div>
+      <div var="instructions" class="instructions"></div>
+      <hr/>
       <div var="form"></div>
     </div>
   </div>

@@ -185,7 +185,140 @@ SQL;
     }
     
     
-    
+    public function findStudentResults()
+    {
+
+
+
+        /*
+         * TODO: We need to finish this as a query, may have to use a procedure or similar
+         * See: https://stackoverflow.com/questions/17964078/mysql-query-to-dynamically-convert-rows-to-columns-on-the-basis-of-two-columns
+         *
+
+
+This produces the correct result for one student we need this to be for all students
+
+
+SELECT a.collection_id, a.user_id, a.domain_id, a.label, b.weight,
+  c.max_grade, ROUND(AVG(a.avg), 2) as 'avg',
+  (ROUND(AVG(a.avg), 2)*(c.max_grade/d.scale)) as 'grade'
+
+FROM
+  (
+    SELECT a.collection_id, b.user_id as 'user_id', c.id as 'domain_id', a.id as 'item_id', c.label, a.question, IF(b.avg IS NOT NULL, b.avg, 0) as 'avg'
+    FROM
+      (
+        SELECT u.collection_id, u.course_id, u.user_id, d.id AS 'domain_id', b.item_id, d.label, c.question,
+          ROUND(AVG(b.value), 2) AS 'avg', c.order_by
+        FROM skill_entry a, skill_value b, skill_item c, skill_domain d,
+          (
+            SELECT 1 as 'collection_id', b.course_id, a.id as 'user_id'
+            FROM user a, course_has_student b
+            WHERE a.id = b.user_id AND b.course_id = 24 AND a.id = 1494
+          ) u
+        WHERE
+          a.del = 0 AND c.del = 0 AND d.del = 0 AND
+          a.id = b.entry_id AND
+          a.collection_id = u.collection_id AND
+          a.course_id = u.course_id AND
+          a.user_id = u.user_id AND
+          a.status = 'approved' AND
+          b.item_id = c.id AND
+          b.value > 0 AND
+          c.domain_id = d.id
+        GROUP BY u.user_id, b.item_id
+        ORDER BY u.user_id, d.order_by
+      ) b
+      RIGHT JOIN skill_item a ON (a.id = b.item_id AND a.collection_id = b.collection_id),
+      skill_domain c
+    WHERE
+      a.collection_id = 1 AND       # why this and not ... the results are wrong we need to find out why
+                                    # a.collection_id = b.collection_id AND
+      a.domain_id = c.id
+  ) a,
+  skill_domain b,
+  skill_collection c,
+  (
+    SELECT a.collection_id, COUNT(a.id)-1 as 'scale'
+    FROM skill_scale a
+    GROUP BY a.collection_id
+  ) d
+
+WHERE a.domain_id = b.id AND
+    c.id = a.collection_id AND
+    d.collection_id = a.collection_id
+
+GROUP BY b.id
+ORDER BY b.order_by
+;
+
+
+
+
+/ --------------------------------------------------------------
+// This is a work in progress
+SELECT a.collection_id, a.user_id, a.domain_id, a.label, b.weight,
+  c.max_grade, ROUND(AVG(a.avg), 2) as 'avg',
+  (ROUND(AVG(a.avg), 2)*(c.max_grade/d.scale)) as 'grade'
+
+FROM
+  (
+    SELECT b.collection_id, a.user_id as 'user_id', c.id as 'domain_id', b.id as 'item_id', c.label, b.question,
+      IF(a.avg IS NOT NULL, a.avg, 0) as 'avg'
+    FROM
+      (
+        SELECT a.collection_id, a.course_id, a.user_id, d.domain_id, c.item_id, e.label, d.question,
+          ROUND(AVG(c.value), 2) AS 'avg', d.order_by
+        FROM
+          (
+            SELECT 1 as 'collection_id', b.course_id, a.id as 'user_id'
+            FROM user a, course_has_student b
+            WHERE a.id = b.user_id AND b.course_id = 24 #AND a.id = 1494
+          ) a,
+          skill_entry b, skill_value c, skill_item d, skill_domain e
+        WHERE
+          b.del = 0 AND d.del = 0 AND e.del = 0 AND
+          b.id = c.entry_id AND
+          b.collection_id = a.collection_id AND
+          b.course_id = a.course_id AND
+          b.user_id = a.user_id AND
+          b.status = 'approved' AND
+          c.item_id = d.id AND
+          c.value > 0 AND
+          d.domain_id = e.id
+        GROUP BY a.user_id, c.item_id
+        ORDER BY a.user_id, e.order_by
+      ) a
+      RIGHT JOIN skill_item b ON (b.id = a.item_id),
+      skill_domain c
+    WHERE
+      b.collection_id = 1 AND       # why this and not ... the results are wrong we need to find out why not a.collection_id = b.collection_id AND
+      b.domain_id = c.id
+      AND a.user_id = 1494
+  ) a,
+  skill_domain b,
+  skill_collection c,
+  (
+    SELECT a.collection_id, COUNT(a.id)-1 as 'scale'
+    FROM skill_scale a
+    GROUP BY a.collection_id
+  ) d
+
+WHERE a.domain_id = b.id AND
+    c.id = a.collection_id AND
+    d.collection_id = a.collection_id
+
+GROUP BY b.id
+ORDER BY b.order_by
+;
+
+
+
+         */
+    }
+
+
+
     
     
     /**

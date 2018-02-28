@@ -84,6 +84,11 @@ class Report extends \App\Controller\AdminManagerIface
 
         $list = \Skill\Db\ReportingMap::create()->findDomainAverages($this->collection->getId(), $this->getCourse()->getId(), 1494);
         vd($list);
+        //  TODO:
+        //  TODO: We have to figure this one out, disable it for now.
+        //  TODO:
+        //  TODO:
+        //  TODO:
 
     }
 

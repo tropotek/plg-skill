@@ -229,7 +229,7 @@ CSS;
     </div>
     <div class="panel-body">
 
-      <div class="col-lg-4">
+      <div class="col-lg-6">
 
         <table class="table keyvalue-table">
           <tbody>
@@ -237,11 +237,11 @@ CSS;
             <td class="kv-key"><i class="fa fa-hashtag kv-icon kv-icon-default"></i> Placements Assessed</td>
             <td class="kv-value" var="entryCount">0</td>
           </tr>
-          <tr>
+          <tr choice="hide">
             <td class="kv-key"><i class="fa fa-exchange kv-icon kv-icon-tertiary"></i> Average Response</td>
             <td class="kv-value" var="avg">0</td>
           </tr>
-          <tr>
+          <tr choice="hide">
             <td class="kv-key"><i class="fa fa-graduation-cap kv-icon kv-icon-primary"></i> Calculated Grade</td>
             <td class="kv-value" var="grade">0.0</td>
           </tr>
@@ -252,7 +252,7 @@ CSS;
           </tbody>
         </table>
       </div>
-      <div class="col-lg-4">
+      <div class="col-lg-6">
         <table class="table table-bordered">
           <tr>
             <th>Domain</th>
@@ -268,7 +268,7 @@ CSS;
           </tr>
         </table>
       </div>
-      <div class="col-lg-4">
+      <div class="col-lg-4" choice="hide">
 
         <table class="table line-chart" var="line-chart">
           <tr>
