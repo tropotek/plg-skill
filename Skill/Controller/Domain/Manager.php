@@ -40,7 +40,8 @@ class Manager extends AdminManagerIface
 
     /**
      * @param Request $request
-     * @throws \Tk\Exception
+     * @throws \Tk\Db\Exception
+     * @throws \Tk\Form\Exception
      */
     public function doDefault(Request $request)
     {

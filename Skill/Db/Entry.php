@@ -138,6 +138,7 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 
     /**
      * @return \Skill\Db\Collection|null|\Tk\Db\Map\Model|\Tk\Db\ModelInterface
+     * @throws \Tk\Db\Exception
      */
     public function getCollection()
     {
@@ -149,6 +150,7 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 
     /**
      * @return \App\Db\Course|null|\Tk\Db\Map\Model|\Tk\Db\ModelInterface
+     * @throws \Tk\Db\Exception
      */
     public function getCourse()
     {
@@ -160,6 +162,7 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 
     /**
      * @return \App\Db\User|null|\Tk\Db\Map\Model|\Tk\Db\ModelInterface
+     * @throws \Tk\Db\Exception
      */
     public function getUser()
     {
@@ -171,6 +174,7 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 
     /**
      * @return \App\Db\Placement|null|\Tk\Db\Map\Model|\Tk\Db\ModelInterface
+     * @throws \Tk\Db\Exception
      */
     public function getPlacement()
     {
@@ -206,6 +210,7 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 
     /**
      * @return float
+     * @throws \Tk\Db\Exception
      */
     public function calcWeightedAverage()
     {

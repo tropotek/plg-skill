@@ -101,6 +101,7 @@ class Item extends \Tk\Db\Map\Model
 
     /**
      * @return null|Collection|\Tk\Db\Map\Model|\Tk\Db\ModelInterface
+     * @throws \Tk\Db\Exception
      */
     public function getCollection()
     {
@@ -112,6 +113,7 @@ class Item extends \Tk\Db\Map\Model
 
     /**
      * @return Category|null|\Tk\Db\Map\Model|\Tk\Db\ModelInterface
+     * @throws \Tk\Db\Exception
      */
     public function getCategory()
     {
@@ -123,6 +125,7 @@ class Item extends \Tk\Db\Map\Model
 
     /**
      * @return null|Domain
+     * @throws \Tk\Db\Exception
      */
     public function getDomain()
     {

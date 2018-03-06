@@ -20,11 +20,12 @@ class Item extends \Tk\Form\Field\Input
     protected $item = null;
 
 
-
     /**
      * __construct
      *
      * @param \Skill\Db\Item $item
+     * @throws \Tk\Db\Exception
+     * @throws \Tk\Form\Exception
      */
     public function __construct($item)
     {

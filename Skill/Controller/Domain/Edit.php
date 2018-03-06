@@ -35,6 +35,8 @@ class Edit extends AdminEditIface
     /**
      *
      * @param Request $request
+     * @throws \Exception
+     * @throws \Tk\Db\Exception
      */
     public function doDefault(Request $request)
     {
