@@ -33,7 +33,7 @@ class StatusMailHandler implements Subscriber
                     'available' => $event->getStatus()->name,
                     'placementTypeId' => $message->get('placement::placementTypeId')
                 );
-//vd($filter);
+
                 $collections = \Skill\Db\CollectionMap::create()->findFiltered($filter);
                 $config = \App\Config::getInstance();
                 /** @var \Skill\Db\Collection $collection */
