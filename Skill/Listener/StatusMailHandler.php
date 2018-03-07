@@ -29,7 +29,9 @@ class StatusMailHandler implements Subscriber
                     'available' => $event->getStatus()->name,
                     'placementTypeId' => $message->get('placement::placementTypeId')
                 );
+
                 $collections = \Skill\Db\CollectionMap::create()->findFiltered($filter);
+                vd($filter, $collections->count());
 
                 /** @var \Skill\Db\Collection $collection */
                 foreach ($collections as $collection) {
