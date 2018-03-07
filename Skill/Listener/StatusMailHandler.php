@@ -33,13 +33,15 @@ class StatusMailHandler implements Subscriber
                     'available' => $event->getStatus()->name,
                     'placementTypeId' => $message->get('placement::placementTypeId')
                 );
-
+//vd($filter);
                 $collections = \Skill\Db\CollectionMap::create()->findFiltered($filter);
-
+                $config = \App\Config::getInstance();
                 /** @var \Skill\Db\Collection $collection */
                 foreach ($collections as $collection) {
-                    $url = \App\Uri::createInstitutionUrl('/skillEdit.html', $collection->getProfile()->getInstitution())->set('collectionId', $collection->getId())->
+                    $url = \App\Uri::createInstitutionUrl('/skillEdit.html',
+                            $collection->getProfile()->getInstitution())->set('collectionId', $collection->getId())->
                         set('userId', $message->get('student::id'))->set('courseId', $message->get('course::id'));
+
                     if ($message->get('placement::id'))
                         $url->set('placementId', $message->get('placement::id'));
 
