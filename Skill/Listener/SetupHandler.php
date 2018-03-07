@@ -18,6 +18,24 @@ class SetupHandler implements Subscriber
      */
     public function onRequest(\Tk\Event\GetResponseEvent $event)
     {
+        $this->setup();
+    }
+
+    /**
+     * @param \Symfony\Component\Console\Event\ConsoleCommandEvent $event
+     * @throws \Tk\Db\Exception
+     */
+    public function onCommand(\Symfony\Component\Console\Event\ConsoleCommandEvent $event)
+    {
+        vd('----213321321--------');
+        $this->setup();
+    }
+
+    /**
+     * @throws \Tk\Db\Exception
+     */
+    public function setup()
+    {
         /* NOTE:
          *  If you require the Institution object for an event
          *  be sure to subscribe events here.
@@ -26,7 +44,6 @@ class SetupHandler implements Subscriber
          *  session on first page load?
          *
          */
-
         $config = \Tk\Config::getInstance();
         $dispatcher = \App\Config::getInstance()->getEventDispatcher();
         $plugin = Plugin::getInstance();
@@ -84,7 +101,8 @@ class SetupHandler implements Subscriber
     public static function getSubscribedEvents()
     {
         return array(
-            \Tk\Kernel\KernelEvents::REQUEST => array('onRequest', -10)
+            \Tk\Kernel\KernelEvents::REQUEST => array('onRequest', -10),
+            \Symfony\Component\Console\ConsoleEvents::COMMAND  => array('onCommand', -10)
         );
     }
     

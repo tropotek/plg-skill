@@ -11,6 +11,10 @@ use Tk\Event\Subscriber;
 class StatusMailHandler implements Subscriber
 {
 
+    /**
+     * @param \App\Event\StatusEvent $event
+     * @throws \Tk\Db\Exception
+     */
     public function onSendAllStatusMessages(\App\Event\StatusEvent $event)
     {
         if (!$event->getStatus()->notify || !$event->getStatus()->getProfile()->notifications) return;   // do not send messages
@@ -31,11 +35,10 @@ class StatusMailHandler implements Subscriber
                 );
 
                 $collections = \Skill\Db\CollectionMap::create()->findFiltered($filter);
-                vd($filter, $collections->count());
 
                 /** @var \Skill\Db\Collection $collection */
                 foreach ($collections as $collection) {
-                    $url = \App\Uri::createInstitutionUrl('/skillEdit.html')->set('collectionId', $collection->getId())->
+                    $url = \App\Uri::createInstitutionUrl('/skillEdit.html', $collection->getProfile()->getInstitution())->set('collectionId', $collection->getId())->
                         set('userId', $message->get('student::id'))->set('courseId', $message->get('course::id'));
                     if ($message->get('placement::id'))
                         $url->set('placementId', $message->get('placement::id'));

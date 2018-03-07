@@ -31,7 +31,8 @@ class Plugin extends \App\Plugin\Iface
     function doInit()
     {
         include dirname(__FILE__) . '/config.php';
-vd('-------------------------------------------------->>>>>');
+
+
         // Register the plugin for the different client areas if they are to be enabled/disabled/configured by those roles.
         //$this->getPluginFactory()->registerZonePlugin($this, self::ZONE_INSTITUTION);
         $this->getPluginFactory()->registerZonePlugin($this, self::ZONE_COURSE_PROFILE);
