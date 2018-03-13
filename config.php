@@ -27,8 +27,8 @@ $routes->add('skill-scale-edit', new \Tk\Routing\Route('/skill/scaleEdit.html', 
 $routes->add('skill-item-manager', new \Tk\Routing\Route('/skill/itemManager.html', 'Skill\Controller\Item\Manager::doDefault', $params));
 $routes->add('skill-item-edit', new \Tk\Routing\Route('/skill/itemEdit.html', 'Skill\Controller\Item\Edit::doDefault', $params));
 
-//$routes->add('skill-entry-manager', new \Tk\Routing\Route('/skill/entryManager.html', 'Skill\Controller\Entry\Manager::doDefault', $params));
 
+//$routes->add('skill-entry-manager', new \Tk\Routing\Route('/skill/entryManager.html', 'Skill\Controller\Entry\Manager::doDefault', $params));
 
 // Staff Only
 $params = array('role' => array('staff'));
@@ -48,5 +48,7 @@ $routes->add('skill-entry-results-student', new \Tk\Routing\Route('/student/{cou
 
 
 // Guest Pages
-$routes->add('guest-skill-entry-submit', new \Tk\Routing\Route('/inst/{institutionHash}/skillEdit.html', 'Skill\Controller\Entry\Edit::doPublicSubmission', array()));
+$routes->add('guest-skill-entry-submit', new \Tk\Routing\Route('/inst/{institutionHash}/skillEdit.html', 'Skill\Controller\Entry\Edit::doPublicSubmission'));
+
+
 
