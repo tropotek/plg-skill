@@ -27,7 +27,6 @@ class SetupHandler implements Subscriber
      */
     public function onCommand(\Symfony\Component\Console\Event\ConsoleCommandEvent $event)
     {
-        vd('----213321321--------');
         $this->setup();
     }
 
