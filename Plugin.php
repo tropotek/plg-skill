@@ -19,7 +19,7 @@ class Plugin extends \App\Plugin\Iface
      */
     static function getInstance()
     {
-        return \Uni\Config::getInstance()->getPluginFactory()->getPlugin('ems-skill');
+        return \Uni\Config::getInstance()->getPluginFactory()->getPlugin('plg-skill');
     }
 
     /**
