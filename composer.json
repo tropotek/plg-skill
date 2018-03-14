@@ -1,5 +1,5 @@
 {
-    "name": "ttek-plg/ems-skill",
+    "name": "ttek-plg/plg-skill",
     "type": "ttek-plugin",
     "description": "EMS III Assessment plugin, Gives users the ability to fill in a questionnaire to assess students.",
     "keywords":  [
@@ -31,6 +31,7 @@
         }
     },
     "require":  {
+        "ttek/tk-framework": "~2.0"
         "ttek/tk-installers": "~2.0"
     }
 }
