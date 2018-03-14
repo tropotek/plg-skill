@@ -324,8 +324,8 @@ class Edit extends AdminEditIface
 
         // Render the form
         $template->insertTemplate('form', $this->form->getRenderer()->show());
-        $template->appendCssUrl(\Tk\Uri::create('/plugin/ems-skill/assets/skill.less'));
-        $template->appendJsUrl(\Tk\Uri::create('/plugin/ems-skill/assets/skill.js'));
+        $template->appendCssUrl(\Tk\Uri::create('/plugin/plg-skill/assets/skill.less'));
+        $template->appendJsUrl(\Tk\Uri::create('/plugin/plg-skill/assets/skill.js'));
 
 
         $css = <<<CSS

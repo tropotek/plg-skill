@@ -44,8 +44,8 @@ class Item extends \Tk\Form\Field\Input
         $template = parent::show();
 
         // TODO: setup slider javascript etc
-        $template->appendCssUrl(\Tk\Uri::create('/plugin/ems-skill/assets/bootstrap-slider/src/less/bootstrap-slider.less'));
-        $template->appendJsUrl(\Tk\Uri::create('/plugin/ems-skill/assets/bootstrap-slider/dist/bootstrap-slider.js'));
+        $template->appendCssUrl(\Tk\Uri::create('/plugin/plg-skill/assets/bootstrap-slider/src/less/bootstrap-slider.less'));
+        $template->appendJsUrl(\Tk\Uri::create('/plugin/plg-skill/assets/bootstrap-slider/dist/bootstrap-slider.js'));
 
         $template->insertText('uid', self::$incr.'.');
         $template->insertText('question', $this->item->question);
