@@ -1,11 +1,11 @@
-# EMS III Example Plugin
+# EMS III Skill Plugin
 
-__Project:__ [ttek-plg/sample](http://packagist.org/packages/ttek-plg/sample)  
+__Project:__ [ttek-plg/plg-skill](http://packagist.org/packages/ttek-plg/plg-skill)  
 __Published:__ 01 Sep 2016
 __Web:__ <http://www.tropotek.com/>  
 __Authors:__ Michael Mifsud <http://www.tropotek.com/>  
   
-An sample Plugin for the new EMS III System. Use this to create your own plugins.
+An plg-skill Plugin for the new EMS III System. 
 
 ## Contents
 
@@ -15,23 +15,23 @@ An sample Plugin for the new EMS III System. Use this to create your own plugins
 
 ## Installation
 
-Available on Packagist ([ttek-plg/sample](http://packagist.org/packages/ttek-plg/sample))
+Available on Packagist ([ttek-plg/plg-skill](http://packagist.org/packages/ttek-plg/plg-skill))
 and as such installable via [Composer](http://getcomposer.org/).
 
 ```bash
-# composer require ttek-plg/sample
+# composer require ttek-plg/plg-skill
 ```
 
 Or add the following to your composer.json file:
 
 ```json
 {
-  "ttek-plg/sample": "~1.0"
+  "ttek-plg/plg-skill": "~1.0"
 }
 ```
 
 If you do not use Composer, you can grab the code from GitHub, and use any
-PSR-0 compatible autoloader (e.g. the [plg-sample](https://github.com/tropotek/plg-sample))
+PSR-0 compatible autoloader (e.g. the [plg-plg-skill](https://github.com/tropotek/plg-plg-skill))
 to load the classes.
 
 ## Introduction
