@@ -149,7 +149,7 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
     -->
   </div>
 </div>',
-            $model->assessor, $from, $collection->name, $userName, htmlentities($editUrl));
+            htmlentities($model->assessor), $from, htmlentities($collection->name), htmlentities($userName), htmlentities($editUrl));
 
         return $html;
     }
