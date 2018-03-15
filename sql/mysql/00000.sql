@@ -46,11 +46,11 @@ CREATE TABLE IF NOT EXISTS skill_collection (
   KEY del (del)
 ) ENGINE=InnoDB;
 
--- A place to enable entry views on a per course level
-CREATE TABLE IF NOT EXISTS skill_collection_course (
+-- A place to enable entry views on a per subject level
+CREATE TABLE IF NOT EXISTS skill_collection_subject (
   collection_id INT UNSIGNED NOT NULL DEFAULT 0,
-  course_id INT UNSIGNED NOT NULL DEFAULT 0,
-  PRIMARY KEY (collection_id, course_id)
+  subject_id INT UNSIGNED NOT NULL DEFAULT 0,
+  PRIMARY KEY (collection_id, subject_id)
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS skill_collection_placement_type (
@@ -140,7 +140,7 @@ CREATE TABLE IF NOT EXISTS skill_item (
 CREATE TABLE IF NOT EXISTS skill_entry (
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   collection_id INT UNSIGNED NOT NULL DEFAULT 0,            --
-  course_id INT UNSIGNED NOT NULL DEFAULT 0,                --
+  subject_id INT UNSIGNED NOT NULL DEFAULT 0,                --
   user_id INT UNSIGNED NOT NULL DEFAULT 0,                  -- The student user id the entry belongs to
   placement_id INT UNSIGNED NOT NULL DEFAULT 0,             -- (optional) The placement this entry is linked to if 0 then assume self-assessment
   title VARCHAR(255) NOT NULL DEFAULT '',                   -- A title for the assessment instance
@@ -155,7 +155,7 @@ CREATE TABLE IF NOT EXISTS skill_entry (
   modified DATETIME NOT NULL,
   created DATETIME NOT NULL,
   KEY (collection_id),
-  KEY (course_id),
+  KEY (subject_id),
   KEY (user_id),
   KEY (placement_id),
   KEY (del)

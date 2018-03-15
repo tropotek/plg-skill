@@ -14,14 +14,14 @@ class PlacementEditHandler implements Subscriber
 {
 
     /**
-     * @var \App\Db\Course
+     * @var \App\Db\Subject
      */
-    private $course = null;
+    private $subject = null;
 
 
-    public function __construct($course)
+    public function __construct($subject)
     {
-        $this->course = $course;
+        $this->subject = $subject;
     }
 
     /**
@@ -44,7 +44,7 @@ class PlacementEditHandler implements Subscriber
 
             $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array(
                 'active' => true,
-                'profileId' => $this->course->profileId,
+                'profileId' => $this->subject->profileId,
                 'available' => $controller->getPlacement()->status,
                 'placementTypeId' => $controller->getPlacement()->placementTypeId
             ));
@@ -58,8 +58,8 @@ class PlacementEditHandler implements Subscriber
                     'placementId' => $controller->getPlacement()->getId()))->current();
 
                 $btn = $actionPanel->add(\Tk\Ui\Button::create($collection->name,
-                    \App\Uri::createCourseUrl('/entryEdit.html')->set('collectionId', $collection->getId())
-                        ->set('placementId', $controller->getPlacement()->getId())->set('courseId', $this->course->getId())
+                    \App\Uri::createSubjectUrl('/entryEdit.html')->set('collectionId', $collection->getId())
+                        ->set('placementId', $controller->getPlacement()->getId())->set('subjectId', $this->subject->getId())
                         ->set('userId', $controller->getPlacement()->getId()), $collection->icon));
                 //$btn->setAttr('title', 'This is a test');
                 //$btn->addCss('disabled');

@@ -51,7 +51,7 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
         }
         $message = \Tk\Mail\CurlyMessage::create($mailTemplate->template);
         $message->setSubject($model->getCollection()->name . ' Entry ' . ucfirst($status->name) . ' for ' . $placement->getTitle(true) . ' ');
-        $message->setFrom(\Tk\Mail\Message::joinEmail($status->getProfile()->email, $status->getCourseName()));
+        $message->setFrom(\Tk\Mail\Message::joinEmail($status->getProfile()->email, $status->getSubjectName()));
 
         // Setup the message vars
         \App\Util\StatusMessage::setStudent($message, $placement->getUser());
@@ -85,15 +85,15 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
                     $message->addTo(\Tk\Mail\Message::joinEmail($placement->getSupervisor()->email, $placement->getSupervisor()->name));
                 break;
             case \App\Db\MailTemplate::RECIPIENT_STAFF:
-                $staffList = $status->getCourse()->getStaffList();
+                $staffList = $status->getSubject()->getStaffList();
                 if (count($staffList)) {
                     /** @var \App\Db\User $s */
                     foreach ($staffList as $s) {
                         $message->addBcc(\Tk\Mail\Message::joinEmail($s->email, $s->name));
                     }
-                    $message->addTo(\Tk\Mail\Message::joinEmail($status->getCourse()->getProfile()->email, $status->getCourseName()));
-                    $message->set('recipient::email', $status->getCourse()->getProfile()->email);
-                    $message->set('recipient::name', $status->getCourseName());
+                    $message->addTo(\Tk\Mail\Message::joinEmail($status->getSubject()->getProfile()->email, $status->getSubjectName()));
+                    $message->set('recipient::email', $status->getSubject()->getProfile()->email);
+                    $message->set('recipient::name', $status->getSubjectName());
                 }
                 break;
         }
@@ -110,7 +110,7 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
     {
         /** @var Entry $model */
         $model = $this->getStatus()->getModel();
-        $editUrl = \App\Uri::createCourseUrl('/entryEdit.html')->set('collectionId', $model->collectionId)->
+        $editUrl = \App\Uri::createSubjectUrl('/entryEdit.html')->set('collectionId', $model->collectionId)->
             set('userId', $model->userId)->set('placementId', $model->placementId);
 
         // TODO: get the icon from the entry collection
@@ -127,13 +127,13 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
         /** @var Entry $model */
         $model = $this->getStatus()->getModel();
         $collection = $model->getCollection();
-//        $editUrl = \App\Uri::createCourseUrl('/entryEdit.html')->set('collectionId', $model->collectionId)->
+//        $editUrl = \App\Uri::createSubjectUrl('/entryEdit.html')->set('collectionId', $model->collectionId)->
 //        set('userId', $model->userId)->set('placementId', $model->placementId);
-        $editUrl = \App\Uri::createCourseUrl('/entryEdit.html')->set('entryId', $model->getId());
+        $editUrl = \App\Uri::createSubjectUrl('/entryEdit.html')->set('entryId', $model->getId());
         $from = '';
         $userName = $model->getUser()->name;
         if ($model->getPlacement()) {
-            //$editUrl = \App\Uri::createCourseUrl('/entryEdit.html')->set('placementId', $model->getPlacement()->getId());
+            //$editUrl = \App\Uri::createSubjectUrl('/entryEdit.html')->set('placementId', $model->getPlacement()->getId());
             $from = 'from <em>' . htmlentities($model->getPlacement()->getCompany()->name) . '</em>';
             //$userName = $model->getPlacement()->getUser()->name;
         }

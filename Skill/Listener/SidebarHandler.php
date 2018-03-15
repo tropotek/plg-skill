@@ -14,9 +14,9 @@ class SidebarHandler implements Subscriber
 {
 
     /**
-     * @var \App\Db\Course
+     * @var \App\Db\Subject
      */
-    private $course = null;
+    private $subject = null;
 
     /**
      * @var \App\Controller\Iface
@@ -26,12 +26,12 @@ class SidebarHandler implements Subscriber
 
 
     /**
-     * CourseDashboardHandler constructor.
-     * @param \App\Db\Course $course
+     *  constructor.
+     * @param \App\Db\Subject $subject
      */
-    public function __construct($course)
+    public function __construct($subject)
     {
-        $this->course = $course;
+        $this->subject = $subject;
     }
 
     /**
@@ -41,7 +41,7 @@ class SidebarHandler implements Subscriber
      */
     public function onControllerInit(Event $event)
     {
-        /** @var \App\Controller\Staff\CourseDashboard $controller */
+        /** @var \App\Controller\Staff\SubjectDashboard $controller */
         $this->controller = $event->get('controller');
     }
 
@@ -55,12 +55,12 @@ class SidebarHandler implements Subscriber
         if ($this->controller->getUser()->isStudent()) {
             /** @var \App\Ui\Sidebar\Iface $sidebar */
             $sidebar = $event->get('sidebar');
-            $course = $this->controller->getCourse();
+            $subject = $this->controller->getSubject();
             $user = $this->controller->getUser();
             if (!$user || !$user->isStudent()) return;
 
             $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(
-                array('courseId' => $course->getId())
+                array('subjectId' => $subject->getId())
             );
 
             /** @var \Skill\Db\Collection $collection */
@@ -69,23 +69,23 @@ class SidebarHandler implements Subscriber
                 if ($collection->requirePlacement) {        // Results views
                     if ($collection->gradable) {
                         $html = sprintf('<li><a href="%s" title="View %s Results">%s</a></li>',
-                            htmlentities(\App\Uri::createCourseUrl('/entryResults.html')->set('collectionId', $collection->getId())->toString()),
+                            htmlentities(\App\Uri::createSubjectUrl('/entryResults.html')->set('collectionId', $collection->getId())->toString()),
                             $collection->name, $collection->name);
                     }
                 } else if ($collection->role == \Skill\Db\Collection::ROLE_STUDENT) {
                     /** @var \Skill\Db\Entry $e */
                     $e = \Skill\Db\EntryMap::create()->findFiltered(array(
                                     'collectionId' => $collection->getId(),
-                                    'courseId' => $course->getId(),
+                                    'subjectId' => $subject->getId(),
                                     'userId' => $user->getId())
                     )->current();
                     if ($e && $e->status == \Skill\Db\Entry::STATUS_APPROVED) {
                         $html = sprintf('<li><a href="%s" title="View %s">%s</a></li>',
-                            htmlentities(\App\Uri::createCourseUrl('/entryView.html')->set('entryId', $e->getId())->toString()),
+                            htmlentities(\App\Uri::createSubjectUrl('/entryView.html')->set('entryId', $e->getId())->toString()),
                             $collection->name, $collection->name);
                     } else {
                         $html = sprintf('<li><a href="%s" title="Create %s">%s</a></li>',
-                            htmlentities(\App\Uri::createCourseUrl('/entryEdit.html')->set('collectionId', $collection->getId())->toString()),
+                            htmlentities(\App\Uri::createSubjectUrl('/entryEdit.html')->set('collectionId', $collection->getId())->toString()),
                             $collection->name, $collection->name);
                     }
 

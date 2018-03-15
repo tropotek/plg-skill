@@ -48,7 +48,7 @@ class Report extends \App\Controller\AdminManagerIface
             throw new \Tk\Exception('A report is not available for this collection.');
         }
         if ($this->editUrl === null)
-            $this->editUrl = \App\Uri::createCourseUrl('/entryResults.html')->set('collectionId', $this->collection->getId());
+            $this->editUrl = \App\Uri::createSubjectUrl('/entryResults.html')->set('collectionId', $this->collection->getId());
 
         $this->table = \App\Config::getInstance()->createTable(\Tk\Object::basename($this).'_fieldList');
         $this->table->setRenderer(\App\Config::getInstance()->createTableRenderer($this->table));
@@ -82,7 +82,7 @@ class Report extends \App\Controller\AdminManagerIface
         $this->table->setList($this->getList());
 
 
-        $list = \Skill\Db\ReportingMap::create()->findDomainAverages($this->collection->getId(), $this->getCourse()->getId(), 1494);
+        $list = \Skill\Db\ReportingMap::create()->findDomainAverages($this->collection->getId(), $this->getSubject()->getId(), 1494);
         vd($list);
         //  TODO:
         //  TODO: We have to figure this one out, disable it for now.
@@ -100,7 +100,7 @@ class Report extends \App\Controller\AdminManagerIface
     protected function getList()
     {
         $filter = $this->table->getFilterValues();
-        $filter['courseId'] = $this->getCourse()->getId();
+        $filter['subjectId'] = $this->getSubject()->getId();
         $filter['role'] = \App\Db\User::ROLE_STUDENT;
         return \App\Db\UserMap::create()->findFiltered($filter, $this->table->getTool('name'));
     }
@@ -120,8 +120,8 @@ class Report extends \App\Controller\AdminManagerIface
 
         $tool = $this->table->getTool('d.name, a.name');
         $filter = $this->table->getFilterValues();
-        $filter['profileId'] = $this->getCourse()->profileId;
-        $filter['courseId'] = $this->getCourse()->getId();
+        $filter['profileId'] = $this->getSubject()->profileId;
+        $filter['subjectId'] = $this->getSubject()->getId();
 
 
 
@@ -133,8 +133,8 @@ class Report extends \App\Controller\AdminManagerIface
         if (!empty($filter['companyId'])) {
             $where .= sprintf('c.company_id = %d AND ', (int)$filter['companyId']);
         }
-        if (!empty($filter['courseId'])) {
-            $where .= sprintf('c.course_id = %d AND ', (int)$filter['courseId']);
+        if (!empty($filter['subjectId'])) {
+            $where .= sprintf('c.subject_id = %d AND ', (int)$filter['subjectId']);
         } else {
             if (!empty($filter['profileId'])) {
                 $where .= sprintf('b.profile_id = %d AND ', (int)$filter['profileId']);

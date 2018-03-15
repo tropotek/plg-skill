@@ -76,8 +76,8 @@ class Manager extends AdminManagerIface
         $this->table->addCell(new \Tk\Table\Cell\Text('entries'))->setOnPropertyValue(function ($cell, $obj) {
             /** @var \Skill\Db\Collection $obj */
             $filter = array('collectionId' => $obj->getId());
-            if (\Uni\Config::getInstance()->getCourse()) {
-                $filter['courseId'] = \Uni\Config::getInstance()->getCourse()->getId();
+            if (\Uni\Config::getInstance()->getSubject()) {
+                $filter['subjectId'] = \Uni\Config::getInstance()->getSubject()->getId();
             }
             return \Skill\Db\EntryMap::create()->findFiltered($filter)->count();
         });

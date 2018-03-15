@@ -59,7 +59,7 @@ class Scale extends \Tk\Db\Map\Model
 
 
     /**
-     * Course constructor.
+     * constructor.
      */
     public function __construct()
     {
@@ -141,7 +141,7 @@ class Scale extends \Tk\Db\Map\Model
             $errors['collectionId'] = 'Invalid Collection ID';
         }
         if (!$this->name) {
-            $errors['name'] = 'Please enter a valid course name';
+            $errors['name'] = 'Please enter a valid name';
         }
         
         return $errors;

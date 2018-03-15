@@ -83,7 +83,7 @@ class Collection extends \Tk\Db\Map\Model
 
     /**
      * Enable students to view their final results of all compiled entry grades
-     * This is now a data variable in the course_data table as this is course
+     * This is now a data variable in the subject_data table as this is subject
      * @var boolean
      */
     //public $viewGrade = false;
@@ -130,7 +130,7 @@ class Collection extends \Tk\Db\Map\Model
 
 
     /**
-     * Course constructor.
+     * constructor.
      */
     public function __construct()
     {
@@ -176,13 +176,13 @@ class Collection extends \Tk\Db\Map\Model
     }
 
     /**
-     * @param \App\Db\Course|int $courseId
+     * @param \App\Db\Subject|int $subjectId
      * @return bool
      */
-    public function isAvailableToCourse($courseId)
+    public function isAvailableToSubject($subjectId)
     {
-        if ($courseId instanceof \App\Db\Course) $courseId = $courseId->getId();
-        $b = \Skill\Db\CollectionMap::create()->hasCourse($courseId, $this->getId());
+        if ($subjectId instanceof \App\Db\Subject) $subjectId = $subjectId->getId();
+        $b = \Skill\Db\CollectionMap::create()->hasSubject($subjectId, $this->getId());
         return $b;
     }
 

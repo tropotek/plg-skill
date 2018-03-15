@@ -41,7 +41,7 @@ class StatusMailHandler implements Subscriber
                     $url = \App\Uri::createInstitutionUrl('/skillEdit.html', $collection->getProfile()->getInstitution())
                         ->set('collectionId', $collection->getId())
                         ->set('userId', $message->get('student::id'))
-                        ->set('courseId', $message->get('course::id'));
+                        ->set('subjectId', $message->get('subject::id'));
 
                     if ($message->get('placement::id'))
                         $url->set('placementId', $message->get('placement::id'));

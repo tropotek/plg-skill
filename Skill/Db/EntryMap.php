@@ -25,7 +25,7 @@ class EntryMap extends \App\Db\Mapper
             $this->dbMap = new \Tk\DataMap\DataMap();
             $this->dbMap->addPropertyMap(new Db\Integer('id'), 'key');
             $this->dbMap->addPropertyMap(new Db\Integer('collectionId', 'collection_id'));
-            $this->dbMap->addPropertyMap(new Db\Integer('courseId', 'course_id'));
+            $this->dbMap->addPropertyMap(new Db\Integer('subjectId', 'subject_id'));
             $this->dbMap->addPropertyMap(new Db\Integer('userId', 'user_id'));
             $this->dbMap->addPropertyMap(new Db\Integer('placementId', 'placement_id'));
             $this->dbMap->addPropertyMap(new Db\Text('title'));
@@ -51,7 +51,7 @@ class EntryMap extends \App\Db\Mapper
             $this->formMap = new \Tk\DataMap\DataMap();
             $this->formMap->addPropertyMap(new Form\Integer('id'), 'key');
             $this->formMap->addPropertyMap(new Form\Integer('collectionId'));
-            $this->formMap->addPropertyMap(new Form\Integer('courseId'));
+            $this->formMap->addPropertyMap(new Form\Integer('subjectId'));
             $this->formMap->addPropertyMap(new Form\Integer('userId'));
             $this->formMap->addPropertyMap(new Form\Integer('placementId'));
             $this->formMap->addPropertyMap(new Form\Text('title'));
@@ -93,8 +93,8 @@ class EntryMap extends \App\Db\Mapper
         }
 
 
-        if (!empty($filter['courseId'])) {
-            $where .= sprintf('a.course_id = %s AND ', (int)$filter['courseId']);
+        if (!empty($filter['subjectId'])) {
+            $where .= sprintf('a.subject_id = %s AND ', (int)$filter['subjectId']);
         }
 
         if (!empty($filter['collectionId'])) {

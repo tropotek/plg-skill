@@ -49,12 +49,12 @@ class ReportingMap
     /**
      * 
      * @param $collectionId
-     * @param $courseId
+     * @param $subjectId
      * @param int $userId
      * @param bool $valueOnly
      * @return array
      */
-    public function findStudentResult($collectionId, $courseId, $userId = 0, $valueOnly = false)
+    public function findStudentResult($collectionId, $subjectId, $userId = 0, $valueOnly = false)
     {
         $usql = '';
         if ($userId) {
@@ -62,13 +62,13 @@ class ReportingMap
         }
         
         $sql = <<<SQL
-SELECT a.collection_id, a.user_id, a.course_id, SUM(a.weighted_avg) / a.scale AS 'course_result'
+SELECT a.collection_id, a.user_id, a.subject_id, SUM(a.weighted_avg) / a.scale AS 'subject_result'
   FROM
-    (SELECT a.collection_id, a.user_id, a.course_id, a.domain_id, a.label, c.scale, a.weight,
+    (SELECT a.collection_id, a.user_id, a.subject_id, a.domain_id, a.label, c.scale, a.weight,
       SUM(a.average) / b.count AS 'avg', (SUM(a.average) / b.count) * a.weight AS 'weighted_avg'
     FROM
       (
-        SELECT a.collection_id, a.course_id, a.user_id, c.id AS 'item_id', a.id AS 'entry_id', d.id AS 'domain_id',
+        SELECT a.collection_id, a.subject_id, a.user_id, c.id AS 'item_id', a.id AS 'entry_id', d.id AS 'domain_id',
           d.label, c.question, ROUND(AVG(b.value), 2) AS 'average', d.order_by, d.weight
         FROM skill_entry a, skill_value b, skill_item c, skill_domain d
         WHERE
@@ -77,7 +77,7 @@ SELECT a.collection_id, a.user_id, a.course_id, SUM(a.weighted_avg) / a.scale AS
               a.status = 'approved' AND
               b.item_id = c.id AND
               c.domain_id = d.id
-        GROUP BY a.collection_id, a.course_id, a.user_id, b.item_id
+        GROUP BY a.collection_id, a.subject_id, a.user_id, b.item_id
         ORDER BY d.order_by, c.order_by
       ) a,
       (
@@ -94,17 +94,17 @@ SELECT a.collection_id, a.user_id, a.course_id, SUM(a.weighted_avg) / a.scale AS
       a.domain_id = b.domain_id AND
           c.collection_id = a.collection_id
 
-    GROUP BY a.collection_id, a.course_id, a.user_id, a.domain_id
+    GROUP BY a.collection_id, a.subject_id, a.user_id, a.domain_id
     ORDER BY a.order_by
     ) a
   WHERE
-    a.collection_id = ? AND a.course_id = ? $usql
-  GROUP BY a.collection_id, a.course_id, a.user_id
+    a.collection_id = ? AND a.subject_id = ? $usql
+  GROUP BY a.collection_id, a.subject_id, a.user_id
 SQL;
         
         $stm = $this->getDb()->prepare($sql);
         $stm->bindParam(1, $collectionId);
-        $stm->bindParam(2, $courseId);
+        $stm->bindParam(2, $subjectId);
         if ($usql)
             $stm->bindParam(3, $userId);
         
@@ -114,8 +114,8 @@ SQL;
             if (!count($arr) && $userId) return 0;
             $arr1 = array();
             foreach ($arr as $obj) {
-                if ($userId) return $obj->course_result;
-                $arr1[$obj->user_id] = $obj->course_result;
+                if ($userId) return $obj->subject_result;
+                $arr1[$obj->user_id] = $obj->subject_result;
             }
             $arr = $arr1;
         }
@@ -126,11 +126,11 @@ SQL;
     /**
      *
      * @param $collectionId
-     * @param $courseId
+     * @param $subjectId
      * @param bool $valueOnly
      * @return array
      */
-    public function findCourseAverages($collectionId, $courseId, $valueOnly = false)
+    public function findSubjectAverages($collectionId, $subjectId, $valueOnly = false)
     {
         // Faster query
         $sql = <<<SQL
@@ -144,7 +144,7 @@ FROM (
         FROM skill_entry a, skill_value b, skill_item c, skill_domain d
         WHERE a.del = 0 AND c.del = 0 AND d.del = 0 AND
             a.id = b.entry_id AND b.value > 0 AND
-            a.collection_id = ? AND a.course_id = ? AND a.status = 'approved' AND
+            a.collection_id = ? AND a.subject_id = ? AND a.status = 'approved' AND
             b.item_id = c.id AND
             c.domain_id = d.id
         GROUP BY b.item_id
@@ -170,7 +170,7 @@ SQL;
 
         $stm = $this->getDb()->prepare($sql);
         $stm->bindParam(1, $collectionId);
-        $stm->bindParam(2, $courseId);
+        $stm->bindParam(2, $subjectId);
 
         $stm->execute();
         $arr = $stm->fetchAll();
@@ -208,19 +208,19 @@ FROM
     SELECT a.collection_id, b.user_id as 'user_id', c.id as 'domain_id', a.id as 'item_id', c.label, a.question, IF(b.avg IS NOT NULL, b.avg, 0) as 'avg'
     FROM
       (
-        SELECT u.collection_id, u.course_id, u.user_id, d.id AS 'domain_id', b.item_id, d.label, c.question,
+        SELECT u.collection_id, u.subject_id, u.user_id, d.id AS 'domain_id', b.item_id, d.label, c.question,
           ROUND(AVG(b.value), 2) AS 'avg', c.order_by
         FROM skill_entry a, skill_value b, skill_item c, skill_domain d,
           (
-            SELECT 1 as 'collection_id', b.course_id, a.id as 'user_id'
-            FROM user a, course_has_student b
-            WHERE a.id = b.user_id AND b.course_id = 24 AND a.id = 1494
+            SELECT 1 as 'collection_id', b.subject_id, a.id as 'user_id'
+            FROM user a, subject_has_student b
+            WHERE a.id = b.user_id AND b.subject_id = 24 AND a.id = 1494
           ) u
         WHERE
           a.del = 0 AND c.del = 0 AND d.del = 0 AND
           a.id = b.entry_id AND
           a.collection_id = u.collection_id AND
-          a.course_id = u.course_id AND
+          a.subject_id = u.subject_id AND
           a.user_id = u.user_id AND
           a.status = 'approved' AND
           b.item_id = c.id AND
@@ -267,20 +267,20 @@ FROM
       IF(a.avg IS NOT NULL, a.avg, 0) as 'avg'
     FROM
       (
-        SELECT a.collection_id, a.course_id, a.user_id, d.domain_id, c.item_id, e.label, d.question,
+        SELECT a.collection_id, a.subject_id, a.user_id, d.domain_id, c.item_id, e.label, d.question,
           ROUND(AVG(c.value), 2) AS 'avg', d.order_by
         FROM
           (
-            SELECT 1 as 'collection_id', b.course_id, a.id as 'user_id'
-            FROM user a, course_has_student b
-            WHERE a.id = b.user_id AND b.course_id = 24 #AND a.id = 1494
+            SELECT 1 as 'collection_id', b.subject_id, a.id as 'user_id'
+            FROM user a, subject_has_student b
+            WHERE a.id = b.user_id AND b.subject_id = 24 #AND a.id = 1494
           ) a,
           skill_entry b, skill_value c, skill_item d, skill_domain e
         WHERE
           b.del = 0 AND d.del = 0 AND e.del = 0 AND
           b.id = c.entry_id AND
           b.collection_id = a.collection_id AND
-          b.course_id = a.course_id AND
+          b.subject_id = a.subject_id AND
           b.user_id = a.user_id AND
           b.status = 'approved' AND
           c.item_id = d.id AND
@@ -324,12 +324,12 @@ ORDER BY b.order_by
     /**
      * 
      * @param $collectionId
-     * @param $courseId
+     * @param $subjectId
      * @param int $userId
      * @param bool $valueOnly
      * @return array
      */
-    public function findDomainAverages($collectionId, $courseId, $userId = 0, $valueOnly = false)
+    public function findDomainAverages($collectionId, $subjectId, $userId = 0, $valueOnly = false)
     {
         $usql = '';
         if ($userId) {
@@ -340,7 +340,7 @@ ORDER BY b.order_by
 SELECT a.domain_id, a.label, c.scale, a.weight, SUM(a.average)/b.count AS 'avg', a.order_by
 FROM
   (
-    SELECT a.collection_id, a.course_id, a.user_id, c.id AS 'item_id', a.id AS 'entry_id', d.id AS 'domain_id', d.label, c.question,
+    SELECT a.collection_id, a.subject_id, a.user_id, c.id AS 'item_id', a.id AS 'entry_id', d.id AS 'domain_id', d.label, c.question,
       ROUND(AVG(b.value), 2) AS 'average', d.order_by, d.weight
     FROM skill_entry a, skill_value b, skill_item c, skill_domain d
     WHERE
@@ -349,7 +349,7 @@ FROM
            a.status = 'approved' AND
           b.item_id = c.id AND
           c.domain_id = d.id
-    GROUP BY a.collection_id, a.course_id, a.user_id, b.item_id
+    GROUP BY a.collection_id, a.subject_id, a.user_id, b.item_id
     ORDER BY d.order_by, c.order_by
   ) a,
   (
@@ -363,7 +363,7 @@ FROM
     GROUP BY a.collection_id
   ) c
 WHERE
-  a.collection_id = ? AND a.course_id = ? AND $usql 
+  a.collection_id = ? AND a.subject_id = ? AND $usql 
   a.domain_id = b.domain_id AND
   c.collection_id = a.collection_id
 
@@ -380,7 +380,7 @@ FROM
     FROM skill_entry a, skill_value b, skill_item c, skill_domain d
     WHERE a.del = 0 AND c.del = 0 AND d.del = 0 AND
         a.id = b.entry_id AND b.value > 0 AND
-        a.collection_id = ? AND a.course_id = ? AND $usql a.status = 'approved' AND
+        a.collection_id = ? AND a.subject_id = ? AND $usql a.status = 'approved' AND
         b.item_id = c.id AND
         c.domain_id = d.id
     GROUP BY b.item_id
@@ -405,7 +405,7 @@ SQL;
         
         $stm = $this->getDb()->prepare($sql);
         $stm->bindParam(1, $collectionId);
-        $stm->bindParam(2, $courseId);
+        $stm->bindParam(2, $subjectId);
         if ($usql)
             $stm->bindParam(3, $userId);
         
@@ -424,12 +424,12 @@ SQL;
     /**
      *
      * @param $collectionId
-     * @param $courseId
+     * @param $subjectId
      * @param null $userId
      * @param bool $valueOnly  If true then only the itemId and average is return as an array key,value pair
      * @return array
      */
-    public function findItemAverages($collectionId, $courseId, $userId = null, $valueOnly = false)
+    public function findItemAverages($collectionId, $subjectId, $userId = null, $valueOnly = false)
     {
         $usql = '';
         if ($userId) {
@@ -443,7 +443,7 @@ FROM skill_entry a, skill_value b, skill_item c, skill_domain d
 WHERE
   a.del = 0 AND c.del = 0 AND d.del = 0 AND
       a.id = b.entry_id AND
-      a.collection_id = ? AND a.course_id = ? $usql AND a.status = 'approved' AND
+      a.collection_id = ? AND a.subject_id = ? $usql AND a.status = 'approved' AND
       b.item_id = c.id AND b.value > 0 AND
       c.domain_id = d.id
 GROUP BY b.item_id
@@ -452,7 +452,7 @@ SQL;
         $stm = $this->getDb()->prepare($sql);
 
         $stm->bindParam(1, $collectionId);
-        $stm->bindParam(2, $courseId);
+        $stm->bindParam(2, $subjectId);
         if ($usql)
             $stm->bindParam(3, $userId);
         $stm->execute();

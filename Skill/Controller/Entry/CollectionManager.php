@@ -14,9 +14,9 @@ class CollectionManager extends \Skill\Controller\Collection\Manager
 {
 
     /**
-     * @var \App\Db\Course
+     * @var \App\Db\Subject
      */
-    protected $course = null;
+    protected $subject = null;
 
 
     /**
@@ -26,7 +26,7 @@ class CollectionManager extends \Skill\Controller\Collection\Manager
     {
         parent::__construct();
         $this->setPageTitle('Skill Entry Collections');
-        $this->editUrl = \App\Uri::createCourseUrl('/entryManager.html');
+        $this->editUrl = \App\Uri::createSubjectUrl('/entryManager.html');
     }
 
     /**
@@ -35,9 +35,9 @@ class CollectionManager extends \Skill\Controller\Collection\Manager
      */
     protected function findProfile(Request $request)
     {
-//        $this->course = \App\Db\CourseMap::create()->find($request->get('courseId'));
-//        //$this->editUrl->set('courseId', $this->course->getId());
-//        $profile = $this->course->getProfile();
+//        $this->subject = \App\Db\SubjectMap::create()->find($request->get('subjectId'));
+//        //$this->editUrl->set('subjectId', $this->subject->getId());
+//        $profile = $this->subject->getProfile();
         return $this->getConfig()->getProfile();
     }
 

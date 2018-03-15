@@ -73,19 +73,19 @@ class Results extends AdminIface
         $filter = array(
             'userId' => $this->user->getId(),
             'collectionId' => $this->collection->getId(),
-            'courseId' => $this->getCourse()->getId(),
+            'subjectId' => $this->getSubject()->getId(),
             'status' => \Skill\Db\Entry::STATUS_APPROVED
         );
         $entryList = \Skill\Db\EntryMap::create()->findFiltered($filter, \Tk\Db\Tool::create('created DESC'));
 
         $template->insertText('entryCount', $entryList->count());
-        $studentResult =  \Skill\Db\ReportingMap::create()->findStudentResult($this->collection->getId(), $this->getCourse()->getId(), $this->user->getId(), true);
+        $studentResult =  \Skill\Db\ReportingMap::create()->findStudentResult($this->collection->getId(), $this->getSubject()->getId(), $this->user->getId(), true);
 
         $template->insertText('avg', sprintf('%.2f / %d', $studentResult*($this->collection->getScaleLength()-1), $this->collection->getScaleLength()-1));
         $template->insertText('grade', sprintf('%.2f / %d', $studentResult*$this->collection->maxGrade, $this->collection->maxGrade));
         $template->insertText('gradePcnt', sprintf('%.2f', $studentResult*100) . '%');
 
-        $domainResults = \Skill\Db\ReportingMap::create()->findDomainAverages($this->collection->getId(), $this->getCourse()->getId(), $this->user->getId());
+        $domainResults = \Skill\Db\ReportingMap::create()->findDomainAverages($this->collection->getId(), $this->getSubject()->getId(), $this->user->getId());
 
         // TODO: Could look at using a pie chart for this information
         foreach ($domainResults as $obj) {
@@ -100,7 +100,7 @@ class Results extends AdminIface
         }
 
 
-        $itemResults = \Skill\Db\ReportingMap::create()->findItemAverages($this->collection->getId(), $this->getCourse()->getId(), $this->user->getId());
+        $itemResults = \Skill\Db\ReportingMap::create()->findItemAverages($this->collection->getId(), $this->getSubject()->getId(), $this->user->getId());
         $catList = \Skill\Db\CategoryMap::create()->findFiltered(array(
             'collectionId' => $this->collection->getId()
         ));
@@ -159,7 +159,7 @@ CSS;
         $dataRow->insertText('status', 'Approved');
 
         $entryList = \Skill\Db\EntryMap::create()->findFiltered(array(
-            'userId' => $this->user->getId(), 'courseId' => $this->getCourse()->getId(), 'status' => \Skill\Db\Entry::STATUS_APPROVED)
+            'userId' => $this->user->getId(), 'subjectId' => $this->getSubject()->getId(), 'status' => \Skill\Db\Entry::STATUS_APPROVED)
         );
         /** @var \Skill\Db\Entry $entry */
         foreach ($entryList as $entry) {

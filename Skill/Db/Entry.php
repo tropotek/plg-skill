@@ -27,7 +27,7 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     /**
      * @var int
      */
-    public $courseId = 0;
+    public $subjectId = 0;
 
     /**
      * @var int
@@ -97,9 +97,9 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     private $collection = null;
 
     /**
-     * @var \App\Db\Course
+     * @var \App\Db\Subject
      */
-    private $course = null;
+    private $subject = null;
 
     /**
      * @var \App\Db\User
@@ -114,7 +114,7 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 
 
     /**
-     * Course constructor.
+     * constructor.
      */
     public function __construct()
     {
@@ -149,15 +149,15 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     }
 
     /**
-     * @return \App\Db\Course|null|\Tk\Db\Map\Model|\Tk\Db\ModelInterface
+     * @return \App\Db\Subject|null|\Tk\Db\Map\Model|\Tk\Db\ModelInterface
      * @throws \Tk\Db\Exception
      */
-    public function getCourse()
+    public function getSubject()
     {
-        if (!$this->course) {
-            $this->course = \App\Db\CourseMap::create()->find($this->courseId);
+        if (!$this->subject) {
+            $this->subject = \App\Db\SubjectMap::create()->find($this->subjectId);
         }
-        return $this->course;
+        return $this->subject;
     }
 
     /**
@@ -243,8 +243,8 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
         if ((int)$this->collectionId <= 0) {
             $errors['collectionId'] = 'Invalid Collection ID';
         }
-        if ((int)$this->courseId <= 0) {
-            $errors['courseId'] = 'Invalid Course ID';
+        if ((int)$this->subjectId <= 0) {
+            $errors['subjectId'] = 'Invalid Subject ID';
         }
         if ((int)$this->userId <= 0) {
             $errors['userId'] = 'Invalid User ID';

@@ -10,13 +10,13 @@ use Skill\Plugin;
  * @link http://www.tropotek.com/
  * @license Copyright 2015 Michael Mifsud
  */
-class CourseDashboardHandler implements Subscriber
+class SubjectDashboardHandler implements Subscriber
 {
 
     /**
-     * @var \App\Db\Course
+     * @var \App\Db\Subject
      */
-    private $course = null;
+    private $subject = null;
 
     /**
      * @var \App\Controller\Iface
@@ -26,12 +26,12 @@ class CourseDashboardHandler implements Subscriber
 
 
     /**
-     * CourseDashboardHandler constructor.
-     * @param \App\Db\Course $course
+     * constructor.
+     * @param \App\Db\Subject $subject
      */
-    public function __construct($course)
+    public function __construct($subject)
     {
-        $this->course = $course;
+        $this->subject = $subject;
     }
 
     /**
@@ -41,18 +41,18 @@ class CourseDashboardHandler implements Subscriber
      */
     public function onControllerInit(Event $event)
     {
-        /** @var \App\Controller\Staff\CourseDashboard $controller */
+        /** @var \App\Controller\Staff\SubjectDashboard $controller */
         $this->controller = $event->get('controller');
-        $course = $this->controller->getCourse();
+        $subject = $this->controller->getSubject();
 
-        // STAFF Course Dashboard
-        if ($this->controller instanceof \App\Controller\Staff\CourseDashboard) {
-            $userList = $this->controller->getCourseUserList();
-            $userList->setOnShowUser(function (\Dom\Template $template, \App\Db\User $user) use ($course) {
-                $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('profileId' => $course->profileId, 'gradable' => true));
+        // STAFF Subject Dashboard
+        if ($this->controller instanceof \App\Controller\Staff\SubjectDashboard) {
+            $userList = $this->controller->getSubjectUserList();
+            $userList->setOnShowUser(function (\Dom\Template $template, \App\Db\User $user) use ($subject) {
+                $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('profileId' => $subject->profileId, 'gradable' => true));
                 /** @var \Skill\Db\Collection $collection */
                 foreach ($collectionList as $collection) {
-                    if (!$collection->isAvailable() || !$collection->isAvailableToCourse($course)) continue;
+                    if (!$collection->isAvailable() || !$collection->isAvailableToSubject($subject)) continue;
 
                     // if user has a placement of at least one of the types and status
                     $entryList = \Skill\Db\EntryMap::create()->findFiltered(array(
@@ -61,7 +61,7 @@ class CourseDashboardHandler implements Subscriber
                         'status' => \Skill\Db\Entry::STATUS_APPROVED
                     ));
                     if ($entryList->count()) {
-                        $btn = \Tk\Ui\Button::create($collection->name . ' Results', \App\Uri::createCourseUrl('/entryResults.html')->
+                        $btn = \Tk\Ui\Button::create($collection->name . ' Results', \App\Uri::createSubjectUrl('/entryResults.html')->
                             set('userId', $user->getId())->set('collectionId', $collection->getId()), $collection->icon);
                         $btn->addCss('btn-primary btn-xs');
                         $btn->setAttr('title', 'View Student ' . $collection->name . ' Results');
@@ -69,16 +69,16 @@ class CourseDashboardHandler implements Subscriber
                     }
                 }
 
-                $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('profileId' => $course->profileId, 'requirePlacement' => false));
+                $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('profileId' => $subject->profileId, 'requirePlacement' => false));
                 /** @var \Skill\Db\Collection $collection */
                 foreach ($collectionList as $collection) {
-                    if (!$collection->isAvailable() || !$collection->isAvailableToCourse($course)) continue;
-                    $btn = \Tk\Ui\Button::create($collection->name, \App\Uri::createCourseUrl('/entryEdit.html')->
+                    if (!$collection->isAvailable() || !$collection->isAvailableToSubject($subject)) continue;
+                    $btn = \Tk\Ui\Button::create($collection->name, \App\Uri::createSubjectUrl('/entryEdit.html')->
                         set('userId', $user->getId())->set('collectionId', $collection->getId()), $collection->icon);
                     $entry = \Skill\Db\EntryMap::create()->findFiltered(
                         array(
                             'collectionId' => $collection->getId(),
-                            'courseId' => $course->getId(),
+                            'subjectId' => $subject->getId(),
                             'userId' => $user->getId(),
                             'placementId' => 0
                         )
@@ -99,16 +99,16 @@ class CourseDashboardHandler implements Subscriber
 
         }
 
-        // STUDENT Course Dashboard
-        if ($this->controller instanceof \App\Controller\Student\CourseDashboard) {
+        // STUDENT Subject Dashboard
+        if ($this->controller instanceof \App\Controller\Student\SubjectDashboard) {
             $placementList = $this->controller->getPlacementList();
             $actionsCell = $placementList->getActionsCell();
 
-            $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('profileId' => $course->profileId, 'requirePlacement' => true));
+            $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('profileId' => $subject->profileId, 'requirePlacement' => true));
             foreach ($collectionList as $collection) {
                 if (!$collection->isAvailable()) continue;
                 $actionsCell->addButton(\Tk\Table\Cell\ActionButton::create($collection->name,
-                    \App\Uri::createCourseUrl('/entryView.html'), $collection->icon))
+                    \App\Uri::createSubjectUrl('/entryView.html'), $collection->icon))
                     ->setShowLabel()
                     ->setOnShow(function ($cell, $obj, $btn) use ($collection) {
                         /** @var \Tk\Table\Cell\Actions $cell */

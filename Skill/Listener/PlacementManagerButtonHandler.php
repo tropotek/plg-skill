@@ -14,14 +14,14 @@ class PlacementManagerButtonHandler implements Subscriber
 {
 
     /**
-     * @var \App\Db\Course
+     * @var \App\Db\Subject
      */
-    private $course = null;
+    private $subject = null;
 
 
-    public function __construct($course)
+    public function __construct($subject)
     {
-        $this->course = $course;
+        $this->subject = $subject;
     }
 
     /**
@@ -38,12 +38,12 @@ class PlacementManagerButtonHandler implements Subscriber
         $controller = $event->get('controller');
         if ($controller instanceof \App\Controller\Placement\Manager) {
 
-            $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('profileId' => $this->course->profileId, 'active' => true));
+            $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('profileId' => $this->subject->profileId, 'active' => true));
             $actionsCell = $controller->getActionsCell();
 
             /** @var \Skill\Db\Collection $collection */
             foreach ($collectionList as $collection) {
-                $url = \App\Uri::createCourseUrl('/entryEdit.html')->set('collectionId', $collection->getId());
+                $url = \App\Uri::createSubjectUrl('/entryEdit.html')->set('collectionId', $collection->getId());
                 $actionsCell->addButton(\Tk\Table\Cell\ActionButton::create($collection->name, $url, $collection->icon))
                     ->setOnShow(function ($cell, $obj, $button) use ($collection) {
                         /* @var $obj \App\Db\Placement */

@@ -60,19 +60,19 @@ class Manager extends AdminManagerIface
         $this->collection = \Skill\Db\CollectionMap::create()->find($request->get('collectionId'));
 
         if ($this->editUrl === null)
-            $this->editUrl = \App\Uri::createCourseUrl('/entryEdit.html');
+            $this->editUrl = \App\Uri::createSubjectUrl('/entryEdit.html');
 
 
         $this->getActionPanel()->add(\Tk\Ui\Button::create('Setup',
-            \App\Uri::createCourseUrl('/collectionEdit.html')->set('collectionId', $this->collection->getId()), 'fa fa-gears'));
+            \App\Uri::createSubjectUrl('/collectionEdit.html')->set('collectionId', $this->collection->getId()), 'fa fa-gears'));
         if ($this->collection->gradable) {
             $this->getActionPanel()->add(\Tk\Ui\Button::create('Grade Report',
-                \App\Uri::createCourseUrl('/collectionReport.html')->set('collectionId', $this->collection->getId()), 'fa fa-pie-chart'));
+                \App\Uri::createSubjectUrl('/collectionReport.html')->set('collectionId', $this->collection->getId()), 'fa fa-pie-chart'));
         }
 
         $this->actionsCell = new \Tk\Table\Cell\Actions();
         $this->actionsCell->addButton(\Tk\Table\Cell\ActionButton::create('View Entry',
-            \App\Uri::createCourseUrl('/entryView.html'), 'fa fa-eye'))->setAppendQuery();
+            \App\Uri::createSubjectUrl('/entryView.html'), 'fa fa-eye'))->setAppendQuery();
 
         $this->table = \App\Config::getInstance()->createTable(\Tk\Object::basename($this).'_entryList'.$this->collection->name);
         $this->table->setRenderer(\App\Config::getInstance()->createTableRenderer($this->table));
@@ -113,7 +113,7 @@ class Manager extends AdminManagerIface
     {
         $filter = $this->table->getFilterValues();
         $filter['collectionId'] = $this->collection->getId();
-        $filter['courseId'] = $this->getCourse()->getId();
+        $filter['subjectId'] = $this->getSubject()->getId();
         return \Skill\Db\EntryMap::create()->findFiltered($filter, $this->table->getTool('created DESC'));
     }
 
@@ -126,7 +126,7 @@ class Manager extends AdminManagerIface
 
         $template->replaceTemplate('table', $this->table->getRenderer()->show());
 
-        $template->insertText('title', $this->collection->name . ' entries for ' . $this->getCourse()->name);
+        $template->insertText('title', $this->collection->name . ' entries for ' . $this->getSubject()->name);
 
         return $template;
     }

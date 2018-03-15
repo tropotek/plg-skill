@@ -83,7 +83,7 @@ class Edit extends AdminEditIface
         $this->form->addField(new Field\Checkbox('active'))->setTabGroup($tab)
             ->setNotes('Enable this collection for user submissions.');
         $this->form->addField(new Field\Checkbox('gradable'))->setTabGroup($tab)
-            ->setNotes('Calculate totals for all results. If enabled then the student can view a summary of the results. (This can be enabled in the course settings page)');
+            ->setNotes('Calculate totals for all results. If enabled then the student can view a summary of the results. (This can be enabled in the subject settings page)');
         $this->form->addField(new Field\Checkbox('includeZero'))->setTabGroup($tab)
             ->setNotes('Should the zero values be included in the weighted average calculation.');
 

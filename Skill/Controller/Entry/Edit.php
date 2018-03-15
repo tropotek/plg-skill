@@ -84,7 +84,7 @@ class Edit extends AdminEditIface
     {
         $this->entry = new \Skill\Db\Entry();
         $this->entry->userId = ($request->has('userId')) ? (int)$request->get('userId') : $this->getUser()->getId();
-        $this->entry->courseId = ($request->has('courseId')) ? (int)$request->get('courseId') : $this->getCourse()->getId();
+        $this->entry->subjectId = ($request->has('subjectId')) ? (int)$request->get('subjectId') : $this->getSubject()->getId();
         $this->entry->collectionId = (int)$request->get('collectionId');
         $this->entry->placementId = (int)$request->get('placementId');
         if ($request->get('entryId')) {
@@ -98,10 +98,10 @@ class Edit extends AdminEditIface
             if ($e)
                 $this->entry = $e;
         }
-        if (!$request->has('userId') && !$request->has('courseId') && $this->getUser()->isStudent()) {       // Assumed to be student self assessment form
+        if (!$request->has('userId') && !$request->has('subjectId') && $this->getUser()->isStudent()) {       // Assumed to be student self assessment form
             $e = \Skill\Db\EntryMap::create()->findFiltered(array(
                 'collectionId' => $this->entry->collectionId,
-                'courseId' => $this->entry->courseId,
+                'subjectId' => $this->entry->subjectId,
                 'userId' => $this->entry->userId)
             )->current();
             if ($e)
@@ -120,7 +120,7 @@ class Edit extends AdminEditIface
         }
 
 //        if ($this->entry->getId()) {
-//            $this->getActionPanel()->add(\Tk\Ui\Button::create('View', \App\Uri::createCourseUrl('/entryView.html')->set('entryId', $this->entry->getId()), 'fa fa-eye'));
+//            $this->getActionPanel()->add(\Tk\Ui\Button::create('View', \App\Uri::createSubjectUrl('/entryView.html')->set('entryId', $this->entry->getId()), 'fa fa-eye'));
 //        }
 
         if (!$this->entry->getId() && $this->entry->getPlacement()) {
@@ -144,11 +144,11 @@ class Edit extends AdminEditIface
         $this->form->execute($request);
 
         if ($this->getUser()->isStaff()) {
-            $this->statusTable = new \App\Ui\Table\Status(\App\Uri::createCourseUrl('/mailLogManager.html'));
+            $this->statusTable = new \App\Ui\Table\Status(\App\Uri::createSubjectUrl('/mailLogManager.html'));
             if ($this->entry->getId()) {
                 $filter = $this->statusTable->getTable()->getFilterValues();
                 $filter['model'] = $this->entry;
-                $filter['courseId'] = $this->entry->courseId;
+                $filter['subjectId'] = $this->entry->subjectId;
                 $list = \App\Db\StatusMap::create()->findFiltered($filter, $this->statusTable->getTable()->getTool('created DESC'));
                 $this->statusTable->setList($list);
             }
@@ -264,17 +264,17 @@ class Edit extends AdminEditIface
         // Create status if changed and trigger notifications
         if (!$this->isPublic && $form->getField('status')) {
             \App\Db\Status::createFromField($this->entry, $form->getField('status'),
-                $this->entry->getCourse()->getProfile(), $this->entry->getCourse());
+                $this->entry->getSubject()->getProfile(), $this->entry->getSubject());
         } else {
             \App\Db\Status::create($this->entry, $this->entry->status, true, '',
-                $this->entry->getCourse()->getProfile(), $this->entry->getCourse());
+                $this->entry->getSubject()->getProfile(), $this->entry->getSubject());
         }
 
         \Tk\Alert::addSuccess('Record saved!');
         $url = \Tk\Uri::create()->set('entryId', $this->entry->getId());
         if ($form->getTriggeredEvent()->getName() == 'update') {
             if ($this->entry->getPlacement() && $this->getUser()->isStaff()) {
-                $url = \App\Uri::createCourseUrl('/placementEdit.html')->set('placementId', $this->entry->getPlacement()->getId());
+                $url = \App\Uri::createSubjectUrl('/placementEdit.html')->set('placementId', $this->entry->getPlacement()->getId());
             } else {
                 $url = \Uni\Ui\Crumbs::getInstance()->getBackUrl();
             }
@@ -303,7 +303,8 @@ class Edit extends AdminEditIface
                     \Tk\Alert::addWarning($error);
                 }
                 $template->setChoice('not-available');
-                $template->setAttr('contact', 'href', \Tk\Uri::create('/contact.html')->set('courseId', $this->entry->courseId));
+                $template->setAttr('contact', 'href', \Tk\Uri::create('/contact.html')
+                    ->set('subjectId', $this->entry->subjectId));
                 return $template;
             } else {
                 $template->setChoice('available');
@@ -393,7 +394,7 @@ HTML;
         <div var="form"></div>
       </div>
       <div class="layout-main" choice="not-available">
-        <p>Please <a href="/contact.html?courseId=0" var="contact">contact</a> the course coordinator as this resource is no longer available.</p>
+        <p>Please <a href="/contact.html?subjectId=0" var="contact">contact</a> the subject coordinator as this resource is no longer available.</p>
       </div>
     </div>
   </div>

@@ -133,7 +133,7 @@ class CollectionMap extends \App\Db\Mapper
             $where .= sprintf('a.active = %s AND ', (int)$filter['active']);
         }
 
-        if (!empty($filter['studentCourseId'])) {
+        if (!empty($filter['studentsubjectId'])) {
             $where .= sprintf('a.active = %s AND ', (int)$filter['active']);
         }
 
@@ -150,9 +150,9 @@ class CollectionMap extends \App\Db\Mapper
             }
         }
 
-        if (isset($filter['courseId'])) {
-            $from .= sprintf(', %s b', $this->quoteTable('skill_collection_course'));
-            $where .= sprintf('a.id = b.collection_id AND b.course_id = %s AND ', (int)$filter['courseId']);
+        if (isset($filter['subjectId'])) {
+            $from .= sprintf(', %s b', $this->quoteTable('skill_collection_subject'));
+            $where .= sprintf('a.id = b.collection_id AND b.subject_id = %s AND ', (int)$filter['subjectId']);
         }
 
         // Find all collections that are enabled for the given placement statuses
@@ -245,11 +245,11 @@ class CollectionMap extends \App\Db\Mapper
     }
 
 
-    public function findCourseAverage($collectionId, $courseId)
+    public function findSubjectAverage($collectionId, $subjectId)
     {
         $stm = $this->getDb()->prepare('SELECT * 
           FROM skill_value a, skill_entry b LEFT JOIN skill_item c ON (b.item_id = c.id) LEFT JOIN skill_domain d ON (c.domain_id = d.id)   
-          WHERE a.id = b.entry_id AND collection_id = ? AND course_id = ? ');
+          WHERE a.id = b.entry_id AND collection_id = ? AND subject_id = ? ');
         $stm->bindParam(1, $collectionId);
         $stm->execute();
         $arr = array();
@@ -261,47 +261,47 @@ class CollectionMap extends \App\Db\Mapper
 
 
 
-    // Link to courses
+    // Link to subjects
 
     /**
-     * @param int $courseId
+     * @param int $subjectId
      * @param int $collectionId
      * @return boolean
      */
-    public function hasCourse($courseId, $collectionId)
+    public function hasSubject($subjectId, $collectionId)
     {
-        $stm = $this->getDb()->prepare('SELECT * FROM skill_collection_course WHERE course_id = ? AND collection_id = ?');
-        $stm->bindParam(1, $courseId);
+        $stm = $this->getDb()->prepare('SELECT * FROM skill_collection_subject WHERE subject_id = ? AND collection_id = ?');
+        $stm->bindParam(1, $subjectId);
         $stm->bindParam(2, $collectionId);
         $stm->execute();
         return ($stm->rowCount() > 0);
     }
 
     /**
-     * @param int $courseId
+     * @param int $subjectId
      * @param int $collectionId (optional) If null all are to be removed
      */
-    public function removeCourse($courseId, $collectionId = null)
+    public function removeSubject($subjectId, $collectionId = null)
     {
-        $stm = $this->getDb()->prepare('DELETE FROM skill_collection_course WHERE course_id = ?');
-        $stm->bindParam(1, $courseId);
+        $stm = $this->getDb()->prepare('DELETE FROM skill_collection_subject WHERE subject_id = ?');
+        $stm->bindParam(1, $subjectId);
         if ($collectionId) {
-            $stm = $this->getDb()->prepare('DELETE FROM skill_collection_course WHERE course_id = ? AND collection_id = ?');
-            $stm->bindParam(1, $courseId);
+            $stm = $this->getDb()->prepare('DELETE FROM skill_collection_subject WHERE subject_id = ? AND collection_id = ?');
+            $stm->bindParam(1, $subjectId);
             $stm->bindParam(2, $collectionId);
         }
         $stm->execute();
     }
 
     /**
-     * @param int $courseId
+     * @param int $subjectId
      * @param int $collectionId
      */
-    public function addCourse($courseId, $collectionId)
+    public function addSubject($subjectId, $collectionId)
     {
-        if ($this->hasCourse($courseId, $collectionId)) return;
-        $stm = $this->getDb()->prepare('INSERT INTO skill_collection_course (course_id, collection_id)  VALUES (?, ?)');
-        $stm->bindParam(1, $courseId);
+        if ($this->hasSubject($subjectId, $collectionId)) return;
+        $stm = $this->getDb()->prepare('INSERT INTO skill_collection_subject (subject_id, collection_id)  VALUES (?, ?)');
+        $stm->bindParam(1, $subjectId);
         $stm->bindParam(2, $collectionId);
         $stm->execute();
     }

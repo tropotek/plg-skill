@@ -10,28 +10,27 @@ use Skill\Plugin;
  * @link http://www.tropotek.com/
  * @license Copyright 2015 Michael Mifsud
  */
-class CourseEditHandler implements Subscriber
+class SubjectEditHandler implements Subscriber
 {
 
     /**
-     * @var \App\Db\Course
+     * @var \App\Db\Subject
      */
-    private $course = null;
+    private $subject = null;
 
     /**
-     * @var \App\Controller\Course\Edit
+     * @var \App\Controller\Subject\Edit
      */
     protected $controller = null;
 
 
 
     /**
-     * CourseEditHandler constructor.
-     * @param $course
+     * @param $subject
      */
-    public function __construct($course)
+    public function __construct($subject)
     {
-        $this->course = $course;
+        $this->subject = $subject;
     }
 
 
@@ -40,9 +39,9 @@ class CourseEditHandler implements Subscriber
      */
     public function onKernelController(\Tk\Event\ControllerEvent $event)
     {
-        /** @var \App\Controller\Course\Edit $controller */
+        /** @var \App\Controller\Subject\Edit $controller */
         $controller = $event->getController();
-        if ($controller instanceof \App\Controller\Course\Edit) {
+        if ($controller instanceof \App\Controller\Subject\Edit) {
             $this->controller = $controller;
         }
     }
@@ -60,7 +59,7 @@ class CourseEditHandler implements Subscriber
             /** @var \Tk\Ui\Admin\ActionPanel $actionPanel */
             $actionPanel = $this->controller->getActionPanel();
             $actionPanel->add(\Tk\Ui\Button::create('Skill Collections',
-                \App\Uri::createCourseUrl('/entryCollectionManager.html'), 'fa fa-graduation-cap'));
+                \App\Uri::createSubjectUrl('/entryCollectionManager.html'), 'fa fa-graduation-cap'));
         }
     }
 
@@ -75,12 +74,12 @@ class CourseEditHandler implements Subscriber
         $form = $event->getForm();
 
         $list = \Skill\Db\CollectionMap::create()->findFiltered(
-            array('profileId' => $this->course->profileId)
+            array('profileId' => $this->subject->profileId)
         );
         $field = $form->addField(new \Tk\Form\Field\Select(\Skill\Db\Collection::FIELD_ENABLE_RESULTS.'[]', \Tk\Form\Field\Option\ArrayObjectIterator::create($list)))->addCss('tk-dual-select')
             ->setAttr('data-title', 'Enabled Skill Collections')->setNotes('Enable/Disable the Skill Collections students can access.');
         $selected = \Skill\Db\CollectionMap::create()->findFiltered(
-            array('courseId' => $this->course->getId())
+            array('subjectId' => $this->subject->getId())
         );
         $field->setValue($selected->toArray('id'));
 
@@ -107,9 +106,9 @@ class CourseEditHandler implements Subscriber
         }
 
         // Save collection links
-        \Skill\Db\CollectionMap::create()->removeCourse($this->course->getId());
+        \Skill\Db\CollectionMap::create()->removeSubject($this->subject->getId());
         foreach ($list as $collectionId) {
-            \Skill\Db\CollectionMap::create()->addCourse($this->course->getId(), $collectionId);
+            \Skill\Db\CollectionMap::create()->addSubject($this->subject->getId(), $collectionId);
         }
 
     }
