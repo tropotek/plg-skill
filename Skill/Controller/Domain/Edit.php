@@ -64,8 +64,8 @@ class Edit extends AdminEditIface
         $this->form->addField(new Field\Input('weight'))->setNotes('for weighted marks ad a multiplier value here from 0.0 to 1.0');
         $this->form->addField(new Field\Input('description'))->setNotes('A short description of the domain');
 
-        $this->form->addField(new Event\Button('update', array($this, 'doSubmit')));
-        $this->form->addField(new Event\Button('save', array($this, 'doSubmit')));
+        $this->form->addField(new Event\Submit('update', array($this, 'doSubmit')));
+        $this->form->addField(new Event\Submit('save', array($this, 'doSubmit')));
         $this->form->addField(new Event\Link('cancel', \Uni\Ui\Crumbs::getInstance()->getBackUrl()));
 
     }

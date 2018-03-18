@@ -114,9 +114,9 @@ class Edit extends AdminEditIface
 
 
         if ($this->collection->getId())
-            $this->form->addField(new Event\Button('update', array($this, 'doSubmit')));
+            $this->form->addField(new Event\Submit('update', array($this, 'doSubmit')));
 
-        $this->form->addField(new Event\Button('save', array($this, 'doSubmit')));
+        $this->form->addField(new Event\Submit('save', array($this, 'doSubmit')));
         $this->form->addField(new Event\Link('cancel', \Uni\Ui\Crumbs::getInstance()->getBackUrl()));
 
     }
