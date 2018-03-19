@@ -32,6 +32,8 @@ $routes->add('skill-item-edit', new \Tk\Routing\Route('/skill/itemEdit.html', 'S
 
 // Staff Only
 $params = array('role' => array('staff'));
+$routes->add('skill-entry-collection-edit', new \Tk\Routing\Route('/staff/{subjectCode}/collectionEdit.html', 'Skill\Controller\Collection\Edit::doDefault', $params));
+
 $routes->add('skill-entry-collection-manager', new \Tk\Routing\Route('/staff/{subjectCode}/entryCollectionManager.html', 'Skill\Controller\Entry\CollectionManager::doDefault', $params));
 $routes->add('skill-entry-manager', new \Tk\Routing\Route('/staff/{subjectCode}/entryManager.html', 'Skill\Controller\Entry\Manager::doDefault', $params));
 $routes->add('skill-entry-edit', new \Tk\Routing\Route('/staff/{subjectCode}/entryEdit.html', 'Skill\Controller\Entry\Edit::doDefault', $params));
