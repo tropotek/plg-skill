@@ -61,10 +61,7 @@ class Manager extends AdminManagerIface
 
         if ($this->editUrl === null)
             $this->editUrl = \App\Uri::createSubjectUrl('/entryEdit.html');
-
-
-        $this->getActionPanel()->add(\Tk\Ui\Button::create('Setup',
-            \App\Uri::createSubjectUrl('/collectionEdit.html')->set('collectionId', $this->collection->getId()), 'fa fa-gears'));
+        
         if ($this->collection->gradable) {
             $this->getActionPanel()->add(\Tk\Ui\Button::create('Grade Report',
                 \App\Uri::createSubjectUrl('/collectionReport.html')->set('collectionId', $this->collection->getId()), 'fa fa-pie-chart'));

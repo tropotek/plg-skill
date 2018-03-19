@@ -28,12 +28,8 @@ $routes->add('skill-item-manager', new \Tk\Routing\Route('/skill/itemManager.htm
 $routes->add('skill-item-edit', new \Tk\Routing\Route('/skill/itemEdit.html', 'Skill\Controller\Item\Edit::doDefault', $params));
 
 
-//$routes->add('skill-entry-manager', new \Tk\Routing\Route('/skill/entryManager.html', 'Skill\Controller\Entry\Manager::doDefault', $params));
-
 // Staff Only
 $params = array('role' => array('staff'));
-$routes->add('skill-entry-collection-edit', new \Tk\Routing\Route('/staff/{subjectCode}/collectionEdit.html', 'Skill\Controller\Collection\Edit::doDefault', $params));
-
 $routes->add('skill-entry-collection-manager', new \Tk\Routing\Route('/staff/{subjectCode}/entryCollectionManager.html', 'Skill\Controller\Entry\CollectionManager::doDefault', $params));
 $routes->add('skill-entry-manager', new \Tk\Routing\Route('/staff/{subjectCode}/entryManager.html', 'Skill\Controller\Entry\Manager::doDefault', $params));
 $routes->add('skill-entry-edit', new \Tk\Routing\Route('/staff/{subjectCode}/entryEdit.html', 'Skill\Controller\Entry\Edit::doDefault', $params));
@@ -42,7 +38,7 @@ $routes->add('skill-entry-results-staff', new \Tk\Routing\Route('/staff/{subject
 $routes->add('skill-entry-report', new \Tk\Routing\Route('/staff/{subjectCode}/collectionReport.html', 'Skill\Controller\Collection\Report::doDefault', $params));
 
 
-// student Only
+// Student Only
 $params = array('role' => array('student'));
 $routes->add('skill-entry-edit-student', new \Tk\Routing\Route('/student/{subjectCode}/entryEdit.html', 'Skill\Controller\Entry\Edit::doDefault', $params));
 $routes->add('skill-entry-view-student', new \Tk\Routing\Route('/student/{subjectCode}/entryView.html', 'Skill\Controller\Entry\View::doDefault', $params));
