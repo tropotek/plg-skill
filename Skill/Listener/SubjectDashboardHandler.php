@@ -38,6 +38,8 @@ class SubjectDashboardHandler implements Subscriber
      * Check the user has access to this controller
      *
      * @param Event $event
+     * @throws \Tk\Db\Exception
+     * @throws \Tk\Exception
      */
     public function onControllerInit(Event $event)
     {

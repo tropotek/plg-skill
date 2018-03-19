@@ -28,6 +28,9 @@ class PlacementManagerButtonHandler implements Subscriber
      * Check the user has access to this controller
      *
      * @param Event $event
+     * @throws \Tk\Db\Exception
+     * @throws \Tk\Exception
+     * @throws \Tk\Plugin\Exception
      */
     public function onControllerInit(Event $event)
     {
@@ -71,6 +74,8 @@ class PlacementManagerButtonHandler implements Subscriber
      * Check the user has access to this controller
      *
      * @param Event $event
+     * @throws \Tk\Db\Exception
+     * @throws \Tk\Plugin\Exception
      */
     public function onControllerShow(Event $event)
     {

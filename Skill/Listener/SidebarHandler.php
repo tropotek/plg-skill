@@ -49,6 +49,9 @@ class SidebarHandler implements Subscriber
      * Check the user has access to this controller
      *
      * @param Event $event
+     * @throws \Dom\Exception
+     * @throws \Tk\Db\Exception
+     * @throws \Tk\Exception
      */
     public function onSidebarShow(Event $event)
     {

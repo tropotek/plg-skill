@@ -51,6 +51,8 @@ class SubjectEditHandler implements Subscriber
      * Check the user has access to this controller
      *
      * @param Event $event
+     * @throws \Tk\Db\Exception
+     * @throws \Tk\Exception
      */
     public function onControllerInit(Event $event)
     {
@@ -65,6 +67,7 @@ class SubjectEditHandler implements Subscriber
 
     /**
      * @param \Tk\Event\FormEvent $event
+     * @throws \Tk\Db\Exception
      * @throws \Tk\Form\Exception
      */
     public function onFormInit($event)

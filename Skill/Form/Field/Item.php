@@ -33,11 +33,12 @@ class Item extends \Tk\Form\Field\Input
         $this->item = $item;
         $this->setFieldset($this->item->getCategory()->name);
     }
-    
+
     /**
      * Get the element HTML
      *
      * @return string|\Dom\Template
+     * @throws \Tk\Db\Exception
      */
     public function show()
     {

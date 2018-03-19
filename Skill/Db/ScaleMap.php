@@ -17,6 +17,7 @@ class ScaleMap extends \App\Db\Mapper
 
     /**
      * @return \Tk\DataMap\DataMap
+     * @throws \Tk\Db\Exception
      */
     public function getDbMap()
     {
@@ -58,6 +59,7 @@ class ScaleMap extends \App\Db\Mapper
      * @param array $filter
      * @param Tool $tool
      * @return ArrayObject
+     * @throws \Tk\Db\Exception
      */
     public function findFiltered($filter = array(), $tool = null)
     {

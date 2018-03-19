@@ -17,6 +17,7 @@ class CategoryMap extends \App\Db\Mapper
 
     /**
      * @return \Tk\DataMap\DataMap
+     * @throws \Tk\Db\Exception
      */
     public function getDbMap()
     {
@@ -57,6 +58,7 @@ class CategoryMap extends \App\Db\Mapper
      * @param string $name
      * @param int $profileId
      * @return null|Category|\Tk\Db\ModelInterface
+     * @throws \Tk\Db\Exception
      */
     public function findByName($name, $profileId)
     {
@@ -69,6 +71,7 @@ class CategoryMap extends \App\Db\Mapper
      * @param array $filter
      * @param Tool $tool
      * @return ArrayObject|Category[]
+     * @throws \Tk\Db\Exception
      */
     public function findFiltered($filter = array(), $tool = null)
     {

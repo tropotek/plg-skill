@@ -17,6 +17,7 @@ class DomainMap extends \App\Db\Mapper
 
     /**
      * @return \Tk\DataMap\DataMap
+     * @throws \Tk\Db\Exception
      */
     public function getDbMap()
     {
@@ -59,6 +60,7 @@ class DomainMap extends \App\Db\Mapper
      * @param array $filter
      * @param Tool $tool
      * @return ArrayObject|Domain[]
+     * @throws \Tk\Db\Exception
      */
     public function findFiltered($filter = array(), $tool = null)
     {

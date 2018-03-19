@@ -98,6 +98,7 @@ class View extends AdminEditIface
 
     /**
      * @return \Dom\Template
+     * @throws \Tk\Db\Exception
      */
     public function show()
     {

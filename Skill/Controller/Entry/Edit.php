@@ -65,6 +65,7 @@ class Edit extends AdminEditIface
     /**
      * @param \Skill\Db\Entry $entry
      * @return bool
+     * @throws \Tk\Db\Exception
      */
     public function isSelfAssessment($entry)
     {
@@ -157,6 +158,9 @@ class Edit extends AdminEditIface
     }
 
     /**
+     * @throws \ReflectionException
+     * @throws \Tk\Db\Exception
+     * @throws \Tk\Exception
      * @throws \Tk\Form\Exception
      */
     protected function buildForm()
@@ -222,6 +226,9 @@ class Edit extends AdminEditIface
     /**
      * @param \Tk\Form $form
      * @param \Tk\Form\Event\Iface $event
+     * @throws \ReflectionException
+     * @throws \Tk\Db\Exception
+     * @throws \Tk\Exception
      */
     public function doSubmit($form, $event)
     {
@@ -285,6 +292,7 @@ class Edit extends AdminEditIface
     /**
      * @return Template
      * @throws \Dom\Exception
+     * @throws \Tk\Db\Exception
      */
     public function show()
     {

@@ -28,6 +28,7 @@ class ProfileEditHandler implements Subscriber
      * Check the user has access to this controller
      *
      * @param Event $event
+     * @throws \Tk\Db\Exception
      */
     public function onControllerInit(Event $event)
     {

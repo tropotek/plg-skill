@@ -80,6 +80,7 @@ class Scale extends \Tk\Db\Map\Model
      * recalculate the values for a collection of scales
      *
      * @param $collectionId
+     * @throws \Tk\Db\Exception
      */
     public static function recalculateValues($collectionId) {
         $list = ScaleMap::create()->findFiltered(array('collectionId' => $collectionId));
@@ -110,6 +111,7 @@ class Scale extends \Tk\Db\Map\Model
      * Generally this is a percentage of the scale in the list 0% - 100%
      *
      * @return float|int
+     * @throws \Tk\Db\Exception
      */
     public function getValue()
     {

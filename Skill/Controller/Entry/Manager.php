@@ -119,6 +119,7 @@ class Manager extends AdminManagerIface
 
     /**
      * @return \Dom\Template
+     * @throws \Tk\Exception
      */
     public function show()
     {

@@ -190,6 +190,7 @@ class Collection extends \Tk\Db\Map\Model
      * Get the total number of scale ticks/records for this collection
      *
      * @return int
+     * @throws \Tk\Db\Exception
      */
     public function getScaleLength()
     {

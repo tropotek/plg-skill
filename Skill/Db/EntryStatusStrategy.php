@@ -15,6 +15,7 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
      *
      * @param \App\Db\Status $status
      * @return boolean
+     * @throws \Tk\Db\Exception
      */
     public function triggerStatusChange($status)
     {
@@ -156,6 +157,7 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
 
     /**
      * @return string
+     * @throws \Tk\Db\Exception
      */
     public function getLabel()
     {

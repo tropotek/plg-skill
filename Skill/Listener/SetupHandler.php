@@ -15,6 +15,8 @@ class SetupHandler implements Subscriber
     /**
      * @param \Tk\Event\GetResponseEvent $event
      * @throws \Tk\Db\Exception
+     * @throws \Tk\Exception
+     * @throws \Tk\Plugin\Exception
      */
     public function onRequest(\Tk\Event\GetResponseEvent $event)
     {
@@ -24,6 +26,8 @@ class SetupHandler implements Subscriber
     /**
      * @param \Symfony\Component\Console\Event\ConsoleCommandEvent $event
      * @throws \Tk\Db\Exception
+     * @throws \Tk\Exception
+     * @throws \Tk\Plugin\Exception
      */
     public function onCommand(\Symfony\Component\Console\Event\ConsoleCommandEvent $event)
     {
@@ -32,6 +36,8 @@ class SetupHandler implements Subscriber
 
     /**
      * @throws \Tk\Db\Exception
+     * @throws \Tk\Exception
+     * @throws \Tk\Plugin\Exception
      */
     public function setup()
     {

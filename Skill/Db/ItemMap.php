@@ -17,6 +17,7 @@ class ItemMap extends \App\Db\Mapper
 
     /**
      * @return \Tk\DataMap\DataMap
+     * @throws \Tk\Db\Exception
      */
     public function getDbMap()
     {
@@ -62,6 +63,7 @@ class ItemMap extends \App\Db\Mapper
      * @param int $profileId
      * @param int $categoryId
      * @return null|Item|\Tk\Db\ModelInterface
+     * @throws \Tk\Db\Exception
      */
     public function findByName($question, $profileId, $categoryId = null) {
         $filter = array('profileId' => $profileId, 'question' => $question);
@@ -77,6 +79,7 @@ class ItemMap extends \App\Db\Mapper
      * @param array $filter
      * @param Tool $tool
      * @return ArrayObject|Item[]
+     * @throws \Tk\Db\Exception
      */
     public function findFiltered($filter = array(), $tool = null)
     {

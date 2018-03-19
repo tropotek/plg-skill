@@ -187,6 +187,7 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     /**
      * return the status list for a select field
      * @return array
+     * @throws \ReflectionException
      */
     public static function getStatusList()
     {
