@@ -74,8 +74,8 @@ class Results extends AdminIface
         $filter = array(
             'userId' => $this->user->getId(),
             'collectionId' => $this->collection->getId(),
-            'subjectId' => $this->getSubject()->getId(),
-            'status' => \Skill\Db\Entry::STATUS_APPROVED
+            'subjectId' => $this->getSubject()->getId()
+            //,'status' => \Skill\Db\Entry::STATUS_APPROVED             // TODO: We could use the collection Placement Avaliable Status list
         );
         $entryList = \Skill\Db\EntryMap::create()->findFiltered($filter, \Tk\Db\Tool::create('created DESC'));
 
