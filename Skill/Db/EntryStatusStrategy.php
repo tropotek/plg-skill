@@ -4,7 +4,7 @@ namespace Skill\Db;
 
 /**
  * @author Michael Mifsud <info@tropotek.com>
- * @link http://www.tropotek.com/
+ * @see http://www.tropotek.com/
  * @license Copyright 2015 Michael Mifsud
  */
 class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
