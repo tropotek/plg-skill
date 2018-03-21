@@ -55,12 +55,13 @@ class SidebarHandler implements Subscriber
      */
     public function onSidebarShow(Event $event)
     {
+        /** @var \App\Ui\Sidebar\Iface $sidebar */
+        $sidebar = $event->get('sidebar');
+        $subject = $this->controller->getSubject();
+        $user = $this->controller->getUser();
+        if (!$user) return;
+
         if ($this->controller->getUser()->isStudent()) {
-            /** @var \App\Ui\Sidebar\Iface $sidebar */
-            $sidebar = $event->get('sidebar');
-            $subject = $this->controller->getSubject();
-            $user = $this->controller->getUser();
-            if (!$user || !$user->isStudent()) return;
 
             $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(
                 array('subjectId' => $subject->getId())
@@ -91,12 +92,22 @@ class SidebarHandler implements Subscriber
                             htmlentities(\App\Uri::createSubjectUrl('/entryEdit.html')->set('collectionId', $collection->getId())->toString()),
                             $collection->name, $collection->name);
                     }
-
                 }
                 if ($html)
                     $sidebar->getTemplate()->appendHtml('menu', $html);
             }
+        } else if ($this->controller->getUser()->isStaff()) {
+            /** @var \App\Ui\Sidebar\StaffMenu $sidebar */
+            $list = \Skill\Db\CollectionMap::create()->findFiltered( array('subjectId' => $this->subject->getId(), 'gradable' => true) );
+            foreach ($list as $collection) {
+                $sidebar->addReportUrl(\Tk\Ui\Link::create($collection->name . ' Grades',
+                    \App\Uri::createSubjectUrl('/gradeReport.html')->set('collectionId', $collection->getId()), $collection->icon));
+
+            }
         }
+
+
+
     }
 
 
