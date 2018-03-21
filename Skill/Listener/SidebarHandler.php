@@ -101,7 +101,7 @@ class SidebarHandler implements Subscriber
             $list = \Skill\Db\CollectionMap::create()->findFiltered( array('subjectId' => $this->subject->getId(), 'gradable' => true) );
             foreach ($list as $collection) {
                 $sidebar->addReportUrl(\Tk\Ui\Link::create($collection->name . ' Grades',
-                    \App\Uri::createSubjectUrl('/gradeReport.html')->set('collectionId', $collection->getId()), $collection->icon));
+                    \App\Uri::createSubjectUrl('/collectionReport.html')->set('collectionId', $collection->getId()), $collection->icon));
 
             }
         }

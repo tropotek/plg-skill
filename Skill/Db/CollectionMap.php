@@ -136,8 +136,14 @@ class CollectionMap extends \App\Db\Mapper
             $where .= sprintf('a.active = %s AND ', (int)$filter['active']);
         }
 
-        if (!empty($filter['studentsubjectId'])) {
-            $where .= sprintf('a.active = %s AND ', (int)$filter['active']);
+        if (isset($filter['enabledSubjectId'])) {      // Only selects collections that have been enabled in the subject
+            $from .= sprintf(', %s c', $this->quoteTable('skill_collection_subject'));
+            $where .= sprintf('a.id = c.collection_id AND c.subject_id = %s AND ', (int)$filter['enabledSubjectId']);
+        }
+
+        if (!empty($filter['subjectId'])) {
+            $from .= sprintf(', %s d', $this->quoteTable('subject'));
+            $where .= sprintf('a.profile_id = d.profile_id AND d.id = %s AND ', (int)$filter['subjectId']);
         }
 
         if (!empty($filter['placementTypeId'])) {
@@ -151,11 +157,6 @@ class CollectionMap extends \App\Db\Mapper
             if ($w) {
                 $where .= '('. $w . ') AND ';
             }
-        }
-
-        if (isset($filter['subjectId'])) {
-            $from .= sprintf(', %s b', $this->quoteTable('skill_collection_subject'));
-            $where .= sprintf('a.id = b.collection_id AND b.subject_id = %s AND ', (int)$filter['subjectId']);
         }
 
         // Find all collections that are enabled for the given placement statuses

@@ -56,20 +56,26 @@ class Report extends \App\Controller\AdminManagerIface
         $this->table->addCell(new \Tk\Table\Cell\Text('uid'))->setLabel('studentNumber');
         $this->table->addCell(new \Tk\Table\Cell\Text('name'))->addCss('key')->setUrl(clone $this->editUrl);
 
-        $domains = \Skill\Db\DomainMap::create()->findFiltered(array('collectionId'=>$this->collection->getId()));
+        $domains = \Skill\Db\DomainMap::create()->findFiltered(array('collectionId'=>$this->collection->getId(), 'active' => true));
         foreach ($domains as $domain) {
-            $this->table->addCell(new \Tk\Table\Cell\Text($domain->label))->setOnPropertyValue(function ($cell, $obj, $value) {
-                /** @var \App\Db\User $obj */
-
-                return $value;
+            $this->table->addCell(new \Tk\Table\Cell\Text($domain->label))->setLabel($domain->label)->setOnPropertyValue(function ($cell, $obj, $value) {
+                /** @var \Tk\Table\Cell\Text $cell */
+                if (array_key_exists($cell->getProperty(), $obj)) {
+                    return sprintf('%.2f', $value);
+                }
+                return '0.00';
             });
         }
-//        foreach ($domains as $domain) {
-//            $this->table->addCell(new \Tk\Table\Cell\Text(''))->setOnPropertyValue(function ($cell, $obj, $value) {
-//                /** @var \App\Db\User $obj */
-//                return $value;
-//            });
-//        }
+        foreach ($domains as $domain) {
+            $this->table->addCell(new \Tk\Table\Cell\Text($domain->label.'Grade'))->setLabel($domain->label.' Grade')->setOnPropertyValue(function ($cell, $obj, $value) use ($domain) {
+                /** @var \Tk\Table\Cell\Text $cell */
+                $prop = $domain->label.'_grade';
+                if (array_key_exists($prop, $obj)) {
+                    return sprintf('%.2f', round($obj[$prop], 2));
+                }
+                return '0.00';
+            });
+        }
 
 
         // Filters
@@ -82,8 +88,8 @@ class Report extends \App\Controller\AdminManagerIface
         $this->table->setList($this->getList());
 
 
-        $list = \Skill\Db\ReportingMap::create()->findDomainAverages($this->collection->getId(), $this->getSubject()->getId(), 1494);
-        vd($list);
+        //$list = \Skill\Db\ReportingMap::create()->findDomainAverages($this->collection->getId(), $this->getSubject()->getId(), 1494);
+
         //  TODO:
         //  TODO: We have to figure this one out, disable it for now.
         //  TODO:
@@ -100,9 +106,7 @@ class Report extends \App\Controller\AdminManagerIface
     protected function getList()
     {
         $filter = $this->table->getFilterValues();
-        $filter['subjectId'] = $this->getSubject()->getId();
-        $filter['role'] = \App\Db\User::ROLE_STUDENT;
-        return \App\Db\UserMap::create()->findFiltered($filter, $this->table->getTool('name'));
+        return \Skill\Db\ReportingMap::create()->findStudentResults($this->collection->getId(), $this->getSubject()->getId());
     }
 
 

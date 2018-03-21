@@ -67,6 +67,7 @@ CREATE TABLE IF NOT EXISTS skill_domain (
   description TEXT,
   label VARCHAR(32) NOT NULL,                                 -- abbreviated label
   weight FLOAT DEFAULT '1' NOT NULL,                          -- grade weight as a ratio, parent will be used if none
+  active BOOL NOT NULL DEFAULT 1,                             -- enable/disable items using this domain
   order_by INT UNSIGNED NOT NULL DEFAULT 0,
   del BOOL NOT NULL DEFAULT 0,
   modified DATETIME NOT NULL,

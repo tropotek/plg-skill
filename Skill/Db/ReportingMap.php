@@ -183,118 +183,79 @@ SQL;
         }
         return $arr;
     }
-    
-    
-    public function findStudentResults()
+
+    /**
+     * Find the average and total results for the student
+     *
+     * @param $collectionId
+     * @param $subjectId
+     * @param int $userId
+     * @return array
+     */
+    public function findStudentResults($collectionId, $subjectId, $userId = 0)
     {
-
-
+        $collectionId = (int)$collectionId;
+        $subjectId = (int)$subjectId;
+        $usql = '';
+        if ($userId) {
+            $usql = ' a.user_id = ' . (int)$userId . ' AND ';
+        }
 
         /*
          * TODO: We need to finish this as a query, may have to use a procedure or similar
          * See: https://stackoverflow.com/questions/17964078/mysql-query-to-dynamically-convert-rows-to-columns-on-the-basis-of-two-columns
-         *
-
-
-This produces the correct result for one student we need this to be for all students
-
-
-SELECT a.collection_id, a.user_id, a.domain_id, a.label, b.weight,
+         */
+        $sql = <<<SQL
+SELECT a.collection_id, a.user_id, a.domain_id, a.label, a.label_name, b.weight,
   c.max_grade, ROUND(AVG(a.avg), 2) as 'avg',
-  (ROUND(AVG(a.avg), 2)*(c.max_grade/d.scale)) as 'grade'
-
+  (ROUND(AVG(a.avg), 2)*(c.max_grade/d.scale)) as 'grade', a.name, a.uid
 FROM
   (
-    SELECT a.collection_id, b.user_id as 'user_id', c.id as 'domain_id', a.id as 'item_id', c.label, a.question, IF(b.avg IS NOT NULL, b.avg, 0) as 'avg'
+    SELECT a.collection_id, a.subject_id, a.user_id, d.domain_id, c.item_id, d.question,
+      IFNULL(ROUND(AVG(NULLIF(c.value, 0)), 2), 0) AS 'avg', d.order_by, a.label, a.label_name, a.name, a.uid
     FROM
       (
-        SELECT u.collection_id, u.subject_id, u.user_id, d.id AS 'domain_id', b.item_id, d.label, c.question,
-          ROUND(AVG(b.value), 2) AS 'avg', c.order_by
-        FROM skill_entry a, skill_value b, skill_item c, skill_domain d,
-          (
-            SELECT 1 as 'collection_id', b.subject_id, a.id as 'user_id'
-            FROM user a, subject_has_student b
-            WHERE a.id = b.user_id AND b.subject_id = 24 AND a.id = 1494
-          ) u
-        WHERE
-          a.del = 0 AND c.del = 0 AND d.del = 0 AND
-          a.id = b.entry_id AND
-          a.collection_id = u.collection_id AND
-          a.subject_id = u.subject_id AND
-          a.user_id = u.user_id AND
-          a.status = 'approved' AND
-          b.item_id = c.id AND
-          b.value > 0 AND
-          c.domain_id = d.id
-        GROUP BY u.user_id, b.item_id
-        ORDER BY u.user_id, d.order_by
-      ) b
-      RIGHT JOIN skill_item a ON (a.id = b.item_id AND a.collection_id = b.collection_id),
-      skill_domain c
-    WHERE
-      a.collection_id = 1 AND       # why this and not ... the results are wrong we need to find out why
-                                    # a.collection_id = b.collection_id AND
-      a.domain_id = c.id
-  ) a,
-  skill_domain b,
-  skill_collection c,
-  (
-    SELECT a.collection_id, COUNT(a.id)-1 as 'scale'
-    FROM skill_scale a
-    GROUP BY a.collection_id
-  ) d
-
-WHERE a.domain_id = b.id AND
-    c.id = a.collection_id AND
-    d.collection_id = a.collection_id
-
-GROUP BY b.id
-ORDER BY b.order_by
-;
-
-
-
-
-/ --------------------------------------------------------------
-// This is a work in progress
-SELECT a.collection_id, a.user_id, a.domain_id, a.label, b.weight,
-  c.max_grade, ROUND(AVG(a.avg), 2) as 'avg',
-  (ROUND(AVG(a.avg), 2)*(c.max_grade/d.scale)) as 'grade'
-
-FROM
-  (
-    SELECT b.collection_id, a.user_id as 'user_id', c.id as 'domain_id', b.id as 'item_id', c.label, b.question,
-      IF(a.avg IS NOT NULL, a.avg, 0) as 'avg'
-    FROM
-      (
-        SELECT a.collection_id, a.subject_id, a.user_id, d.domain_id, c.item_id, e.label, d.question,
-          ROUND(AVG(c.value), 2) AS 'avg', d.order_by
+        SELECT a.collection_id, a.subject_id, a.user_id, a.entry_id, b.domain_id, c.id as 'item_id', c.name as 'label_name', c.label, b.question, b.order_by, a.name, a.uid
         FROM
           (
-            SELECT 1 as 'collection_id', b.subject_id, a.id as 'user_id'
-            FROM user a, subject_has_student b
-            WHERE a.id = b.user_id AND b.subject_id = 24 #AND a.id = 1494
+            SELECT a.collection_id, a.subject_id, a.user_id, b.id as 'entry_id', a.name, a.uid
+            FROM
+              (
+                SELECT $collectionId as 'collection_id', b.subject_id, a.id as 'user_id', a.name, a.uid
+                FROM user a, subject_has_student b
+                WHERE a.id = b.user_id AND  a.del = 0
+                      -- AND a.id = 1494           # user id
+                      AND b.subject_id = $subjectId      # subject id
+                GROUP BY a.id, b.subject_id
+                ORDER BY b.subject_id
+              ) a,
+              skill_entry b
+            WHERE
+              b.del = 0 AND
+              a.user_id = b.user_id AND
+              b.status = 'approved' AND
+              b.collection_id = a.collection_id AND
+              b.subject_id = a.subject_id AND
+              b.user_id = a.user_id
           ) a,
-          skill_entry b, skill_value c, skill_item d, skill_domain e
+          skill_item b, skill_domain c
         WHERE
-          b.del = 0 AND d.del = 0 AND e.del = 0 AND
-          b.id = c.entry_id AND
-          b.collection_id = a.collection_id AND
-          b.subject_id = a.subject_id AND
-          b.user_id = a.user_id AND
-          b.status = 'approved' AND
-          c.item_id = d.id AND
-          c.value > 0 AND
-          d.domain_id = e.id
-        GROUP BY a.user_id, c.item_id
-        ORDER BY a.user_id, e.order_by
-      ) a
-      RIGHT JOIN skill_item b ON (b.id = a.item_id),
-      skill_domain c
+          b.del = 0 AND c.del = 0 AND
+          c.active = 1 AND
+          a.collection_id = b.collection_id AND
+          b.domain_id = c.id
+        ORDER BY a.user_id, b.order_by
+      ) a,
+      skill_value c, skill_item d
     WHERE
-      b.collection_id = 1 AND       # why this and not ... the results are wrong we need to find out why not a.collection_id = b.collection_id AND
-      b.domain_id = c.id
-      AND a.user_id = 1494
+      d.del = 0 AND
+      a.entry_id = c.entry_id AND
+      c.item_id = d.id AND
+      a.domain_id = d.domain_id
+    -- AND a.label = 'CS'
+    -- AND c.value > 0
+    GROUP BY a.user_id, c.item_id
+    ORDER BY a.user_id, d.order_by
   ) a,
   skill_domain b,
   skill_collection c,
@@ -306,15 +267,44 @@ FROM
 
 WHERE a.domain_id = b.id AND
     c.id = a.collection_id AND
+    $usql      -- AND a.user_id = 1494           # user id
     d.collection_id = a.collection_id
+    
 
-GROUP BY b.id
-ORDER BY b.order_by
-;
+GROUP BY a.user_id, b.id
+ORDER BY a.user_id, b.order_by
+SQL;
 
+/* returns:
+1	1494	1	PD	Personal And Professional Development	0.05	10.00	4.45	8.9	Aaron Adno	637920
+1	1494	3	SB	Scientific Basis Of Clinical Practice	0.2	10.00	4.15	8.3	Aaron Adno	637920
+1	1494	4	CS	Clinical Skills	0.5	10.00	2.29	4.58	Aaron Adno	637920
+1	1494	6	AW	Ethics And Animal Welfare	0.2	10.00	2.29	4.58	Aaron Adno	637920
+1	1494	7	BIOS	Biosecurity And Population Health	0.05	10.00	4	8	Aaron Adno	637920
+*/
+/* We Want
+Student Number	Name	PD	SB	CS	AW	BIOS	PD Grade	SB Grade	CS Grade	AW Grade	BIOS Grade	Total 100%
+637920	Aaron Adno	4.45	4.15	2.29	2.29	4.00	8.90	8.30	4.58	4.57	8.00	57.11
+*/
 
+//vd($sql);
+        $stm = $this->getDb()->prepare($sql);
+        $stm->execute();
 
-         */
+        $arr = array();
+        foreach ($stm as $i => $row) {
+            //vd($row);
+            if (!array_key_exists($row->user_id, $arr)) {
+                $arr[$row->user_id] = array('user_id' => $row->user_id, 'uid' => $row->uid, 'name' => $row->name, 'max_grade' => $row->max_grade);
+            }
+            $arr[$row->user_id][$row->label] = $row->avg;
+            $arr[$row->user_id][$row->label.'_grade'] = $row->grade;
+            $arr[$row->user_id][$row->label.'_weight'] = $row->weight;
+        }
+
+        //TODO:  Calculate the total grade
+
+        return $arr;
     }
 
 

@@ -82,7 +82,7 @@ class SubjectEditHandler implements Subscriber
         $field = $form->addField(new \Tk\Form\Field\Select(\Skill\Db\Collection::FIELD_ENABLE_RESULTS.'[]', \Tk\Form\Field\Option\ArrayObjectIterator::create($list)))->addCss('tk-dual-select')
             ->setAttr('data-title', 'Enabled Skill Collections')->setNotes('Enable/Disable the Skill Collections students can access.');
         $selected = \Skill\Db\CollectionMap::create()->findFiltered(
-            array('subjectId' => $this->subject->getId())
+            array('enabledSubjectId' => $this->subject->getId())
         );
         $field->setValue($selected->toArray('id'));
 

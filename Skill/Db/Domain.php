@@ -41,6 +41,11 @@ class Domain extends \Tk\Db\Map\Model
     public $weight = 0.0;
 
     /**
+     * @var bool
+     */
+    public $active = true;
+
+    /**
      * @var int
      */
     public $orderBy = 0;

@@ -30,6 +30,7 @@ class DomainMap extends \App\Db\Mapper
             $this->dbMap->addPropertyMap(new Db\Text('description'));
             $this->dbMap->addPropertyMap(new Db\Text('label'));
             $this->dbMap->addPropertyMap(new Db\Decimal('weight'));
+            $this->dbMap->addPropertyMap(new Db\Boolean('active'));
             $this->dbMap->addPropertyMap(new Db\Integer('orderBy', 'order_by'));
             $this->dbMap->addPropertyMap(new Db\Date('modified'));
             $this->dbMap->addPropertyMap(new Db\Date('created'));
@@ -50,6 +51,7 @@ class DomainMap extends \App\Db\Mapper
             $this->formMap->addPropertyMap(new Form\Text('description'));
             $this->formMap->addPropertyMap(new Form\Text('label'));
             $this->formMap->addPropertyMap(new Form\Decimal('weight'));
+            $this->formMap->addPropertyMap(new Form\Boolean('active'));
         }
         return $this->formMap;
     }
@@ -84,6 +86,10 @@ class DomainMap extends \App\Db\Mapper
 
         if (!empty($filter['collectionId'])) {
             $where .= sprintf('a.collection_id = %s AND ', (int)$filter['collectionId']);
+        }
+
+        if (!empty($filter['active'])) {
+            $where .= sprintf('a.active = %s AND ', (int)$filter['active']);
         }
 
         if (!empty($filter['exclude'])) {
