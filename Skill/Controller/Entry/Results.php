@@ -74,8 +74,8 @@ class Results extends AdminIface
         $filter = array(
             'userId' => $this->user->getId(),
             'collectionId' => $this->collection->getId(),
-            'subjectId' => $this->getSubject()->getId()
-            //,'status' => \Skill\Db\Entry::STATUS_APPROVED             // TODO: We could use the collection Placement Avaliable Status list
+            'subjectId' => $this->getSubject()->getId(),
+            'status' => \Skill\Db\Entry::STATUS_APPROVED             // TODO: We could use the collection Placement Avaliable Status list
         );
         $entryList = \Skill\Db\EntryMap::create()->findFiltered($filter, \Tk\Db\Tool::create('created DESC'));
 
@@ -99,7 +99,6 @@ class Results extends AdminIface
             $row->insertText('weight', round($obj->weight*100) . '%');
             $row->appendRepeat();
         }
-
 
         $itemResults = \Skill\Db\ReportingMap::create()->findItemAverages($this->collection->getId(), $this->getSubject()->getId(), $this->user->getId());
         $catList = \Skill\Db\CategoryMap::create()->findFiltered(array(
