@@ -76,6 +76,7 @@ class SetupHandler implements Subscriber
                 $dispatcher->addSubscriber(new \Skill\Listener\SubjectDashboardHandler($subject));
                 $dispatcher->addSubscriber(new \Skill\Listener\PlacementManagerButtonHandler($subject));
                 $dispatcher->addSubscriber(new \Skill\Listener\SidebarHandler($subject));
+                $dispatcher->addSubscriber(new \Rs\Listener\StaffSideMenuHandler());
             }
         }
 
