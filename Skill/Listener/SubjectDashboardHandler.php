@@ -88,10 +88,10 @@ class SubjectDashboardHandler implements Subscriber
 
                     if ($entry) {
                         $btn->addCss('btn-primary btn-xs');
-                        $btn->setAttr('title', 'View Student ' . $collection->name . ' Results');
+                        $btn->setAttr('title', 'View Student ' . $collection->name);
                     } else {
                         $btn->addCss('btn-success btn-xs');
-                        $btn->setAttr('title', 'Create Student ' . $collection->name . ' Results');
+                        $btn->setAttr('title', 'Create Student ' . $collection->name);
                     }
 
                     $template->prependTemplate('utr-row2', $btn->show());

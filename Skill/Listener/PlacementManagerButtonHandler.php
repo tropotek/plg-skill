@@ -62,7 +62,8 @@ class PlacementManagerButtonHandler implements Subscriber
                         if ($entry) {
                             $button->addCss('btn-default');
                         } else {
-                            $button->addCss('btn-primary');
+                            $button->addCss('btn-success');
+                            $button->setTitle('Create ' . $collection->name);
                         }
                     });
 

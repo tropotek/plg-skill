@@ -166,8 +166,8 @@ class Collection extends \Tk\Db\Map\Model
      */
     public function isAvailable($placement = null)
     {
+        if (!$this->active) return false;
         $b = true;
-        $b &= $this->active;
         if ($placement) {
             $b &= in_array($placement->status, $this->available);
             $b &= CollectionMap::create()->hasPlacementType($this->getId(), $placement->placementTypeId);

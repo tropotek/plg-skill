@@ -79,7 +79,7 @@ class Report extends \App\Controller\AdminManagerIface
 
 
         // Filters
-        $this->table->addFilter(new \Tk\Form\Field\Input('keywords'))->setAttr('placeholder', 'Keywords');
+        $this->table->addFilter(new \Tk\Form\Field\Input('uid'))->setAttr('placeholder', 'Student Number');
 
         // Actions
         //$this->table->addAction(\Tk\Table\Action\ColumnSelect::create()->setDisabled(array('id', 'name')));
@@ -106,7 +106,14 @@ class Report extends \App\Controller\AdminManagerIface
     protected function getList()
     {
         $filter = $this->table->getFilterValues();
-        return \Skill\Db\ReportingMap::create()->findStudentResults($this->collection->getId(), $this->getSubject()->getId());
+        $this->table->resetSessionTool();
+
+        $filter['collectionId'] = $this->collection->getId();
+        $filter['subjectId'] = $this->getSubject()->getId();
+        $filter['userId'] = 0;
+
+        return \Skill\Db\ReportingMap::create()->findStudentResults($filter, $this->table->getTool('a.name', 0));
+        //return \Skill\Db\ReportingMap::create()->findStudentResults($filter);
     }
 
 
@@ -126,10 +133,6 @@ class Report extends \App\Controller\AdminManagerIface
         $filter = $this->table->getFilterValues();
         $filter['profileId'] = $this->getSubject()->profileId;
         $filter['subjectId'] = $this->getSubject()->getId();
-
-
-
-
 
 
         $where = '';

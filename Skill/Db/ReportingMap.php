@@ -187,19 +187,30 @@ SQL;
     /**
      * Find the average and total results for the student
      *
-     * @param $collectionId
-     * @param $subjectId
-     * @param int $userId
+     * @param array $filter
+     * @param null|\Tk\Db\Tool $tool
      * @return array
      */
-    public function findStudentResults($collectionId, $subjectId, $userId = 0)
+    public function findStudentResults($filter, $tool = null)
     {
-        $collectionId = (int)$collectionId;
-        $subjectId = (int)$subjectId;
+        $collectionId = (int)$filter['collectionId'];
+        $subjectId = (int)$filter['subjectId'];
+
         $usql = '';
-        if ($userId) {
-            $usql = ' a.user_id = ' . (int)$userId . ' AND ';
+        if (!empty($filter['userId'])) {
+            $usql = ' a.user_id = ' . (int)$filter['userId'] . ' AND ';
         }
+
+        // Query
+        $toolStr = '';
+        if ($tool) {
+            $toolStr = $tool->toSql();
+        }
+
+        $filterStr = '';
+        if (!empty($filter['uid']))
+            $filterStr = 'a.uid = ' . $this->getDb()->quote($filter['uid']) . ' AND ';
+
 
         /*
          * TODO: We need to finish this as a query, may have to use a procedure or similar
@@ -208,11 +219,11 @@ SQL;
         $sql = <<<SQL
 SELECT a.collection_id, a.user_id, a.domain_id, a.label, a.label_name, b.weight,
   c.max_grade, ROUND(AVG(a.avg), 2) as 'avg',
-  (ROUND(AVG(a.avg), 2)*(c.max_grade/d.scale)) as 'grade', a.name, a.uid
+  (ROUND(AVG(a.avg), 2)*(c.max_grade/d.scale)) as 'grade', a.name, a.uid, a.entry_count
 FROM
   (
     SELECT a.collection_id, a.subject_id, a.user_id, d.domain_id, c.item_id, d.question,
-      IFNULL(ROUND(AVG(NULLIF(c.value, 0)), 2), 0) AS 'avg', d.order_by, a.label, a.label_name, a.name, a.uid
+      IFNULL(ROUND(AVG(NULLIF(c.value, 0)), 2), 0) AS 'avg', d.order_by, a.label, a.label_name, a.name, a.uid, COUNT(a.entry_id) as 'entry_count'
     FROM
       (
         SELECT a.collection_id, a.subject_id, a.user_id, a.entry_id, b.domain_id, c.id as 'item_id', c.name as 'label_name', c.label, b.question, b.order_by, a.name, a.uid
@@ -266,15 +277,18 @@ FROM
   ) d
 
 WHERE a.domain_id = b.id AND
+    $filterStr
     c.id = a.collection_id AND
     $usql      -- AND a.user_id = 1494           # user id
     d.collection_id = a.collection_id
     
 
 GROUP BY a.user_id, b.id
-ORDER BY a.user_id, b.order_by
-SQL;
 
+SQL;
+        $sql .= $toolStr;
+
+        //vd($sql);
 /* returns:
 1	1494	1	PD	Personal And Professional Development	0.05	10.00	4.45	8.9	Aaron Adno	637920
 1	1494	3	SB	Scientific Basis Of Clinical Practice	0.2	10.00	4.15	8.3	Aaron Adno	637920
@@ -287,7 +301,6 @@ Student Number	Name	PD	SB	CS	AW	BIOS	PD Grade	SB Grade	CS Grade	AW Grade	BIOS Gr
 637920	Aaron Adno	4.45	4.15	2.29	2.29	4.00	8.90	8.30	4.58	4.57	8.00	57.11
 */
 
-//vd($sql);
         $stm = $this->getDb()->prepare($sql);
         $stm->execute();
 
@@ -401,14 +414,17 @@ SQL;
         
         $stm->execute();
         $arr = $stm->fetchAll();
+        $arr1 = array();
         if ($valueOnly) {
-            $arr1 = array();
             foreach ($arr as $obj) {
                 $arr1[$obj->domain_id] = $obj->avg;
             }
-            $arr = $arr1;
+        } else {
+            foreach ($arr as $obj) {
+                $arr1[$obj->domain_id] = $obj;
+            }
         }
-        return $arr;
+        return $arr1;
     }
     
     /**

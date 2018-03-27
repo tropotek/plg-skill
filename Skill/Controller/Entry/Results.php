@@ -87,16 +87,25 @@ class Results extends AdminIface
         $template->insertText('gradePcnt', sprintf('%.2f', $studentResult*100) . '%');
 
         $domainResults = \Skill\Db\ReportingMap::create()->findDomainAverages($this->collection->getId(), $this->getSubject()->getId(), $this->user->getId());
+        $domainList = \Skill\Db\DomainMap::create()->findFiltered(array('collectionId' => $this->collection->getId(), 'active' => true), \Tk\Db\Tool::create());
 
         // TODO: Could look at using a pie chart for this information
-        foreach ($domainResults as $obj) {
-            /** @var \Skill\Db\Domain $domain */
-            $domain = \Skill\Db\DomainMap::create()->find($obj->domain_id);
+        foreach ($domainList as $domain) {
+            $obj = null;
+            if (!empty($domainResults[$domain->getId()]))
+                $obj = $domainResults[$domain->getId()];
+
             $row = $template->getRepeat('domain-row');
-            $row->insertText('name', $domain->name . ' (' .$domain->label. ')');
-            $row->insertText('avg', sprintf('%.2f', $obj->avg));
-            $row->insertText('grade', sprintf('%.2f', ($obj->avg/$obj->scale)*$this->collection->maxGrade));
-            $row->insertText('weight', round($obj->weight*100) . '%');
+
+            $row->insertText('name', $domain->name . ' (' . $domain->label . ')');
+            $row->insertText('weight', round($domain->weight * 100) . '%');
+            if ($obj) {
+                $row->insertText('avg', sprintf('%.2f', $obj->avg));
+                $row->insertText('grade', sprintf('%.2f', ($obj->avg / $obj->scale) * $this->collection->maxGrade));
+            } else {
+                $row->insertText('avg', sprintf('%.2f', 0));
+                $row->insertText('grade', sprintf('%.2f', 0));
+            }
             $row->appendRepeat();
         }
 
@@ -128,7 +137,7 @@ class Results extends AdminIface
                 if($obj)
                     $avg = $obj->avg;
 
-                $row->insertText('result', $avg);
+                $row->insertText('result', sprintf('%.2f', $avg));
                 if ($avg <= 0) {
                     $row->addCss('result', 'zero');
                 }
