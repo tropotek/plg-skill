@@ -308,7 +308,7 @@ Student Number	Name	PD	SB	CS	AW	BIOS	PD Grade	SB Grade	CS Grade	AW Grade	BIOS Gr
         foreach ($stm as $i => $row) {
             //vd($row);
             if (!array_key_exists($row->user_id, $arr)) {
-                $arr[$row->user_id] = array('user_id' => $row->user_id, 'uid' => $row->uid, 'name' => $row->name, 'max_grade' => $row->max_grade);
+                $arr[$row->user_id] = array('userId' => $row->user_id, 'uid' => $row->uid, 'name' => $row->name, 'maxGrade' => $row->max_grade);
             }
             $arr[$row->user_id][$row->label] = $row->avg;
             $arr[$row->user_id][$row->label.'_grade'] = $row->grade;
