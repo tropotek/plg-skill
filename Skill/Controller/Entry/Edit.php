@@ -135,7 +135,7 @@ class Edit extends AdminEditIface
 
 
         if ($this->isSelfAssessment($this->entry) && !$this->entry->getId()) {
-            $this->entry->title = $this->entry->getCollection()->name . ' for ' . $this->entry->getUser()->getDisplayName();
+            $this->entry->title = $this->entry->getCollection()->name . ' for ' . $this->entry->getUser()->getName();
             $this->entry->assessor = $this->entry->getUser()->getName();
         }
 
