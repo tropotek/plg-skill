@@ -1,4 +1,5 @@
 <?php
+
 namespace Skill\Controller\Entry;
 
 use App\Controller\AdminEditIface;
@@ -39,6 +40,8 @@ class Edit extends AdminEditIface
 
     /**
      * Iface constructor.
+     *
+     * @throws \Tk\Db\Exception
      */
     public function __construct()
     {
@@ -88,22 +91,25 @@ class Edit extends AdminEditIface
         $this->entry->subjectId = ($request->has('subjectId')) ? (int)$request->get('subjectId') : $this->getSubject()->getId();
         $this->entry->collectionId = (int)$request->get('collectionId');
         $this->entry->placementId = (int)$request->get('placementId');
+
         if ($request->get('entryId')) {
             $this->entry = \Skill\Db\EntryMap::create()->find($request->get('entryId'));
         }
+
         if ($request->get('collectionId') && $request->get('placementId')) {
             $e = \Skill\Db\EntryMap::create()->findFiltered(array(
-                'collectionId' => $request->get('collectionId'),
-                'placementId' => $request->get('placementId'))
+                    'collectionId' => $request->get('collectionId'),
+                    'placementId' => $request->get('placementId'))
             )->current();
             if ($e)
                 $this->entry = $e;
         }
+
         if (!$request->has('userId') && !$request->has('subjectId') && $this->getUser()->isStudent()) {       // Assumed to be student self assessment form
             $e = \Skill\Db\EntryMap::create()->findFiltered(array(
-                'collectionId' => $this->entry->collectionId,
-                'subjectId' => $this->entry->subjectId,
-                'userId' => $this->entry->userId)
+                    'collectionId' => $this->entry->collectionId,
+                    'subjectId' => $this->entry->subjectId,
+                    'userId' => $this->entry->userId)
             )->current();
             if ($e)
                 $this->entry = $e;
@@ -132,7 +138,6 @@ class Edit extends AdminEditIface
             if ($this->entry->getPlacement()->getSupervisor())
                 $this->entry->assessor = $this->entry->getPlacement()->getSupervisor()->name;
         }
-
 
         if ($this->isSelfAssessment($this->entry) && !$this->entry->getId()) {
             $this->entry->title = $this->entry->getCollection()->name . ' for ' . $this->entry->getUser()->getName();
@@ -237,7 +242,7 @@ class Edit extends AdminEditIface
 
         if (!$this->isPublic) {
             if ($form->getField('status') && (!$form->getFieldValue('status') || !in_array($form->getFieldValue('status'),
-                    \Tk\Object::getClassConstants($this->entry, 'STATUS'))) ) {
+                        \Tk\Object::getClassConstants($this->entry, 'STATUS')))) {
                 $form->addFieldError('status', 'Please Select a valid status');
             }
         } else {
@@ -262,7 +267,7 @@ class Edit extends AdminEditIface
         // Save Item values
         \Skill\Db\EntryMap::create()->removeValue($this->entry->getVolatileId());
         foreach ($form->getValues('/^item\-/') as $name => $val) {
-            $id = (int)substr($name, strrpos($name, '-')+1);
+            $id = (int)substr($name, strrpos($name, '-') + 1);
             \Skill\Db\EntryMap::create()->saveValue($this->entry->getVolatileId(), $id, (int)$val);
         }
 
@@ -302,11 +307,9 @@ class Edit extends AdminEditIface
         if ($this->entry->getCollection()->icon) {
             $template->setAttr('icon', 'class', $this->entry->getCollection()->icon);
         }
-
-
-            $template->insertHtml('instructions', $this->entry->getCollection()->instructions);
+        $template->insertHtml('instructions', $this->entry->getCollection()->instructions);
         if ($this->isPublic) {
-            if(count($this->errors)) {
+            if (count($this->errors)) {
                 foreach ($this->errors as $error) {
                     \Tk\Alert::addWarning($error);
                 }

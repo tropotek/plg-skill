@@ -140,8 +140,8 @@ CREATE TABLE IF NOT EXISTS skill_item (
 --
 CREATE TABLE IF NOT EXISTS skill_entry (
   id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-  collection_id INT UNSIGNED NOT NULL DEFAULT 0,            --
-  subject_id INT UNSIGNED NOT NULL DEFAULT 0,                --
+  collection_id INT UNSIGNED NOT NULL DEFAULT 0,
+  subject_id INT UNSIGNED NOT NULL DEFAULT 0,
   user_id INT UNSIGNED NOT NULL DEFAULT 0,                  -- The student user id the entry belongs to
   placement_id INT UNSIGNED NOT NULL DEFAULT 0,             -- (optional) The placement this entry is linked to if 0 then assume self-assessment
   title VARCHAR(255) NOT NULL DEFAULT '',                   -- A title for the assessment instance
@@ -149,7 +149,7 @@ CREATE TABLE IF NOT EXISTS skill_entry (
   absent INT(4) DEFAULT '0' NOT NULL,                       -- Number of days absent from placement.
   average DECIMAL(6,2) NOT NULL DEFAULT 0.0,                -- Average calculated from all item values
   weighted_average DECIMAL(6,2) NOT NULL DEFAULT 0.0,       -- Average calculated from all item values with their domain weight, including/not zero values
-  confirm BOOL DEFAULT 0,                                   -- The value of the confirmation question
+  confirm BOOL DEFAULT NULL,                                -- The value of the confirmation question true/false/null
   status VARCHAR(64) NOT NULL DEFAULT '',                   -- pending, approved, not-approved
   notes TEXT,                                               -- Staff only notes
   del BOOL NOT NULL DEFAULT 0,

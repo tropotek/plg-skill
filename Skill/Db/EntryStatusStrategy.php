@@ -109,6 +109,9 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
      */
     public function getPendingIcon()
     {
+//        if (!\Skill\Plugin::getInstance()->isZonePluginEnabled(\Skill\Plugin::ZONE_SUBJECT_PROFILE, \App\Config::getInstance()->getProfileId()))
+//            return '';
+
         /** @var Entry $model */
         $model = $this->getStatus()->getModel();
         $editUrl = \App\Uri::createSubjectUrl('/entryEdit.html')->set('collectionId', $model->collectionId)->
@@ -125,6 +128,9 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
      */
     public function getPendingHtml()
     {
+//        if (!\Skill\Plugin::getInstance()->isZonePluginEnabled(\Skill\Plugin::ZONE_SUBJECT_PROFILE, \App\Config::getInstance()->getProfileId()))
+//            return '';
+
         /** @var Entry $model */
         $model = $this->getStatus()->getModel();
         $collection = $model->getCollection();
