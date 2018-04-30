@@ -24,12 +24,15 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
             case Entry::STATUS_PENDING:
                 if (!$prevStatusName)
                     return true;
+                break;
             case Entry::STATUS_APPROVED:
                 if (!$prevStatusName || Entry::STATUS_PENDING == $prevStatusName)
                     return true;
+                break;
             case Entry::STATUS_NOT_APPROVED:
                 if (Entry::STATUS_PENDING == $prevStatusName)
                     return true;
+                break;
         }
         return false;
     }
