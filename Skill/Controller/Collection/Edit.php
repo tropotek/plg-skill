@@ -48,8 +48,6 @@ class Edit extends AdminEditIface
 
         $this->buildForm();
 
-
-
         $this->form->load(\Skill\Db\CollectionMap::create()->unmapForm($this->collection));
         $this->form->execute($request);
     }
@@ -176,10 +174,6 @@ class Edit extends AdminEditIface
 
         // Render the form
         $template->insertTemplate('form', $this->form->getRenderer()->show());
-
-
-
-
 
         return $template;
     }

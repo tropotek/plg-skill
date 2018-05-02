@@ -169,6 +169,7 @@ class Collection extends \Tk\Db\Map\Model
         if (!$this->active) return false;
         $b = true;
         if ($placement) {
+            //vd($this->name, $placement->status, $this->available, $this->getId(), $placement->placementTypeId, CollectionMap::create()->hasPlacementType($this->getId(), $placement->placementTypeId));
             $b &= in_array($placement->status, $this->available);
             $b &= CollectionMap::create()->hasPlacementType($this->getId(), $placement->placementTypeId);
         }
@@ -216,12 +217,12 @@ class Collection extends \Tk\Db\Map\Model
             $errors['role'] = 'Please enter a valid role for this collection';
         }
 
-        if($this->requirePlacement) {
-            if (!$this->available) {
-                $errors['available'] = 'Please select at least one valid status for this collection to be available for.';
-            }
-            // Also requires a placement type
+        // Available for status types
+        if (!$this->available && $this->requirePlacement) {
+            $errors['available'] = 'Please select at least one valid status for this collection to be available for.';
         }
+        // TODO: Also requires a placement type ????
+
         
         return $errors;
     }
