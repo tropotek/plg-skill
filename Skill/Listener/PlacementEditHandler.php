@@ -49,7 +49,8 @@ class PlacementEditHandler implements Subscriber
                 'active' => true,
                 'profileId' => $this->subject->profileId,
                 'available' => $controller->getPlacement()->status,
-                'placementTypeId' => $controller->getPlacement()->placementTypeId
+                'placementTypeId' => $controller->getPlacement()->placementTypeId,
+                'requirePlacement' => true
             ));
 
             //$status = $controller->getPlacement()->status;
@@ -64,14 +65,15 @@ class PlacementEditHandler implements Subscriber
                     \App\Uri::createSubjectUrl('/entryEdit.html')->set('collectionId', $collection->getId())
                         ->set('placementId', $controller->getPlacement()->getId())->set('subjectId', $this->subject->getId())
                         ->set('userId', $controller->getPlacement()->getId()), $collection->icon));
-                //$btn->setAttr('title', 'This is a test');
-                //$btn->addCss('disabled');
 
                 if ($entry) {
                     $btn->addCss('btn-default');
+                    $btn->setAttr('title', 'Edit ' . $collection->name);
                 } else {
-                    $btn->addCss('btn-primary');
+                    $btn->addCss('btn-success');
+                    $btn->setAttr('title', 'Create ' . $collection->name);
                 }
+
             }
         }
     }

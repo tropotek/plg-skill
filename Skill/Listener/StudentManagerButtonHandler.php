@@ -10,7 +10,7 @@ use Tk\Event\Event;
  * @license Copyright 2015 Michael Mifsud
  * @todo; we still need to implement this
  */
-class PlacementManagerButtonHandler implements Subscriber
+class StudentManagerButtonHandler implements Subscriber
 {
 
     /**
@@ -34,15 +34,11 @@ class PlacementManagerButtonHandler implements Subscriber
      */
     public function onControllerInit(Event $event)
     {
-        $plugin = \Skill\Plugin::getInstance();
-        //$config = $plugin->getConfig();
-
         /** @var \App\Controller\Placement\Edit $controller */
         $controller = $event->get('controller');
-        if ($controller instanceof \App\Controller\Placement\Manager) {
+        if ($controller instanceof \App\Controller\User\StudentManager) {
 
-            $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('profileId' => $this->subject->profileId,
-                'active' => true, 'requirePlacement' => true));
+            $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('profileId' => $this->subject->profileId, 'active' => true, 'requirePlacement' => false));
             $actionsCell = $controller->getActionsCell();
 
             /** @var \Skill\Db\Collection $collection */
@@ -50,29 +46,30 @@ class PlacementManagerButtonHandler implements Subscriber
                 $url = \App\Uri::createSubjectUrl('/entryEdit.html')->set('collectionId', $collection->getId());
 
                 $actionsCell->addButton(\Tk\Table\Cell\ActionButton::create($collection->name, $url, $collection->icon))
-                    ->setOnShow(function ($cell, $obj, $btn) use ($collection) {
-                        /* @var $obj \App\Db\Placement */
-                        /* @var $btn \Tk\Table\Cell\ActionButton */
-                        $btn->getUrl()->set('placementId', $obj->getId());
-                        if (!$collection->isAvailable($obj)) {
-                            $btn->setVisible(false);
+                    ->setOnShow(function ($cell, $obj, $button) use ($collection) {
+                        /* @var $obj \App\Db\User */
+                        /* @var $button \Tk\Table\Cell\ActionButton */
+                        $button->getUrl()->set('userId', $obj->getId());
+                        $entry = \Skill\Db\EntryMap::create()->findFiltered(array('collectionId' => $collection->getId(),
+                            'userId' => $obj->getId()))->current();
+
+                        if (!$collection->isAvailable()) {
+                            $button->setVisible(false);
                             return;
                         }
 
-                        $entry = \Skill\Db\EntryMap::create()->findFiltered(array('collectionId' => $collection->getId(),
-                            'placementId' => $obj->getId()))->current();
                         if ($entry) {
-                            $btn->addCss('btn-default');
-                            $btn->setTitle('Edit ' . $collection->name);
+                            $button->addCss('btn-default');
                         } else {
-                            $btn->addCss('btn-success');
-                            $btn->setTitle('Create ' . $collection->name);
+                            $button->addCss('btn-success');
+                            $button->setTitle('Create ' . $collection->name);
                         }
                     });
 
             }
         }
     }
+
 
     /**
      * Returns an array of event names this subscriber wants to listen to.

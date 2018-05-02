@@ -51,10 +51,12 @@ class SubjectDashboardHandler implements Subscriber
         if ($this->controller instanceof \App\Controller\Staff\SubjectDashboard) {
             $userList = $this->controller->getSubjectUserList();
             $userList->setOnShowUser(function (\Dom\Template $template, \App\Db\User $user) use ($subject) {
+                //$collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('profileId' => $subject->profileId, 'gradable' => true));
                 $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('profileId' => $subject->profileId, 'gradable' => true));
                 /** @var \Skill\Db\Collection $collection */
                 foreach ($collectionList as $collection) {
-                    if (!$collection->isAvailable() || !$collection->isAvailableToSubject($subject)) continue;
+                    //if (!$collection->isAvailable() || !$collection->isAvailableToSubject($subject)) continue;
+                    if (!$collection->isAvailable()) continue;
 
                     // if user has a placement of at least one of the types and status
                     $entryList = \Skill\Db\EntryMap::create()->findFiltered(array(
@@ -62,6 +64,8 @@ class SubjectDashboardHandler implements Subscriber
                         'collectionId' => $collection->getId(),
                         'status' => \Skill\Db\Entry::STATUS_APPROVED
                     ));
+                    if (!$entryList->count()) continue;
+
                     if ($entryList->count()) {
                         $btn = \Tk\Ui\Button::create($collection->name . ' Results', \App\Uri::createSubjectUrl('/entryResults.html')->
                             set('userId', $user->getId())->set('collectionId', $collection->getId()), $collection->icon);

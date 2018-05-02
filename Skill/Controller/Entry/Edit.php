@@ -105,7 +105,16 @@ class Edit extends AdminEditIface
                 $this->entry = $e;
         }
 
-        if (!$request->has('userId') && !$request->has('subjectId') && $this->getUser()->isStudent()) {       // Assumed to be student self assessment form
+        if ($request->get('collectionId') && $request->get('userId') && $this->getUser()->isStaff()) {          // Staff view student self assessment
+            $e = \Skill\Db\EntryMap::create()->findFiltered(array(
+                    'collectionId' => $request->get('collectionId'),
+                    'userId' => $request->get('userId'))
+            )->current();
+            if ($e)
+                $this->entry = $e;
+        }
+
+        if (!$request->has('userId') && !$request->has('subjectId') && $this->getUser()->isStudent()) {         // Assumed to be student self assessment form
             $e = \Skill\Db\EntryMap::create()->findFiltered(array(
                     'collectionId' => $this->entry->collectionId,
                     'subjectId' => $this->entry->subjectId,
