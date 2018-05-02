@@ -54,7 +54,6 @@ class PlacementManagerButtonHandler implements Subscriber
                         /* @var $button \Tk\Table\Cell\ActionButton */
                         $button->getUrl()->set('placementId', $obj->getId());
                         if (!$collection->isAvailable($obj)) {
-                            vd();
                             $button->setVisible(false);
                             return;
                         }
