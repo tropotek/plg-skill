@@ -69,6 +69,7 @@ class SidebarHandler implements Subscriber
 
             /** @var \Skill\Db\Collection $collection */
             foreach ($collectionList as $collection) {
+                if (!$collection->isAvailable() || !$collection->isAvailableToSubject($subject)) continue;
                 $html = '';
                 if ($collection->requirePlacement) {        // Results views
                     if ($collection->gradable) {

@@ -78,7 +78,8 @@ class SubjectDashboardHandler implements Subscriber
                 $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('profileId' => $subject->profileId, 'requirePlacement' => false));
                 /** @var \Skill\Db\Collection $collection */
                 foreach ($collectionList as $collection) {
-                    if (!$collection->isAvailable() || !$collection->isAvailableToSubject($subject)) continue;
+                    //if (!$collection->isAvailable() || !$collection->isAvailableToSubject($subject)) continue;
+                    if (!$collection->isAvailable()) continue;
                     $btn = \Tk\Ui\Button::create($collection->name, \App\Uri::createSubjectUrl('/entryEdit.html')->
                         set('userId', $user->getId())->set('collectionId', $collection->getId()), $collection->icon);
                     $entry = \Skill\Db\EntryMap::create()->findFiltered(
@@ -94,8 +95,9 @@ class SubjectDashboardHandler implements Subscriber
                         $btn->addCss('btn-primary btn-xs');
                         $btn->setAttr('title', 'View Student ' . $collection->name);
                     } else {
-                        $btn->addCss('btn-success btn-xs');
-                        $btn->setAttr('title', 'Create Student ' . $collection->name);
+                        continue;
+//                        $btn->addCss('btn-success btn-xs');
+//                        $btn->setAttr('title', 'Create Student ' . $collection->name);
                     }
 
                     $template->prependTemplate('utr-row2', $btn->show());
@@ -113,6 +115,7 @@ class SubjectDashboardHandler implements Subscriber
             $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('profileId' => $subject->profileId, 'requirePlacement' => true));
             foreach ($collectionList as $collection) {
                 if (!$collection->isAvailable()) continue;
+                //if (!$collection->isAvailable() || !$collection->isAvailableToSubject($subject)) continue;
                 $actionsCell->addButton(\Tk\Table\Cell\ActionButton::create($collection->name,
                     \App\Uri::createSubjectUrl('/entryView.html'), $collection->icon))
                     ->setShowLabel()
