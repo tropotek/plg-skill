@@ -56,22 +56,36 @@ class Report extends \App\Controller\AdminManagerIface
         $this->table->addCell(new \Tk\Table\Cell\Text('uid'))->setLabel('studentNumber');
         $this->table->addCell(new \Tk\Table\Cell\Text('name'))->addCss('key')->setUrl(clone $this->editUrl, 'userId');
 
+        // Student Results
+        $filter = array();
+        $filter['collectionId'] = $this->collection->getId();
+        $filter['subjectId'] = $this->getSubject()->getId();
+        $filter['userId'] = 0;
+        $results = \Skill\Db\ReportingMap::create()->findStudentResults($filter, \Tk\Db\Tool::create('', 0));
+
         $domains = \Skill\Db\DomainMap::create()->findFiltered(array('collectionId'=>$this->collection->getId(), 'active' => true));
         foreach ($domains as $domain) {
-            $this->table->addCell(new \Tk\Table\Cell\Text($domain->label))->setLabel($domain->label)->setOnPropertyValue(function ($cell, $obj, $value) {
+            $this->table->addCell(new \Tk\Table\Cell\Text($domain->label))->setLabel($domain->label)->setOnPropertyValue(function ($cell, $obj, $value) use ($results) {
                 /** @var \Tk\Table\Cell\Text $cell */
-                if (array_key_exists($cell->getProperty(), $obj)) {
-                    return sprintf('%.2f', $value);
+                $res = array();
+                if (!empty($results[$obj->getId()]))
+                    $res = $results[$obj->getId()];
+
+                if (array_key_exists($cell->getProperty(), $res)) {
+                    return sprintf('%.2f', $res[$cell->getProperty()]);
                 }
                 return '0.00';
             });
         }
         foreach ($domains as $domain) {
-            $this->table->addCell(new \Tk\Table\Cell\Text($domain->label.'Grade'))->setLabel($domain->label.' Grade')->setOnPropertyValue(function ($cell, $obj, $value) use ($domain) {
+            $this->table->addCell(new \Tk\Table\Cell\Text($domain->label.'Grade'))->setLabel($domain->label.' Grade')->setOnPropertyValue(function ($cell, $obj, $value) use ($domain, $results) {
                 /** @var \Tk\Table\Cell\Text $cell */
                 $prop = $domain->label.'_grade';
-                if (array_key_exists($prop, $obj)) {
-                    return sprintf('%.2f', round($obj[$prop], 2));
+                $res = array();
+                if (!empty($results[$obj->getId()]))
+                    $res = $results[$obj->getId()];
+                if (array_key_exists($prop, $res)) {
+                    return sprintf('%.2f', round($res[$prop], 2));
                 }
                 return '0.00';
             });
@@ -108,12 +122,12 @@ class Report extends \App\Controller\AdminManagerIface
         $filter = $this->table->getFilterValues();
         $this->table->resetSessionTool();
 
-        $filter['collectionId'] = $this->collection->getId();
+        //$filter['collectionId'] = $this->collection->getId();
         $filter['subjectId'] = $this->getSubject()->getId();
-        $filter['userId'] = 0;
+        //$filter['userId'] = 0;
 
-        return \Skill\Db\ReportingMap::create()->findStudentResults($filter, $this->table->getTool('a.name', 0));
-        //return \Skill\Db\ReportingMap::create()->findStudentResults($filter);
+        return \App\Db\UserMap::create()->findFiltered($filter, $this->table->getTool('a.name', 0));
+        //return \Skill\Db\ReportingMap::create()->findStudentResults($filter, $this->table->getTool('a.name', 0));
     }
 
 

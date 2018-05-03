@@ -42,19 +42,18 @@ class ReportingMap
         return $this->db;
     }
 
-    
-    
-    
-    
+
     /**
-     * 
+     *
      * @param $collectionId
      * @param $subjectId
      * @param int $userId
      * @param bool $valueOnly
+     * @param string $entryStatus
+     * @param string $placementStatus
      * @return array
      */
-    public function findStudentResult($collectionId, $subjectId, $userId = 0, $valueOnly = false)
+    public function findStudentResult($collectionId, $subjectId, $userId = 0, $valueOnly = false, $entryStatus = 'approved', $placementStatus = 'completed')
     {
         $usql = '';
         if ($userId) {
@@ -70,11 +69,12 @@ SELECT a.collection_id, a.user_id, a.subject_id, SUM(a.weighted_avg) / a.scale A
       (
         SELECT a.collection_id, a.subject_id, a.user_id, c.id AS 'item_id', a.id AS 'entry_id', d.id AS 'domain_id',
           d.label, c.question, ROUND(AVG(b.value), 2) AS 'average', d.order_by, d.weight
-        FROM skill_entry a, skill_value b, skill_item c, skill_domain d
+        FROM skill_entry a LEFT JOIN placement p ON (a.placement_id = p.id), skill_value b, skill_item c, skill_domain d
         WHERE
           a.del = 0 AND c.del = 0 AND d.del = 0 AND
               a.id = b.entry_id AND b.value > 0 AND
-              a.status = 'approved' AND
+              a.status = '$entryStatus' AND
+              (p.status IS NULL OR p.status = '$placementStatus') AND 
               b.item_id = c.id AND
               c.domain_id = d.id
         GROUP BY a.collection_id, a.subject_id, a.user_id, b.item_id
@@ -128,9 +128,11 @@ SQL;
      * @param $collectionId
      * @param $subjectId
      * @param bool $valueOnly
+     * @param string $entryStatus
+     * @param string $placementStatus
      * @return array
      */
-    public function findSubjectAverages($collectionId, $subjectId, $valueOnly = false)
+    public function findSubjectAverages($collectionId, $subjectId, $valueOnly = false, $entryStatus = 'approved', $placementStatus = 'completed')
     {
         // Faster query
         $sql = <<<SQL
@@ -141,10 +143,13 @@ FROM (
       (
         SELECT c.id as 'item_id', a.collection_id, a.id as 'entry_id', d.id as 'domain_id', 
             d.label, c.question, ROUND(AVG(b.value), 2) as 'average', d.order_by, d.weight
-        FROM skill_entry a, skill_value b, skill_item c, skill_domain d
+        FROM skill_entry a LEFT JOIN placement p ON (a.placement_id = p.id), skill_value b, skill_item c, skill_domain d
         WHERE a.del = 0 AND c.del = 0 AND d.del = 0 AND
             a.id = b.entry_id AND b.value > 0 AND
-            a.collection_id = ? AND a.subject_id = ? AND a.status = 'approved' AND
+            a.collection_id = ? AND 
+            a.subject_id = ? AND 
+            a.status = '$entryStatus' AND
+              (p.status IS NULL OR p.status = '$placementStatus') AND 
             b.item_id = c.id AND
             c.domain_id = d.id
         GROUP BY b.item_id
@@ -189,9 +194,11 @@ SQL;
      *
      * @param array $filter
      * @param null|\Tk\Db\Tool $tool
+     * @param string $entryStatus
+     * @param string $placementStatus
      * @return array
      */
-    public function findStudentResults($filter, $tool = null)
+    public function findStudentResults($filter, $tool = null, $entryStatus = 'approved', $placementStatus = 'completed')
     {
         $collectionId = (int)$filter['collectionId'];
         $subjectId = (int)$filter['subjectId'];
@@ -210,7 +217,6 @@ SQL;
         $filterStr = '';
         if (!empty($filter['uid']))
             $filterStr = 'a.uid = ' . $this->getDb()->quote($filter['uid']) . ' AND ';
-
 
         /*
          * TODO: We need to finish this as a query, may have to use a procedure or similar
@@ -240,11 +246,12 @@ FROM
                 GROUP BY a.id, b.subject_id
                 ORDER BY b.subject_id
               ) a,
-              skill_entry b
+              skill_entry b LEFT JOIN placement p ON (b.placement_id = p.id)
             WHERE
               b.del = 0 AND
               a.user_id = b.user_id AND
-              b.status = 'approved' AND
+              b.status = '$entryStatus' AND
+              (p.status IS NULL OR p.status = '$placementStatus') AND 
               b.collection_id = a.collection_id AND
               b.subject_id = a.subject_id AND
               b.user_id = a.user_id
@@ -321,18 +328,17 @@ Student Number	Name	PD	SB	CS	AW	BIOS	PD Grade	SB Grade	CS Grade	AW Grade	BIOS Gr
     }
 
 
-
-    
-    
     /**
-     * 
+     *
      * @param $collectionId
      * @param $subjectId
      * @param int $userId
      * @param bool $valueOnly
+     * @param string $entryStatus
+     * @param string $placementStatus
      * @return array
      */
-    public function findDomainAverages($collectionId, $subjectId, $userId = 0, $valueOnly = false)
+    public function findDomainAverages($collectionId, $subjectId, $userId = 0, $valueOnly = false, $entryStatus = 'approved', $placementStatus = 'completed')
     {
         $usql = '';
         if ($userId) {
@@ -345,11 +351,12 @@ FROM
   (
     SELECT a.collection_id, a.subject_id, a.user_id, c.id AS 'item_id', a.id AS 'entry_id', d.id AS 'domain_id', d.label, c.question,
       ROUND(AVG(b.value), 2) AS 'average', d.order_by, d.weight
-    FROM skill_entry a, skill_value b, skill_item c, skill_domain d
+    FROM skill_entry a LEFT JOIN placement p ON (a.placement_id = p.id), skill_value b, skill_item c, skill_domain d
     WHERE
       a.del = 0 AND c.del = 0 AND d.del = 0 AND
           a.id = b.entry_id AND b.value > 0 AND
-           a.status = 'approved' AND
+          a.status = '$entryStatus' AND
+          (p.status IS NULL OR p.status = '$placementStatus') AND 
           b.item_id = c.id AND
           c.domain_id = d.id
     GROUP BY a.collection_id, a.subject_id, a.user_id, b.item_id
@@ -366,7 +373,9 @@ FROM
     GROUP BY a.collection_id
   ) c
 WHERE
-  a.collection_id = ? AND a.subject_id = ? AND $usql 
+  a.collection_id = ? AND 
+  a.subject_id = ? AND 
+  $usql 
   a.domain_id = b.domain_id AND
   c.collection_id = a.collection_id
 
@@ -380,10 +389,14 @@ SELECT a.domain_id, a.label, c.scale, a.weight, SUM(a.average)/b.count as 'avg',
 FROM
   (
     SELECT c.id as 'item_id', a.collection_id, a.id as 'entry_id', d.id as 'domain_id', d.label, c.question, ROUND(AVG(b.value), 2) as 'average', d.order_by, d.weight
-    FROM skill_entry a, skill_value b, skill_item c, skill_domain d
+    FROM skill_entry a LEFT JOIN placement p ON (a.placement_id = p.id), skill_value b, skill_item c, skill_domain d
     WHERE a.del = 0 AND c.del = 0 AND d.del = 0 AND
         a.id = b.entry_id AND b.value > 0 AND
-        a.collection_id = ? AND a.subject_id = ? AND $usql a.status = 'approved' AND
+        a.status = '$entryStatus' AND
+        (p.status IS NULL OR p.status = '$placementStatus') AND 
+        a.collection_id = ? AND 
+        a.subject_id = ? AND 
+        $usql
         b.item_id = c.id AND
         c.domain_id = d.id
     GROUP BY b.item_id
@@ -426,16 +439,18 @@ SQL;
         }
         return $arr1;
     }
-    
+
     /**
      *
      * @param $collectionId
      * @param $subjectId
      * @param null $userId
-     * @param bool $valueOnly  If true then only the itemId and average is return as an array key,value pair
+     * @param bool $valueOnly If true then only the itemId and average is return as an array key,value pair
+     * @param string $entryStatus
+     * @param string $placementStatus
      * @return array
      */
-    public function findItemAverages($collectionId, $subjectId, $userId = null, $valueOnly = false)
+    public function findItemAverages($collectionId, $subjectId, $userId = null, $valueOnly = false, $entryStatus = 'approved', $placementStatus = 'completed')
     {
         $usql = '';
         if ($userId) {
@@ -445,11 +460,15 @@ SQL;
         $sql = <<<SQL
 SELECT a.id AS 'entry_id', c.id AS 'item_id', c.category_id, d.id AS 'domain_id', d.label, c.question,
   ROUND(AVG(b.value), 2) AS 'avg', c.order_by
-FROM skill_entry a, skill_value b, skill_item c, skill_domain d
+FROM skill_entry a LEFT JOIN placement p ON (a.placement_id = p.id), skill_value b, skill_item c, skill_domain d
 WHERE
   a.del = 0 AND c.del = 0 AND d.del = 0 AND
       a.id = b.entry_id AND
-      a.collection_id = ? AND a.subject_id = ? $usql AND a.status = 'approved' AND
+      a.status = '$entryStatus' AND
+      (p.status IS NULL OR p.status = '$placementStatus') AND 
+      a.collection_id = ? AND 
+      a.subject_id = ? 
+      $usql AND
       b.item_id = c.id AND b.value > 0 AND
       c.domain_id = d.id
 GROUP BY b.item_id

@@ -122,10 +122,13 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
         $this->created = \Tk\Date::create();
     }
 
+    /**
+     * @throws \Tk\Db\Exception
+     */
     public function save()
     {
         $this->average = $this->calcAverage();
-        $this->weightedAverage = $this->calcWeightedAverage();
+        $this->weightedAverage = $this->calcDomainAverage(true);
         parent::save();
     }
 
@@ -195,25 +198,11 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     }
 
     /**
-     * Get the entry values average, this average is not weighted to the Domain.weight values
-     *
-     * @return float
-     */
-    public function calcAverage()
-    {
-        $grades = array();
-        $valueList = EntryMap::create()->findValue($this->getId());
-        foreach ($valueList as $value) {
-            $grades[$value->item_id] = (int)$value->value;
-        }
-        return round(\Tk\Math::average($grades), 2);
-    }
-
-    /**
+     * @param bool $weighted
      * @return float
      * @throws \Tk\Db\Exception
      */
-    public function calcWeightedAverage()
+    public function calcDomainAverage($weighted = false)
     {
         $grades = array();
         $valueList = EntryMap::create()->findValue($this->getId());
@@ -221,22 +210,48 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
             if (!$value->value && !$this->getCollection()->includeZero) continue;
             /** @var \Skill\Db\Item $item */
             $item = \Skill\Db\ItemMap::create()->find($value->item_id);
-            $val = (int)$value->value;
+            //$val = (int)$value->value;
+            $val = $value->value;
             $grades[$item->getDomain()->getId()][$value->item_id] = $val;
         }
         $avgs = array();
         foreach ($grades as $domainId => $valArray) {
             /** @var \Skill\Db\Domain $domain */
             $domain = \Skill\Db\DomainMap::create()->find($domainId);
-            $avgs[$domainId] = round(\Tk\Math::average($valArray) * $domain->weight, 2);
+            if ($weighted) {
+                $avgs[$domainId] = \Tk\Math::average($valArray) * $domain->weight;
+            } else {
+                $avgs[$domainId] = \Tk\Math::average($valArray);
+            }
         }
         if (!count($grades)) return 0;
-        return (array_sum($avgs)/count($grades)) * ($this->getCollection()->getScaleLength()-1);
+        $avg = array_sum($avgs)/count($grades);
+        if (!$weighted)
+            vd($grades, $avgs, array_sum($avgs) , count($grades), $avg);
+        return $avg;
+    }
+
+    /**
+     * Get the entry values average, this average is not weighted to the Domain.weight values
+     *
+     * @return float
+     * @throws \Tk\Db\Exception
+     */
+    public function calcAverage()
+    {
+        $grades = array();
+        $valueList = EntryMap::create()->findValue($this->getId());
+        foreach ($valueList as $value) {
+            if (!$value->value && !$this->getCollection()->includeZero) continue;
+            $grades[$value->item_id] = $value->value;
+        }
+        return \Tk\Math::average($grades);
     }
 
 
     /**
-     *
+     * @return array
+     * @throws \Tk\Db\Exception
      */
     public function validate()
     {

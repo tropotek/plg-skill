@@ -26,7 +26,8 @@ class Results extends AdminIface
 
 
     /**
-     * Iface constructor.
+     * Results constructor.
+     * @throws \Tk\Db\Exception
      */
     public function __construct()
     {
