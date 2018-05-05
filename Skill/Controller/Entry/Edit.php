@@ -192,8 +192,9 @@ class Edit extends AdminEditIface
         }
 
         if ($this->entry->getId() && $this->entry->getCollection()->gradable && !$this->isPublic) {
-            $pct = round(($this->entry->average / ($this->entry->getCollection()->getScaleLength() - 1)) * 100);
-            $this->form->addField(new Field\Html('average', sprintf('%.2f &nbsp; (%d%%)', $this->entry->average, $pct)))->setFieldset('Entry Details');
+            $avg = $this->entry->calcAverage();
+            $pct = round(($avg / ($this->entry->getCollection()->getScaleLength() - 1)) * 100);
+            $this->form->addField(new Field\Html('average', sprintf('%.2f &nbsp; (%d%%)', $avg, $pct)))->setFieldset('Entry Details');
         }
 
         if ($this->getUser()->isStaff()) {

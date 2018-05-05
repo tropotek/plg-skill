@@ -107,13 +107,24 @@ class EntryMap extends \App\Db\Mapper
             $where .= sprintf('a.user_id = %s AND ', (int)$filter['userId']);
         }
 
-        if (!empty($filter['placementId'])) {
-            $where .= sprintf('a.placement_id = %s AND ', (int)$filter['placementId']);
-        }
-
         if (!empty($filter['placementTypeId'])) {
             $from .= sprintf(' LEFT JOIN skill_collection_placement_type b ON (a.collection_id = b.collection_id)');
             $where .= sprintf('b.placement_type_id = %s AND ', (int)$filter['placementTypeId']);
+        }
+
+        if (!empty($filter['placementId'])) {
+            $where .= sprintf('a.placement_id = %s AND ', (int)$filter['placementId']);
+
+        }
+
+        if (!empty($filter['placementStatus'])) {
+            $from .= sprintf(', placement c');
+            $where .= sprintf('a.placement_id = c.id AND ');
+            $w = $this->makeMultiQuery($filter['placementStatus'], 'c.status');
+            if ($w) {
+                $where .= '('. $w . ') AND ';
+            }
+
         }
 
         if (!empty($filter['title'])) {
@@ -139,7 +150,7 @@ class EntryMap extends \App\Db\Mapper
         }
 
         $res = $this->selectFrom($from, $where, $tool);
-        //vd($from, $where);
+        vd($this->getDb()->getLastQuery());
         return $res;
     }
 
