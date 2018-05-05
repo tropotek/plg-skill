@@ -22,9 +22,8 @@ class View extends AdminEditIface
     protected $entry = null;
 
 
-
     /**
-     * Iface constructor.
+     * @throws \Tk\Db\Exception
      */
     public function __construct()
     {
@@ -44,6 +43,9 @@ class View extends AdminEditIface
     {
         $this->entry = \Skill\Db\EntryMap::create()->find($request->get('entryId'));
 
+        if (!$this->entry)
+            throw new \Tk\Exception('Invalid entry record.');
+
         $this->buildForm();
 
         $this->form->load(\Skill\Db\EntryMap::create()->unmapForm($this->entry));
@@ -52,7 +54,8 @@ class View extends AdminEditIface
     }
 
     /**
-     *
+     * @throws \Tk\Db\Exception
+     * @throws \Tk\Form\Exception
      */
     protected function buildForm() 
     {
@@ -107,6 +110,9 @@ class View extends AdminEditIface
         if ($this->entry->getCollection()->icon) {
             $template->setAttr('icon', 'class', $this->entry->getCollection()->icon);
         }
+
+        // TODO: this is a bit hacky fix it properly....
+        $template->appendCss('.error-block { display: none !important; position: absolute !important;} ');
 
         // Render the form
         $template->insertTemplate('form', $this->form->getRenderer()->show());

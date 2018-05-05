@@ -123,6 +123,11 @@ class SubjectDashboardHandler implements Subscriber
                         /** @var \Tk\Table\Cell\Actions $cell */
                         /** @var \App\Db\Placement $obj */
                         /** @var \Tk\Table\Cell\ActionButton $btn */
+                        if (!$obj->getPlacementType() || !$obj->getPlacementType()->enableReport || $obj->status != \App\Db\Placement::STATUS_COMPLETED) {
+                            $btn->setVisible(false);
+                            return;
+                        }
+
                         $entry = \Skill\Db\EntryMap::create()->findFiltered(array(
                             'collectionId' => $collection->getId(),
                             'placementId' => $obj->getId(),
