@@ -54,7 +54,12 @@ class Report extends \App\Controller\AdminManagerIface
         $this->table->setRenderer(\App\Config::getInstance()->createTableRenderer($this->table));
 
         $this->table->addCell(new \Tk\Table\Cell\Text('uid'))->setLabel('studentNumber');
-        $this->table->addCell(new \Tk\Table\Cell\Text('name'))->addCss('key')->setUrl(clone $this->editUrl, 'userId');
+        $this->table->addCell(new \Tk\Table\Cell\Text('name'))->addCss('key')->setUrl(clone $this->editUrl, 'userId')
+            ->setOnPropertyValue(function ($cell, $obj, $value) {
+                /** @var \Tk\Table\Cell\Text $cell */
+                $cell->setUrl($cell->getUrl()->set('userId', $obj->getId()));
+                return $value;
+            });
 
         // Student Results
         $filter = array();
