@@ -21,6 +21,10 @@ class Edit extends AdminEditIface
      * @var \Skill\Db\Entry
      */
     protected $entry = null;
+    /**
+     * @var \App\Db\Placement
+     */
+    protected $placement = null;
 
     /**
      * @var \App\Ui\Table\Status
@@ -94,6 +98,21 @@ class Edit extends AdminEditIface
 
         if ($request->get('entryId')) {
             $this->entry = \Skill\Db\EntryMap::create()->find($request->get('entryId'));
+        }
+        if (preg_match('/[0-9a-f]{32}/i', $request->get('h'))) {
+            // EG: h=13644394c4d1473f1547513fc21d7934
+            // http://ems.vet.unimelb.edu.au/goals.html?h=13644394c4d1473f1547513fc21d7934
+            $this->placement = \App\Db\PlacementMap::create()->findByHash($request->get('h'));
+            if (!$this->placement) {
+                \Tk\Alert::addError('Invalid URL. Please contact your course coordinator.');
+                $this->getUser()->getHomeUrl()->redirect();
+            }
+            $this->entry->placementId = $this->placement->getId();
+            $this->entry->userId = $this->placement->userId;
+            $this->entry->subjectId = $this->placement->subjectId;
+            // TODO: Remove this once all old EMS II email urls are no longer valid, sometime after June 2018
+            if (!$this->entry->collectionId)
+                $this->entry->collectionId = 1; // This should be supplied in the request.
         }
 
         if ($request->get('collectionId') && $request->get('placementId')) {

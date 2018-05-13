@@ -47,7 +47,8 @@ $routes->add('skill-entry-results-student', new \Tk\Routing\Route('/student/{sub
 
 // Guest Pages
 $routes->add('guest-skill-entry-submit', new \Tk\Routing\Route('/inst/{institutionHash}/skillEdit.html', 'Skill\Controller\Entry\Edit::doPublicSubmission'));
-//$routes->add('guest-skill-entry-submit', new \Tk\Routing\Route('/skillEdit.html', 'Skill\Controller\Entry\Edit::doPublicSubmission'));
+// Temp bridging page, remove after Aug 2018
+$routes->add('guest-goals-redirect', new \Tk\Routing\Route('/goals.html', 'Skill\Controller\Entry\Goals::doDefault'));
 
 
 
