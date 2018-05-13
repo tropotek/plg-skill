@@ -92,7 +92,7 @@ class Edit extends AdminEditIface
     {
         $this->entry = new \Skill\Db\Entry();
         $this->entry->userId = ($request->has('userId')) ? (int)$request->get('userId') : $this->getUser()->getId();
-        $this->entry->subjectId = ($request->has('subjectId')) ? (int)$request->get('subjectId') : $this->getSubject()->getId();
+        $this->entry->subjectId = (int)$request->get('subjectId');
         $this->entry->collectionId = (int)$request->get('collectionId');
         $this->entry->placementId = (int)$request->get('placementId');
 
@@ -113,6 +113,9 @@ class Edit extends AdminEditIface
             // TODO: Remove this once all old EMS II email urls are no longer valid, sometime after June 2018
             if (!$this->entry->collectionId)
                 $this->entry->collectionId = 1; // This should be supplied in the request.
+        }
+        if (!$this->entry->subjectId && $this->getSubject()) {
+            $this->entry->subjectId = $this->getSubject()->getId();
         }
 
         if ($request->get('collectionId') && $request->get('placementId')) {
