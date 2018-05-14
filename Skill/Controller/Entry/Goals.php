@@ -32,9 +32,18 @@ class Goals extends \App\Controller\Iface
                 \Tk\Alert::addError('Invalid URL. Please contact your course coordinator.');
                 $this->getUser()->getHomeUrl()->redirect();
             }
+
+//            $url = \App\Uri::createInstitutionUrl('/skillEdit.html', $placement->getSubject()->getInstitution())
+//                ->set('collectionId', '1')
+//                ->set('userId', $placement->userId)
+//                ->set('subjectId', $placement->subjectId);
+//            //if ($message->get('placement::id'))
+//                $url->set('placementId', $placement->getId());
+
             $url = \App\Uri::createInstitutionUrl('/skillEdit.html', $placement->getSubject()->getInstitution())
                 ->set('h', $placement->getHash())
                 ->set('collectionId', '1');
+
             $url->redirect();
         }
     }

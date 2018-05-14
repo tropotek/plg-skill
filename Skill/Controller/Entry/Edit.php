@@ -107,12 +107,21 @@ class Edit extends AdminEditIface
                 \Tk\Alert::addError('Invalid URL. Please contact your course coordinator.');
                 $this->getUser()->getHomeUrl()->redirect();
             }
-            $this->entry->placementId = $this->placement->getId();
-            $this->entry->userId = $this->placement->userId;
-            $this->entry->subjectId = $this->placement->subjectId;
-            // TODO: Remove this once all old EMS II email urls are no longer valid, sometime after June 2018
-            if (!$this->entry->collectionId)
-                $this->entry->collectionId = 1; // This should be supplied in the request.
+            $e = \Skill\Db\EntryMap::create()->findFiltered(array(
+                    'collectionId' => 1,
+                    'placementId' => $this->placement->getId()
+                )
+            )->current();
+            if ($e) {
+                $this->entry = $e;
+            } else {
+                $this->entry->placementId = $this->placement->getId();
+                $this->entry->userId = $this->placement->userId;
+                $this->entry->subjectId = $this->placement->subjectId;
+                // TODO: Remove this once all old EMS II email urls are no longer valid, sometime after June 2018
+                if (!$this->entry->collectionId)
+                    $this->entry->collectionId = 1; // This should be supplied in the request.
+            }
         }
         if (!$this->entry->subjectId && $this->getSubject()) {
             $this->entry->subjectId = $this->getSubject()->getId();
