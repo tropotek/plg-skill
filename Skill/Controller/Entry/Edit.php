@@ -310,6 +310,8 @@ class Edit extends AdminEditIface
             \Skill\Db\EntryMap::create()->saveValue($this->entry->getVolatileId(), $id, (int)$val);
         }
 
+        // TODO: Although this seems redundant, there was a bug where the entry->userId == placement->id (try to trace?)
+        $this->entry->userId = $this->entry->getPlacement()->userId;
         $this->entry->save();
 
         // Create status if changed and trigger notifications
