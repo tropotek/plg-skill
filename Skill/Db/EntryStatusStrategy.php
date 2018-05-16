@@ -135,6 +135,8 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
 //        set('userId', $model->userId)->set('placementId', $model->placementId);
         $editUrl = \App\Uri::createSubjectUrl('/entryEdit.html')->set('entryId', $model->getId());
         $from = '';
+
+        if (!$model->getUser()) return '';
         $userName = $model->getUser()->name;
         if ($model->getPlacement()) {
             //$editUrl = \App\Uri::createSubjectUrl('/entryEdit.html')->set('placementId', $model->getPlacement()->getId());
