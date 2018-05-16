@@ -296,7 +296,6 @@ class Edit extends AdminEditIface
             $form->addError('Use the slider at the end of the question to leave feedback.');
         }
 
-
         $form->addFieldErrors($this->entry->validate());
 
         if ($form->hasErrors()) {
