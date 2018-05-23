@@ -176,6 +176,6 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
         $model = $this->getStatus()->getModel();
         $collection = $model->getCollection();
 
-        return $collection->name . ' ' . \Tk\Object::basename($this->getStatus()->fkey);
+        return $collection->name . ' ' . \Tk\ObjectUtil::basename($this->getStatus()->fkey);
     }
 }

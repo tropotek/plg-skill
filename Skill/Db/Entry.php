@@ -194,7 +194,7 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
      */
     public static function getStatusList()
     {
-        return \Tk\Form\Field\Select::arrayToSelectList(\Tk\Object::getClassConstants(__CLASS__, 'STATUS'));
+        return \Tk\Form\Field\Select::arrayToSelectList(\Tk\ObjectUtil::getClassConstants(__CLASS__, 'STATUS'));
     }
 
     /**

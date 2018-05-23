@@ -281,7 +281,7 @@ class Edit extends AdminEditIface
 
         if (!$this->isPublic) {
             if ($form->getField('status') && (!$form->getFieldValue('status') || !in_array($form->getFieldValue('status'),
-                        \Tk\Object::getClassConstants($this->entry, 'STATUS')))) {
+                        \Tk\ObjectUtil::getClassConstants($this->entry, 'STATUS')))) {
                 $form->addFieldError('status', 'Please Select a valid status');
             }
         } else {

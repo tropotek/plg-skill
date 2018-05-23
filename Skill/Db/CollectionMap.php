@@ -59,7 +59,7 @@ class CollectionMap extends \App\Db\Mapper
             $this->formMap->addPropertyMap(new Form\Text('role'));
             $this->formMap->addPropertyMap(new Form\Text('icon'));
             $this->formMap->addPropertyMap(new Form\Text('color'));
-            $this->formMap->addPropertyMap(new Form\Object('available'));
+            $this->formMap->addPropertyMap(new Form\ObjectMap('available'));
             $this->formMap->addPropertyMap(new Form\Boolean('active'));
             $this->formMap->addPropertyMap(new Form\Boolean('gradable'));
             $this->formMap->addPropertyMap(new Form\Boolean('requirePlacement'));

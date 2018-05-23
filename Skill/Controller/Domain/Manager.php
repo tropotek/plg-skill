@@ -54,7 +54,7 @@ class Manager extends AdminManagerIface
         $this->getActionPanel()->add(\Tk\Ui\Button::create('New Domain',
             $u->set('collectionId', $this->collection->getId()), 'fa fa-black-tie'));
 
-        $this->table = \App\Config::getInstance()->createTable(\Tk\Object::basename($this).'_domainList');
+        $this->table = \App\Config::getInstance()->createTable(\Tk\ObjectUtil::basename($this).'_domainList');
         $this->table->setRenderer(\App\Config::getInstance()->createTableRenderer($this->table));
 
         $this->table->addCell(new \Tk\Table\Cell\Checkbox('id'));

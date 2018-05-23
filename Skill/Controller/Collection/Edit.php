@@ -65,7 +65,7 @@ class Edit extends AdminEditIface
 
         $tab = 'Details';
         $this->form->addField(new Field\Input('name'))->setTabGroup($tab)->setNotes('Create a label for this collection');
-        $list = \Tk\Form\Field\Select::arrayToSelectList(\Tk\Object::getClassConstants('\Skill\Db\Collection', 'ROLE'));
+        $list = \Tk\Form\Field\Select::arrayToSelectList(\Tk\ObjectUtil::getClassConstants('\Skill\Db\Collection', 'ROLE'));
         $this->form->addField(new Field\Select('role', $list))->setTabGroup($tab)->prependOption('-- Select --', '')
             ->setNotes('');
 
@@ -101,7 +101,7 @@ class Edit extends AdminEditIface
         $this->form->addField(new Field\Checkbox('requirePlacement'))->addCss('tk-input-toggle')->setTabGroup($tab)
             ->setNotes('If a collection entry requires a placement to be associated with.');
 
-        $list = \Tk\Form\Field\Select::arrayToSelectList(\Tk\Object::getClassConstants('\App\Db\Placement', 'STATUS'));
+        $list = \Tk\Form\Field\Select::arrayToSelectList(\Tk\ObjectUtil::getClassConstants('\App\Db\Placement', 'STATUS'));
         $this->form->addField(new Field\Select('available[]', $list))->setTabGroup($tab)
             ->addCss('tk-dual-select')->setAttr('data-title', 'Placement Status')
             ->setNotes('Enable this collection on the following placement status');

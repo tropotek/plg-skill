@@ -50,7 +50,7 @@ class Report extends \App\Controller\AdminManagerIface
         if ($this->editUrl === null)
             $this->editUrl = \App\Uri::createSubjectUrl('/entryResults.html')->set('collectionId', $this->collection->getId());
 
-        $this->table = \App\Config::getInstance()->createTable(\Tk\Object::basename($this).'_fieldList');
+        $this->table = \App\Config::getInstance()->createTable(\Tk\ObjectUtil::basename($this).'_fieldList');
         $this->table->setRenderer(\App\Config::getInstance()->createTableRenderer($this->table));
 
         $this->table->addCell(new \Tk\Table\Cell\Text('uid'))->setLabel('studentNumber');
