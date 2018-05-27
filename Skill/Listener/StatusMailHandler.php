@@ -45,14 +45,6 @@ class StatusMailHandler implements Subscriber
                         $url = \App\Uri::createInstitutionUrl('/skillEdit.html', $placement->getSubject()->getInstitution())
                             ->set('h', $placement->getHash())
                             ->set('collectionId', $collection->getId());
-
-//                        $url = \App\Uri::createInstitutionUrl('/skillEdit.html', $collection->getProfile()->getInstitution())
-//                            ->set('collectionId', $collection->getId())
-//                            ->set('userId', $message->get('student::id'))
-//                            ->set('subjectId', $message->get('subject::id'));
-//                        if ($message->get('placement::id'))
-//                            $url->set('placementId', $message->get('placement::id'));
-
                         $skillLinkHtml .= sprintf('<a href="%s" title="%s">%s</a> | ', htmlentities($url->toString()),
                             htmlentities($collection->name), htmlentities($collection->name));
                         $skillLinkText .= sprintf('%s: %s | ', htmlentities($collection->name), htmlentities($url->toString()));

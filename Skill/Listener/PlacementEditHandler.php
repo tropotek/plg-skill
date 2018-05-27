@@ -18,10 +18,80 @@ class PlacementEditHandler implements Subscriber
      */
     private $subject = null;
 
+    /**
+     * @var \App\Controller\Placement\Edit
+     */
+    private $controller = null;
 
+    /**
+     * @var \Skill\Db\Collection[]
+     */
+    private $collectionList = array();
+
+
+    /**
+     * PlacementEditHandler constructor.
+     * @param $subject
+     */
     public function __construct($subject)
     {
         $this->subject = $subject;
+    }
+
+    /**
+     * @param Event $event
+     * @throws \Tk\Db\Exception
+     * @throws \Tk\Exception
+     */
+    public function onPageInit(Event $event)
+    {
+        /** @var \App\Controller\Placement\Edit $controller */
+        $controller = $event->get('controller');
+        if ($controller instanceof \App\Controller\Placement\Edit) {
+            $this->controller = $controller;
+        }
+
+    }
+
+    /**
+     * @param \Tk\Event\FormEvent $event
+     * @throws \Tk\Db\Exception
+     * @throws \Tk\Plugin\Exception
+     * @throws \Tk\Form\Exception
+     * @throws \Tk\Exception
+     */
+    public function onFormLoad(\Tk\Event\FormEvent $event)
+    {
+        if ($this->controller) {
+            if (!$this->controller->getPlacement()) return;
+            $placement = $this->controller->getPlacement();
+            $form = $event->getForm();
+
+            $this->collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array(
+                'active' => true,
+                'profileId' => $this->subject->profileId,
+                'available' => $placement->status,
+                'placementTypeId' => $placement->placementTypeId,
+                'requirePlacement' => true
+            ));
+
+            if ($placement->getId()) {
+                /** @var \Skill\Db\Collection $collection */
+                foreach ($this->collectionList as $collection) {
+                    $url = \App\Uri::createInstitutionUrl('/skillEdit.html', $placement->getSubject()->getInstitution())
+                        ->set('h', $placement->getHash())
+                        ->set('collectionId', $collection->getId());
+
+                    $form->addField(new \Tk\Form\Field\Input('collection-' . $collection->getId()))
+                        ->setTabGroup('Details')->setReadonly()->setLabel($collection->name)
+                        ->setFieldset('Company Skill Urls')->setValue($url->toString())
+                        ->setNotes('Copy this URL to send to the ' .
+                            \App\Db\Phrase::findValue('company', $placement->getSubject()->profileId) .
+                            ' to access this ' . \App\Db\Phrase::findValue('placement', $placement->getSubject()->profileId, true) .
+                            ' ' . $collection->name . ' submission form.');
+                }
+            }
+        }
     }
 
     /**
@@ -34,37 +104,22 @@ class PlacementEditHandler implements Subscriber
      */
     public function onControllerInit(Event $event)
     {
-        $plugin = Plugin::getInstance();
-        $config = $plugin->getConfig();
-
-        /** @var \App\Controller\Placement\Edit $controller */
-        $controller = $event->get('controller');
-        if ($controller instanceof \App\Controller\Placement\Edit) {
-            if (!$controller->getPlacement()->getId()) return;
+        if ($this->controller) {
+            if (!$this->controller->getPlacement() || !$this->controller->getPlacement()->getId()) return;
+            $placement = $this->controller->getPlacement();
 
             /** @var \Tk\Ui\Admin\ActionPanel $actionPanel */
-            $actionPanel = $controller->getActionPanel();
+            $actionPanel = $this->controller->getActionPanel();
 
-            $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array(
-                'active' => true,
-                'profileId' => $this->subject->profileId,
-                'available' => $controller->getPlacement()->status,
-                'placementTypeId' => $controller->getPlacement()->placementTypeId,
-                'requirePlacement' => true
-            ));
-
-            //$status = $controller->getPlacement()->status;
             /** @var \Skill\Db\Collection $collection */
-            foreach ($collectionList as $collection) {
-                if (!$collection->isAvailable($controller->getPlacement())) continue;
-
+            foreach ($this->collectionList as $collection) {
+                if (!$collection->isAvailable($placement)) continue;
                 $entry = \Skill\Db\EntryMap::create()->findFiltered(array('collectionId' => $collection->getId(),
-                    'placementId' => $controller->getPlacement()->getId()))->current();
-
+                    'placementId' => $placement->getId()))->current();
                 $btn = $actionPanel->add(\Tk\Ui\Button::create($collection->name,
                     \App\Uri::createSubjectUrl('/entryEdit.html')->set('collectionId', $collection->getId())
-                        ->set('placementId', $controller->getPlacement()->getId())->set('subjectId', $this->subject->getId())
-                        ->set('userId', $controller->getPlacement()->getId()), $collection->icon));
+                        ->set('placementId', $placement->getId())->set('subjectId', $this->subject->getId())
+                        ->set('userId', $placement->getId()), $collection->icon));
 
                 if ($entry) {
                     $btn->addCss('btn-default');
@@ -73,7 +128,6 @@ class PlacementEditHandler implements Subscriber
                     $btn->addCss('btn-success');
                     $btn->setAttr('title', 'Create ' . $collection->name);
                 }
-
             }
         }
     }
@@ -87,8 +141,8 @@ class PlacementEditHandler implements Subscriber
      */
     public function onControllerShow(Event $event)
     {
-        $plugin = Plugin::getInstance();
-        $config = $plugin->getConfig();
+//        $plugin = Plugin::getInstance();
+//        $config = $plugin->getConfig();
         //$config->getLog()->info($plugin->getName() . ': onControllerShow(\'profile\', '.$this->profileId.') ');
     }
 
@@ -115,6 +169,8 @@ class PlacementEditHandler implements Subscriber
     public static function getSubscribedEvents()
     {
         return array(
+            \Tk\PageEvents::PAGE_INIT => array('onPageInit', 0),
+            \Tk\Form\FormEvents::FORM_LOAD => array('onFormLoad', 0),
             \Tk\PageEvents::CONTROLLER_INIT => array('onControllerInit', 0),
             \Tk\PageEvents::CONTROLLER_SHOW => array('onControllerShow', 0)
         );
