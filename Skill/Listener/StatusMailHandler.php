@@ -21,10 +21,8 @@ class StatusMailHandler implements Subscriber
 
         /** @var \Tk\Mail\CurlyMessage $message */
         foreach ($event->getMessageList() as $message) {
-
             $skillLinkHtml = '';
             $skillLinkText = '';
-            $config = \App\Config::getInstance();
 
             if ($message->get('placement::id')) {
                 /** @var \App\Db\Placement $placement */
