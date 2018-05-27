@@ -29,7 +29,7 @@ class StatusMailHandler implements Subscriber
             if ($message->get('placement::id')) {
                 /** @var \App\Db\Placement $placement */
                 $placement = \App\Db\PlacementMap::create()->find($message->get('placement::id'));
-                if (!$placement) {
+                if ($placement) {
                     $filter = array(
                         'active' => true,
                         'profileId' => $message->get('placement::profileId'),
@@ -62,6 +62,7 @@ class StatusMailHandler implements Subscriber
                 $message->set('skill::linkHtml', rtrim($skillLinkHtml, ' | '));
                 $message->set('skill::linkText', rtrim($skillLinkText, ' | '));
                 $message->set('placement::goalsUrl', rtrim($skillLinkHtml, ' | '));
+
             }
         }
 

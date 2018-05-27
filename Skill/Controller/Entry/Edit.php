@@ -228,7 +228,7 @@ class Edit extends AdminEditIface
             $this->form->addField(new Field\Html('average', sprintf('%.2f &nbsp; (%d%%)', $avg, $pct)))->setFieldset('Entry Details');
         }
 
-        if ($this->getUser()->isStaff()) {
+        if ($this->getUser()->isStaff() && $this->getPageRole() == \App\Db\User::ROLE_STAFF) {
             $this->form->addField(new \App\Form\Field\CheckSelect('status', \Skill\Db\Entry::getStatusList()))
                 ->setRequired()->prependOption('-- Status --', '')->setNotes('Set the status. Use the checkbox to disable notification emails.')->setFieldset('Entry Details');
         }
@@ -322,7 +322,7 @@ class Edit extends AdminEditIface
                 $this->entry->getSubject()->getProfile(), $this->entry->getSubject());
         }
 
-        \Tk\Alert::addSuccess('Record saved!');
+        \Tk\Alert::addSuccess('You response has been successfully submitted. Please return at any time to make changes while this Entry remains in the pending status.');
         $url = \Tk\Uri::create()->set('entryId', $this->entry->getId());
         if ($form->getTriggeredEvent()->getName() == 'update') {
             if ($this->entry->getPlacement() && $this->getUser()->isStaff()) {
