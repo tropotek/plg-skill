@@ -75,7 +75,7 @@ class View extends AdminEditIface
 
 
         $this->form->addField(new Field\Html('status'))->setFieldset('Entry Details');
-        $this->form->addField(new Field\Html('assessor'))->setFieldset('Entry Details');
+        $this->form->addField(new Field\Html('assessor', htmlentities($this->entry->assessor)))->setFieldset('Entry Details');
         if ($this->entry->getCollection()->requirePlacement)
             $this->form->addField(new Field\Html('absent'))->setLabel('Days Absent')->setFieldset('Entry Details');
 
