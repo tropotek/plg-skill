@@ -3,7 +3,6 @@ namespace Skill\Controller\Entry;
 
 use App\Controller\AdminEditIface;
 use Dom\Template;
-use Tk\Form\Event;
 use Tk\Form\Field;
 use Tk\Request;
 
