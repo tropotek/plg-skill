@@ -57,10 +57,21 @@ class Manager extends AdminManagerIface
         $this->table->setRenderer(\App\Config::getInstance()->createTableRenderer($this->table));
 
         $this->table->addCell(new \Tk\Table\Cell\Checkbox('id'));
-        $this->table->addCell(new \Tk\Table\Cell\Text('uid'));
+        //$this->table->addCell(new \Tk\Table\Cell\Text('uid'))->setLabel('UID');
         $this->table->addCell(new \Tk\Table\Cell\Text('question'))->addCss('key')->setUrl(clone $this->editUrl);
-        $this->table->addCell(new \Tk\Table\Cell\Text('categoryId'));
-        $this->table->addCell(new \Tk\Table\Cell\Text('domainId'));
+        $this->table->addCell(new \Tk\Table\Cell\Text('categoryId'))->setOnPropertyValue(function ($cell, $obj, $value) {
+            /** @var \Skill\Db\Item $obj */
+            if ($obj->getCategory()) return $obj->getCategory()->name;
+            return $value;
+        });
+        $domains = \Skill\Db\DomainMap::create()->findFiltered(array('collectionId' => $this->collection->getId()));
+        if (count($domains)) {
+            $this->table->addCell(new \Tk\Table\Cell\Text('domainId'))->setOnPropertyValue(function ($cell, $obj, $value) {
+                /** @var \Skill\Db\Item $obj */
+                if ($obj->getDomain()) return $obj->getDomain()->name;
+                return 'None';
+            });
+        }
         $this->table->addCell(new \Tk\Table\Cell\Date('modified'));
         $this->table->addCell(new \Tk\Table\Cell\OrderBy('orderBy'));
 
@@ -76,6 +87,11 @@ class Manager extends AdminManagerIface
 
     }
 
+    /**
+     * @return \Skill\Db\Item[]|\Tk\Db\Map\ArrayObject
+     * @throws \Tk\Db\Exception
+     * @throws \Tk\Exception
+     */
     protected function getList()
     {
         $filter = $this->table->getFilterValues();
