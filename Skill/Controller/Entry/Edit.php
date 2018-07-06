@@ -228,7 +228,7 @@ class Edit extends AdminEditIface
             $this->form->addField(new Field\Html('average', sprintf('%.2f &nbsp; (%d%%)', $avg, $pct)))->setFieldset('Entry Details');
         }
 
-        if ($this->getUser()->isStaff() && $this->getPageRole() == \App\Db\User::ROLE_STAFF) {
+        if ($this->getUser()->isStaff() && $this->getConfig()->getPageRole() == \App\Db\User::ROLE_STAFF) {
             $this->form->addField(new \App\Form\Field\CheckSelect('status', \Skill\Db\Entry::getStatusList()))
                 ->setRequired()->prependOption('-- Status --', '')->setNotes('Set the status. Use the checkbox to disable notification emails.')->setFieldset('Entry Details');
         }
