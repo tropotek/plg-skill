@@ -262,7 +262,7 @@ class Edit extends AdminEditIface
         } else {
             $this->form->addField(new Event\Submit('update', array($this, 'doSubmit')));
             $this->form->addField(new Event\Submit('save', array($this, 'doSubmit')));
-            $this->form->addField(new Event\Link('cancel', \Uni\Ui\Crumbs::getInstance()->getBackUrl()));
+            $this->form->addField(new Event\Link('cancel', $this->getConfig()->getBackUrl()));
         }
 
     }
@@ -325,10 +325,9 @@ class Edit extends AdminEditIface
         \Tk\Alert::addSuccess('You response has been successfully submitted. Please return at any time to make changes while this Entry remains in the pending status.');
         $url = \Tk\Uri::create()->set('entryId', $this->entry->getId());
         if ($form->getTriggeredEvent()->getName() == 'update') {
+            $url = $this->getConfig()->getBackUrl();
             if ($this->entry->getPlacement() && $this->getUser()->isStaff()) {
                 $url = \App\Uri::createSubjectUrl('/placementEdit.html')->set('placementId', $this->entry->getPlacement()->getId());
-            } else {
-                $url = \Uni\Ui\Crumbs::getInstance()->getBackUrl();
             }
         }
         $event->setRedirect($url);

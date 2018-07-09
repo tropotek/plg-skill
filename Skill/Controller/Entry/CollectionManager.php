@@ -21,6 +21,7 @@ class CollectionManager extends \Skill\Controller\Collection\Manager
 
     /**
      * Manager constructor.
+     * @throws \Tk\Exception
      */
     public function __construct()
     {

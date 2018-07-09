@@ -1,13 +1,12 @@
 <?php
-$config = \Tk\Config::getInstance();
+$config = \App\Config::getInstance();
 
 /** @var \Composer\Autoload\ClassLoader $composer */
 $composer = $config->getComposer();
 if ($composer)
     $composer->add('Skill\\', dirname(__FILE__));
 
-/** @var \Tk\Routing\RouteCollection $routes */
-$routes = $config['site.routes'];
+$routes = $config->getRouteCollection();
 if (!$routes) return;
 
 $params = array('role' => 'admin');

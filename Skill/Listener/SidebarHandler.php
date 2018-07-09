@@ -57,11 +57,11 @@ class SidebarHandler implements Subscriber
     {
         /** @var \App\Ui\Sidebar\Iface $sidebar */
         $sidebar = $event->get('sidebar');
-        $subject = $this->controller->getSubject();
-        $user = $this->controller->getUser();
+        $subject = $this->controller->getConfig()->getSubject();
+        $user = $this->controller->getConfig()->getUser();
         if (!$user || !$subject) return;
 
-        if ($this->controller->getUser()->isStudent()) {
+        if ($user->isStudent()) {
 
             $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(
                 array('subjectId' => $subject->getId())

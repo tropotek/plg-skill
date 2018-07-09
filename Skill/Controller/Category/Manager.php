@@ -74,6 +74,11 @@ class Manager extends AdminManagerIface
 
     }
 
+    /**
+     * @return \Skill\Db\Category[]|\Tk\Db\Map\ArrayObject
+     * @throws \Tk\Db\Exception
+     * @throws \Tk\Exception
+     */
     protected function getList()
     {
         $filter = $this->table->getFilterValues();

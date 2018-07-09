@@ -20,7 +20,6 @@ class Goals extends \App\Controller\Iface
     /**
      * @param Request $request
      * @throws \Exception
-     * @throws \Tk\Form\Exception
      */
     public function doDefault(Request $request)
     {
@@ -52,8 +51,6 @@ class Goals extends \App\Controller\Iface
 
     /**
      * @return Template
-     * @throws \Dom\Exception
-     * @throws \Tk\Db\Exception
      */
     public function show()
     {

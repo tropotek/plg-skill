@@ -3,7 +3,6 @@ namespace Skill\Controller\Collection;
 
 use App\Controller\AdminEditIface;
 use Dom\Template;
-use Skill\Db\CollectionMap;
 use Tk\Form\Event;
 use Tk\Form\Field;
 use Tk\Request;
@@ -118,17 +117,18 @@ class Edit extends AdminEditIface
             $this->form->addField(new Event\Submit('update', array($this, 'doSubmit')));
 
         $this->form->addField(new Event\Submit('save', array($this, 'doSubmit')));
-        $this->form->addField(new Event\Link('cancel', \Uni\Ui\Crumbs::getInstance()->getBackUrl()));
+        $this->form->addField(new Event\Link('cancel', $this->getConfig()->getBackUrl()));
 
     }
 
     /**
      * @param \Tk\Form $form
+     * @param \Tk\Form\Event\Iface $event
      * @throws \ReflectionException
      * @throws \Tk\Db\Exception
      * @throws \Tk\Exception
      */
-    public function doSubmit($form)
+    public function doSubmit($form, $event)
     {
         // Load the object with data from the form using a helper object
         \Skill\Db\CollectionMap::create()->mapForm($form->getValues(), $this->collection);
@@ -153,10 +153,10 @@ class Edit extends AdminEditIface
         }
 
         \Tk\Alert::addSuccess('Record saved!');
-        if ($form->getTriggeredEvent()->getName() == 'update') {
-            \Uni\Ui\Crumbs::getInstance()->getBackUrl()->redirect();
+        $event->setRedirect($this->getConfig()->getBackUrl());
+        if ($form->getTriggeredEvent()->getName() == 'save') {
+            $event->setRedirect(\Tk\Uri::create()->set('collectionId', $this->collection->getId()));
         }
-        \Tk\Uri::create()->set('collectionId', $this->collection->getId())->redirect();
     }
 
     /**

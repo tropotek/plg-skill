@@ -28,9 +28,11 @@ class SystemSettings extends Iface
      */
     protected $data = null;
 
-    
+
     /**
-     *
+     * SystemSettings constructor.
+     * @throws \Tk\Db\Exception
+     * @throws \Tk\Plugin\Exception
      */
     public function __construct()
     {
@@ -58,7 +60,7 @@ class SystemSettings extends Iface
         
         $this->form->addField(new Event\Submit('update', array($this, 'doSubmit')));
         $this->form->addField(new Event\Submit('save', array($this, 'doSubmit')));
-        $this->form->addField(new Event\LinkButton('cancel', \Uni\Ui\Crumbs::getInstance()->getBackUrl()));
+        $this->form->addField(new Event\LinkButton('cancel', $this->getConfig()->getBackUrl()));
 
         $this->form->load($this->data->toArray());
         $this->form->execute();
@@ -69,9 +71,10 @@ class SystemSettings extends Iface
      * doSubmit()
      *
      * @param Form $form
+     * @param \Tk\Form\Event\Iface $event
      * @throws \Tk\Db\Exception
      */
-    public function doSubmit($form)
+    public function doSubmit($form, $event)
     {
         $values = $form->getValues();
         $this->data->replace($values);
@@ -90,10 +93,10 @@ class SystemSettings extends Iface
         $this->data->save();
         
         \Tk\Alert::addSuccess('Site settings saved.');
-        if ($form->getTriggeredEvent()->getName() == 'update') {
-            \Tk\Uri::create('/admin/plugins.html')->redirect();
+        $event->setRedirect($this->getConfig()->getBackUrl());
+        if ($form->getTriggeredEvent()->getName() == 'save') {
+            $event->setRedirect(\Tk\Uri::create());
         }
-        \Tk\Uri::create()->redirect();
     }
 
     /**
