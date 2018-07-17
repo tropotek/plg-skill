@@ -39,7 +39,6 @@ class Plugin extends \App\Plugin\Iface
         //$this->getPluginFactory()->registerZonePlugin($this, self::ZONE_INSTITUTION);
         $this->getPluginFactory()->registerZonePlugin($this, self::ZONE_SUBJECT_PROFILE);
         //$this->getPluginFactory()->registerZonePlugin($this, self::ZONE_SUBJECT);
-
         \App\Config::getInstance()->getEventDispatcher()->addSubscriber(new \Skill\Listener\SetupHandler());
     }
 

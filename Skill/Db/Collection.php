@@ -176,7 +176,7 @@ class Collection extends \Tk\Db\Map\Model
     }
 
     /**
-     * @param \App\Db\Subject|int $subjectId
+     * @param \App\Db\Subject|\Uni\Db\SubjectIface|int $subjectId
      * @return bool
      */
     public function isAvailableToSubject($subjectId)

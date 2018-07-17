@@ -107,8 +107,6 @@ class SidebarHandler implements Subscriber
             }
         }
 
-
-
     }
 
 
