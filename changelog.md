@@ -1,5 +1,10 @@
 #CHANGELOG#
 
+Ver 2.0.26 [2018-07-18]:
+-------------------------------
+Fixed SubjectDashboard Entity issue
+
+
 Ver 2.0.24 [2018-07-10]:
 -------------------------------
 Minor Code Updates
