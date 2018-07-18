@@ -10,7 +10,12 @@ use Tk\Request;
  * @author Michael Mifsud <info@tropotek.com>
  * @see http://www.tropotek.com/
  * @license Copyright 2015 Michael Mifsud
+ *
+ *
+ * 
  * @deprecated This is a temporary object to bridge from the old EMSII and ensure the links work.
+ *
+ *
  */
 class Goals extends \App\Controller\Iface
 {
