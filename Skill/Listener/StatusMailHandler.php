@@ -13,7 +13,7 @@ class StatusMailHandler implements Subscriber
 
     /**
      * @param \App\Event\StatusEvent $event
-     * @throws \Tk\Db\Exception
+     * @throws \Exception
      */
     public function onSendAllStatusMessages(\App\Event\StatusEvent $event)
     {

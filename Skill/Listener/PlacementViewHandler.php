@@ -20,10 +20,7 @@ class PlacementViewHandler implements Subscriber
 
     /**
      * @param \Tk\Event\Event $event
-     * @throws \Dom\Exception
-     * @throws \ReflectionException
-     * @throws \Tk\Db\Exception
-     * @throws \Tk\Exception
+     * @throws \Exception
      */
     public function onControllerInit(\Tk\Event\Event $event)
     {
