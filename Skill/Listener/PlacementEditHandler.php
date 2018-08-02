@@ -40,8 +40,7 @@ class PlacementEditHandler implements Subscriber
 
     /**
      * @param Event $event
-     * @throws \Tk\Db\Exception
-     * @throws \Tk\Exception
+     * @throws \Exception
      */
     public function onPageInit(Event $event)
     {
@@ -50,15 +49,11 @@ class PlacementEditHandler implements Subscriber
         if ($controller instanceof \App\Controller\Placement\Edit) {
             $this->controller = $controller;
         }
-
     }
 
     /**
      * @param \Tk\Event\FormEvent $event
-     * @throws \Tk\Db\Exception
-     * @throws \Tk\Plugin\Exception
-     * @throws \Tk\Form\Exception
-     * @throws \Tk\Exception
+     * @throws \Exception
      */
     public function onFormLoad(\Tk\Event\FormEvent $event)
     {
@@ -74,7 +69,6 @@ class PlacementEditHandler implements Subscriber
                 'placementTypeId' => $placement->placementTypeId,
                 'requirePlacement' => true
             ));
-
             if ($placement->getId()) {
                 /** @var \Skill\Db\Collection $collection */
                 foreach ($this->collectionList as $collection) {
@@ -98,9 +92,7 @@ class PlacementEditHandler implements Subscriber
      * Check the user has access to this controller
      *
      * @param Event $event
-     * @throws \Tk\Db\Exception
-     * @throws \Tk\Exception
-     * @throws \Tk\Plugin\Exception
+     * @throws \Exception
      */
     public function onControllerInit(Event $event)
     {
@@ -136,8 +128,7 @@ class PlacementEditHandler implements Subscriber
      * Check the user has access to this controller
      *
      * @param Event $event
-     * @throws \Tk\Db\Exception
-     * @throws \Tk\Plugin\Exception
+     * @throws \Exception
      */
     public function onControllerShow(Event $event)
     {
