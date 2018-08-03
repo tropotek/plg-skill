@@ -60,16 +60,16 @@ class Manager extends AdminManagerIface
         $this->collection = \Skill\Db\CollectionMap::create()->find($request->get('collectionId'));
 
         if ($this->editUrl === null)
-            $this->editUrl = \App\Uri::createSubjectUrl('/entryEdit.html');
+            $this->editUrl = \Uni\Uri::createSubjectUrl('/entryEdit.html');
         
         if ($this->collection->gradable) {
             $this->getActionPanel()->add(\Tk\Ui\Button::create('Grade Report',
-                \App\Uri::createSubjectUrl('/collectionReport.html')->set('collectionId', $this->collection->getId()), 'fa fa-pie-chart'));
+                \Uni\Uri::createSubjectUrl('/collectionReport.html')->set('collectionId', $this->collection->getId()), 'fa fa-pie-chart'));
         }
 
         $this->actionsCell = new \Tk\Table\Cell\Actions();
         $this->actionsCell->addButton(\Tk\Table\Cell\ActionButton::create('View Entry',
-            \App\Uri::createSubjectUrl('/entryView.html'), 'fa fa-eye'))->setAppendQuery();
+            \Uni\Uri::createSubjectUrl('/entryView.html'), 'fa fa-eye'))->setAppendQuery();
 
         $this->table = \App\Config::getInstance()->createTable(\App\Config::getInstance()->getUrlName());
         $this->table->setRenderer(\App\Config::getInstance()->createTableRenderer($this->table));

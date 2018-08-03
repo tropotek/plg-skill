@@ -51,8 +51,7 @@ class SubjectEditHandler implements Subscriber
      * Check the user has access to this controller
      *
      * @param Event $event
-     * @throws \Tk\Db\Exception
-     * @throws \Tk\Exception
+     * @throws \Exception
      */
     public function onControllerInit(Event $event)
     {
@@ -61,7 +60,7 @@ class SubjectEditHandler implements Subscriber
             /** @var \Tk\Ui\Admin\ActionPanel $actionPanel */
             $actionPanel = $this->controller->getActionPanel();
             $actionPanel->add(\Tk\Ui\Button::create('Skill Collections',
-                \App\Uri::createSubjectUrl('/entryCollectionManager.html'), 'fa fa-graduation-cap'));
+                \Uni\Uri::createSubjectUrl('/entryCollectionManager.html'), 'fa fa-graduation-cap'));
         }
     }
 

@@ -48,7 +48,7 @@ class Report extends \App\Controller\AdminManagerIface
             throw new \Tk\Exception('A report is not available for this collection.');
         }
         if ($this->editUrl === null)
-            $this->editUrl = \App\Uri::createSubjectUrl('/entryResults.html')->set('collectionId', $this->collection->getId());
+            $this->editUrl = \Uni\Uri::createSubjectUrl('/entryResults.html')->set('collectionId', $this->collection->getId());
 
         $this->table = \App\Config::getInstance()->createTable(\App\Config::getInstance()->getUrlName());
         $this->table->setRenderer(\App\Config::getInstance()->createTableRenderer($this->table));

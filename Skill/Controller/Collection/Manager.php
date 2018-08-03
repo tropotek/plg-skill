@@ -60,10 +60,10 @@ class Manager extends AdminManagerIface
     {
         $this->profile = $this->findProfile($request);
         if ($this->editUrl === null)
-            $this->editUrl = \App\Uri::create('/skill/collectionEdit.html');
+            $this->editUrl = \Uni\Uri::createHomeUrl('/skill/collectionEdit.html');
 
-        $this->table = \App\Config::getInstance()->createTable(\App\Config::getInstance()->getUrlName());
-        $this->table->setRenderer(\App\Config::getInstance()->createTableRenderer($this->table));
+        $this->table = \Uni\Config::getInstance()->createTable(\App\Config::getInstance()->getUrlName());
+        $this->table->setRenderer(\Uni\Config::getInstance()->createTableRenderer($this->table));
 
         $this->table->addCell(new \Tk\Table\Cell\Checkbox('id'));
         $this->table->addCell(new \Tk\Table\Cell\Text('name'))->addCss('key')->setUrl(clone $this->editUrl);

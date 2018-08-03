@@ -212,7 +212,10 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
             $item = \Skill\Db\ItemMap::create()->find($value->item_id);
             //$val = (int)$value->value;
             $val = $value->value;
-            $grades[$item->getDomain()->getId()][$value->item_id] = $val;
+            $did = 0;
+            if ($item->getDomain())
+                $did = $item->getDomain()->getId();
+            $grades[$did][$value->item_id] = $val;
         }
         $avgs = array();
         foreach ($grades as $domainId => $valArray) {

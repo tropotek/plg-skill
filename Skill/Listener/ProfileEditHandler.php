@@ -43,7 +43,7 @@ class ProfileEditHandler implements Subscriber
                 /** @var \Tk\Ui\Admin\ActionPanel $actionPanel */
                 $actionPanel = $controller->getActionPanel();
                 $actionPanel->add(\Tk\Ui\Button::create('Skill Collections',
-                    \App\Uri::create('/skill/collectionManager.html')->set('profileId', $this->profileId), 'fa fa-graduation-cap'));
+                    \Uni\Uri::createHomeUrl('/skill/collectionManager.html')->set('profileId', $this->profileId), 'fa fa-graduation-cap'));
             }
         }
 

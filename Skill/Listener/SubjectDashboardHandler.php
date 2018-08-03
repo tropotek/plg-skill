@@ -67,7 +67,7 @@ class SubjectDashboardHandler implements Subscriber
                     if (!$entryList->count()) continue;
 
                     if ($entryList->count()) {
-                        $btn = \Tk\Ui\Button::create($collection->name . ' Results', \App\Uri::createSubjectUrl('/entryResults.html')->
+                        $btn = \Tk\Ui\Button::create($collection->name . ' Results', \Uni\Uri::createSubjectUrl('/entryResults.html')->
                             set('userId', $user->getId())->set('collectionId', $collection->getId()), $collection->icon);
                         $btn->addCss('btn-primary btn-xs');
                         $btn->setAttr('title', 'View Student ' . $collection->name . ' Results');
@@ -80,7 +80,7 @@ class SubjectDashboardHandler implements Subscriber
                 foreach ($collectionList as $collection) {
                     //if (!$collection->isAvailable() || !$collection->isAvailableToSubject($subject)) continue;
                     if (!$collection->isAvailable()) continue;
-                    $btn = \Tk\Ui\Button::create($collection->name, \App\Uri::createSubjectUrl('/entryEdit.html')->
+                    $btn = \Tk\Ui\Button::create($collection->name, \Uni\Uri::createSubjectUrl('/entryEdit.html')->
                         set('userId', $user->getId())->set('collectionId', $collection->getId()), $collection->icon);
                     $entry = \Skill\Db\EntryMap::create()->findFiltered(
                         array(
@@ -117,7 +117,7 @@ class SubjectDashboardHandler implements Subscriber
                 if (!$collection->isAvailable()) continue;
                 //if (!$collection->isAvailable() || !$collection->isAvailableToSubject($subject)) continue;
                 $actionsCell->addButton(\Tk\Table\Cell\ActionButton::create($collection->name,
-                    \App\Uri::createSubjectUrl('/entryView.html'), $collection->icon))
+                    \Uni\Uri::createSubjectUrl('/entryView.html'), $collection->icon))
                     ->setShowLabel()
                     ->setOnShow(function ($cell, $obj, $btn) use ($collection) {
                         /** @var \Tk\Table\Cell\Actions $cell */

@@ -74,7 +74,7 @@ class SidebarHandler implements Subscriber
                 if ($collection->requirePlacement) {        // Results views
                     if ($collection->gradable) {
                         $html = sprintf('<li><a href="%s" title="View %s Results">%s</a></li>',
-                            htmlentities(\App\Uri::createSubjectUrl('/entryResults.html')->set('collectionId', $collection->getId())->toString()),
+                            htmlentities(\Uni\Uri::createSubjectUrl('/entryResults.html')->set('collectionId', $collection->getId())->toString()),
                             $collection->name, $collection->name);
                     }
                 } else if ($collection->role == \Skill\Db\Collection::ROLE_STUDENT) {
@@ -86,11 +86,11 @@ class SidebarHandler implements Subscriber
                     )->current();
                     if ($e && $e->status == \Skill\Db\Entry::STATUS_APPROVED) {
                         $html = sprintf('<li><a href="%s" title="View %s">%s</a></li>',
-                            htmlentities(\App\Uri::createSubjectUrl('/entryView.html')->set('entryId', $e->getId())->toString()),
+                            htmlentities(\Uni\Uri::createSubjectUrl('/entryView.html')->set('entryId', $e->getId())->toString()),
                             $collection->name, $collection->name);
                     } else {
                         $html = sprintf('<li><a href="%s" title="Create %s">%s</a></li>',
-                            htmlentities(\App\Uri::createSubjectUrl('/entryEdit.html')->set('collectionId', $collection->getId())->toString()),
+                            htmlentities(\Uni\Uri::createSubjectUrl('/entryEdit.html')->set('collectionId', $collection->getId())->toString()),
                             $collection->name, $collection->name);
                     }
                 }
@@ -102,7 +102,7 @@ class SidebarHandler implements Subscriber
             $list = \Skill\Db\CollectionMap::create()->findFiltered( array('subjectId' => $this->subject->getId(), 'gradable' => true) );
             foreach ($list as $collection) {
                 $sidebar->addReportUrl(\Tk\Ui\Link::create($collection->name . ' Grades',
-                    \App\Uri::createSubjectUrl('/collectionReport.html')->set('collectionId', $collection->getId()), $collection->icon));
+                    \Uni\Uri::createSubjectUrl('/collectionReport.html')->set('collectionId', $collection->getId()), $collection->icon));
 
             }
         }

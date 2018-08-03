@@ -40,7 +40,7 @@ class StatusMailHandler implements Subscriber
                     $collections = \Skill\Db\CollectionMap::create()->findFiltered($filter);
                     /** @var \Skill\Db\Collection $collection */
                     foreach ($collections as $collection) {
-                        $url = \App\Uri::createInstitutionUrl('/skillEdit.html', $placement->getSubject()->getInstitution())
+                        $url = \Uni\Uri::createInstitutionUrl('/skillEdit.html', $placement->getSubject()->getInstitution())
                             ->set('h', $placement->getHash())
                             ->set('collectionId', $collection->getId());
                         $skillLinkHtml .= sprintf('<a href="%s" title="%s">%s</a> | ', htmlentities($url->toString()),

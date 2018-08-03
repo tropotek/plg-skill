@@ -72,7 +72,7 @@ class PlacementEditHandler implements Subscriber
             if ($placement->getId()) {
                 /** @var \Skill\Db\Collection $collection */
                 foreach ($this->collectionList as $collection) {
-                    $url = \App\Uri::createInstitutionUrl('/skillEdit.html', $placement->getSubject()->getInstitution())
+                    $url = \Uni\Uri::createInstitutionUrl('/skillEdit.html', $placement->getSubject()->getInstitution())
                         ->set('h', $placement->getHash())
                         ->set('collectionId', $collection->getId());
 
@@ -109,7 +109,7 @@ class PlacementEditHandler implements Subscriber
                 $entry = \Skill\Db\EntryMap::create()->findFiltered(array('collectionId' => $collection->getId(),
                     'placementId' => $placement->getId()))->current();
                 $btn = $actionPanel->add(\Tk\Ui\Button::create($collection->name,
-                    \App\Uri::createSubjectUrl('/entryEdit.html')->set('collectionId', $collection->getId())
+                    \Uni\Uri::createSubjectUrl('/entryEdit.html')->set('collectionId', $collection->getId())
                         ->set('placementId', $placement->getId())->set('subjectId', $this->subject->getId())
                         ->set('userId', $placement->getId()), $collection->icon));
 

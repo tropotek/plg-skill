@@ -47,7 +47,7 @@ class Manager extends AdminManagerIface
     {
         $this->collection = \Skill\Db\CollectionMap::create()->find($request->get('collectionId'));
 
-        $this->editUrl = \App\Uri::create('/skill/itemEdit.html');
+        $this->editUrl = \Uni\Uri::createHomeUrl('/skill/itemEdit.html');
 
         $u = clone $this->editUrl;
         $this->getActionPanel()->add(\Tk\Ui\Button::create('New Item',

@@ -40,15 +40,13 @@ class Manager extends AdminManagerIface
 
     /**
      * @param Request $request
-     * @throws \Tk\Db\Exception
-     * @throws \Tk\Exception
-     * @throws \Tk\Form\Exception
+     * @throws \Exception
      */
     public function doDefault(Request $request)
     {
         $this->collection = \Skill\Db\CollectionMap::create()->find($request->get('collectionId'));
 
-        $this->editUrl = \App\Uri::create('/skill/domainEdit.html');
+        $this->editUrl = \Uni\Uri::createHomeUrl('/skill/domainEdit.html');
 
         $u = clone $this->editUrl;
         $this->getActionPanel()->add(\Tk\Ui\Button::create('New Domain',

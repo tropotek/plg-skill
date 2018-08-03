@@ -43,7 +43,7 @@ class StudentManagerButtonHandler implements Subscriber
 
             /** @var \Skill\Db\Collection $collection */
             foreach ($collectionList as $collection) {
-                $url = \App\Uri::createSubjectUrl('/entryEdit.html')->set('collectionId', $collection->getId());
+                $url = \Uni\Uri::createSubjectUrl('/entryEdit.html')->set('collectionId', $collection->getId());
 
                 $actionsCell->addButton(\Tk\Table\Cell\ActionButton::create($collection->name, $url, $collection->icon))
                     ->setOnShow(function ($cell, $obj, $button) use ($collection) {
