@@ -420,7 +420,6 @@ WHERE
 GROUP BY a.domain_id
 ORDER BY a.order_by
 SQL;
-        vd($sql);
         $stm = $this->getDb()->prepare($sql);
         $stm->bindParam(1, $collectionId);
         $stm->bindParam(2, $subjectId);
