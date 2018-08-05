@@ -45,13 +45,14 @@ class ReportingMap
 
     /**
      *
+     *
      * @param $collectionId
      * @param $subjectId
      * @param int $userId
      * @param bool $valueOnly
      * @param string $entryStatus
      * @param string $placementStatus
-     * @return array
+     * @return array|int
      */
     public function findStudentResult($collectionId, $subjectId, $userId = 0, $valueOnly = false, $entryStatus = 'approved', $placementStatus = 'completed')
     {
@@ -190,6 +191,7 @@ SQL;
     }
 
     /**
+     * Find the student results by brake-down of domains
      * Find the average and total results for the student
      *
      * @param array $filter
@@ -295,7 +297,7 @@ GROUP BY a.user_id, b.id
 SQL;
         $sql .= $toolStr;
 
-        //vd($sql);
+        vd($sql);
 /* returns:
 1	1494	1	PD	Personal And Professional Development	0.05	10.00	4.45	8.9	Aaron Adno	637920
 1	1494	3	SB	Scientific Basis Of Clinical Practice	0.2	10.00	4.15	8.3	Aaron Adno	637920
@@ -418,7 +420,7 @@ WHERE
 GROUP BY a.domain_id
 ORDER BY a.order_by
 SQL;
-        
+        vd($sql);
         $stm = $this->getDb()->prepare($sql);
         $stm->bindParam(1, $collectionId);
         $stm->bindParam(2, $subjectId);

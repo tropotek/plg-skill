@@ -77,7 +77,7 @@ class CollectionMap extends \App\Db\Mapper
      * @param string $name
      * @param int $profileId
      * @return null|Category|\Tk\Db\ModelInterface
-     * @throws \Tk\Db\Exception
+     * @throws \Exception
      */
     public function findByName($name, $profileId)
     {
@@ -90,7 +90,7 @@ class CollectionMap extends \App\Db\Mapper
      * @param array $filter
      * @param Tool $tool
      * @return ArrayObject|Collection[]
-     * @throws \Tk\Db\Exception
+     * @throws \Exception
      */
     public function findFiltered($filter = array(), $tool = null)
     {

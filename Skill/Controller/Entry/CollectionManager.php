@@ -33,8 +33,7 @@ class CollectionManager extends \Skill\Controller\Collection\Manager
     /**
      * @param Request $request
      * @return null|\Tk\Db\Map\Model|\Tk\Db\ModelInterface
-     * @throws \Tk\Db\Exception
-     * @throws \Tk\Exception
+     * @throws \Exception
      */
     protected function findProfile(Request $request)
     {

@@ -38,8 +38,7 @@ class SubjectDashboardHandler implements Subscriber
      * Check the user has access to this controller
      *
      * @param Event $event
-     * @throws \Tk\Db\Exception
-     * @throws \Tk\Exception
+     * @throws \Exception
      */
     public function onControllerInit(Event $event)
     {
@@ -52,7 +51,7 @@ class SubjectDashboardHandler implements Subscriber
             $userList = $this->controller->getSubjectUserList();
             $userList->setOnShowUser(function (\Dom\Template $template, \App\Db\User $user) use ($subject) {
                 //$collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('profileId' => $subject->profileId, 'gradable' => true));
-                $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('profileId' => $subject->profileId, 'gradable' => true));
+                $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('profileId' => $subject->profileId, 'gradable' => true, 'requirePlacement' => true));
                 /** @var \Skill\Db\Collection $collection */
                 foreach ($collectionList as $collection) {
                     //if (!$collection->isAvailable() || !$collection->isAvailableToSubject($subject)) continue;

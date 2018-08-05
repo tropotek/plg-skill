@@ -58,8 +58,7 @@ class Results extends AdminIface
 
     /**
      * @return \Dom\Template
-     * @throws \Tk\Db\Exception
-     * @throws \Tk\Exception
+     * @throws \Exception
      */
     public function show()
     {
@@ -166,8 +165,8 @@ CSS;
         $template->setAttr('line-chart', 'data-ymax', $this->collection->getScaleLength()-1);
         $template->setAttr('line-chart', 'data-type', 'float');
 
-        $dataRow = $template->getRepeat('dataRow');
-        $dataRow->insertText('status', 'Approved');
+        $dataRow = $template->getRepeat('chart-row');
+        $dataRow->insertText('chart-label', 'Calc. Grade');
 
         $entryList = \Skill\Db\EntryMap::create()->findFiltered(array(
             'userId' => $this->user->getId(), 'subjectId' => $this->getSubject()->getId(), 'status' => \Skill\Db\Entry::STATUS_APPROVED)
@@ -178,12 +177,23 @@ CSS;
             $th->insertText('month', $entry->created->format(\Tk\Date::FORMAT_MED_DATE));
             $th->appendRepeat();
 
-            $data = $dataRow->getRepeat('td');
-            $data->insertText('td', $entry->weightedAverage);
-            $data->setAttr('td', 'data-date', $entry->created->getTimestamp()*1000);
+            $data = $dataRow->getRepeat('chart-data');
+            $data->insertText('chart-data', $entry->weightedAverage);
+            $data->setAttr('chart-data', 'data-date', $entry->created->getTimestamp()*1000);
             $data->appendRepeat();
         }
         $dataRow->appendRepeat();
+
+        // Get subject class totals
+        $res = \Skill\Util\Calculator::findSubjectAverageGrades($this->collection, $this->getSubject());
+        if ($res->count) {
+            $template->insertText('class-min', round($res->min*100, 2) . '%');
+            $template->insertText('class-median', round($res->median*100, 2) . '%');
+            $template->insertText('class-max', round($res->max*100, 2) . '%');
+        }
+
+
+
 
         return $template;
     }
@@ -235,19 +245,36 @@ CSS;
   </style>
   <div class="panel panel-default">
     <div class="panel-heading">
-      <h4 class="panel-title"><i class="fa fa-eye" var="icon"></i> <span var="panel-title">Skill Entry Results</span>
-      </h4>
+      <h4 class="panel-title"><i class="fa fa-eye" var="icon"></i> <span var="panel-title">Skill Entry Results</span></h4>
+      <div class="pull-right"><h6>Placements Assessed: <span var="entryCount"></span></h6></div>
     </div>
     <div class="panel-body">
 
       <div class="col-lg-6">
-
         <table class="table keyvalue-table">
           <tbody>
+          <!--<tr>-->
+            <!--<td class="kv-key"><i class="fa fa-hashtag kv-icon kv-icon-default"></i> Placements Assessed</td>-->
+            <!--<td class="kv-value" var="entryCount">0</td>-->
+          <!--</tr>-->
           <tr>
-            <td class="kv-key"><i class="fa fa-hashtag kv-icon kv-icon-default"></i> Placements Assessed</td>
-            <td class="kv-value" var="entryCount">0</td>
+            <td class="kv-key"><i class="fa fa-calculator kv-icon kv-icon-danger"></i> Calculated Grade</td>
+            <td class="kv-value" var="gradePcnt">0.00%</td>
           </tr>
+          
+          <tr>
+            <td class="kv-key"><i class="fa fa-thermometer-1 kv-icon kv-icon-tertiary"></i> Class Min.</td>
+            <td class="kv-value" var="class-min">0.00%</td>
+          </tr>
+          <tr>
+            <td class="kv-key"><i class="fa fa-thermometer-3 kv-icon kv-icon-secondary"></i> Class Median</td>
+            <td class="kv-value" var="class-median">0.00%</td>
+          </tr>
+          <tr>
+            <td class="kv-key"><i class="fa fa-thermometer-4 kv-icon kv-icon-primary"></i> Class Max.</td>
+            <td class="kv-value" var="class-max">0.00%</td>
+          </tr>
+          
           <tr choice="hide">
             <td class="kv-key"><i class="fa fa-exchange kv-icon kv-icon-tertiary"></i> Average Response</td>
             <td class="kv-value" var="avg">0</td>
@@ -256,11 +283,19 @@ CSS;
             <td class="kv-key"><i class="fa fa-graduation-cap kv-icon kv-icon-primary"></i> Calculated Grade</td>
             <td class="kv-value" var="grade">0.0</td>
           </tr>
-          <tr>
-            <td class="kv-key"><i class="fa fa-percent kv-icon kv-icon-secondary"></i> Calculated Grade %</td>
-            <td class="kv-value" var="gradePcnt">0.00%</td>
-          </tr>
           </tbody>
+        </table>
+      </div>
+      <div class="col-lg-4" choice="hide">
+        <table class="table line-chart" var="line-chart">
+          <tr>
+            <th>Entries</th>
+            <th repeat="month" var="month"></th>
+          </tr>
+          <tr repeat="chart-row">
+            <th var="chart-label">Average</th>
+            <td repeat="chart-data" var="chart-data">0.0</td>
+          </tr>
         </table>
       </div>
       <div class="col-lg-6">
@@ -279,20 +314,7 @@ CSS;
           </tr>
         </table>
       </div>
-      <div class="col-lg-4" choice="hide">
-
-        <table class="table line-chart" var="line-chart">
-          <tr>
-            <th>Entries</th>
-            <th repeat="month" var="month"></th>
-          </tr>
-          <tr repeat="dataRow">
-            <th var="status">Average</th>
-            <!-- data x12 -->
-            <td repeat="td" var="td">0.0</td>
-          </tr>
-        </table>
-      </div>
+      
 
       <div class="col-xs-12 category-row clearfix" repeat="category-row">
         <div class="col-xs-12">

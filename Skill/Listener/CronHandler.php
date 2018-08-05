@@ -14,7 +14,6 @@ class CronHandler implements Subscriber
 
 
     /**
-     *
      * @param Event $event
      * @throws \Exception
      */
@@ -24,14 +23,38 @@ class CronHandler implements Subscriber
         /** @var \App\Console\Cron $cronConsole */
         $cronConsole = $event->get('console');
 
-        $list = \App\Db\InstitutionMap::create()->findFiltered(array('active' => true));
+        $subjects = \App\Db\SubjectMap::create()->findFiltered(array(), \Tk\Db\Tool::create('id DESC'));
+        foreach ($subjects as $subject) {
+            $collections = \Skill\Db\CollectionMap::create()->findFiltered(array(
+                'gradable' => true,
+                'requirePlacement' => true,
+                'subjectId' => $subject->getId())
+            );
+            foreach ($collections as $collection) {
+                if ($config->isDebug()) {
+                    $students = \App\Db\UserMap::create()->findFiltered(array('subjectId' => $subject->getId(), 'role' => \App\Db\UserGroup::ROLE_STUDENT));
+                    $cronConsole->writeComment($subject->name . ' - ' . $collection->name);
+                    $cronConsole->writeComment('  - Collection ID: ' . $collection->getId());
+                    $cronConsole->writeComment('  - Subject ID:    ' . $subject->getId());
+                    $cronConsole->writeComment('  - Students:      ' . $students->count());
+                }
 
+                $res = \Skill\Util\Calculator::findSubjectAverageGrades($collection, $subject, true);  // re-cache results
+                if (!$res || !$res->count){
+                    continue;
+                }
 
+                if ($config->isDebug()) {
+                    $cronConsole->writeComment('  - Entry Count:   ' . $res->subjectEntryCount);
+                    //$cronConsole->writeComment('  - Count:        ' . $res->count);
+                    $cronConsole->writeComment('  - Min:           ' . $res->min);
+                    $cronConsole->writeComment('  - Median:        ' . $res->median);
+                    $cronConsole->writeComment('  - Max:           ' . $res->max);
+                    $cronConsole->writeComment('  - Avg:           ' . $res->avg);
+                }
+            }
 
-
-
-
-
+        }
 
     }
 
