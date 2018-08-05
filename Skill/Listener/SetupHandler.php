@@ -27,6 +27,11 @@ class SetupHandler implements Subscriber
      */
     public function onCommand(\Symfony\Component\Console\Event\ConsoleCommandEvent $event)
     {
+        $config = \Uni\Config::getInstance();
+        $dispatcher = $config->getEventDispatcher();
+
+        $dispatcher->addSubscriber(new \Skill\Listener\CronHandler());
+
         $this->setup();
     }
 
@@ -41,10 +46,9 @@ class SetupHandler implements Subscriber
          *  As any events fired before this event do not have access to
          *  the institution object, unless you manually save the id in the
          *  session on first page load?
-         *
          */
-        $config = \Tk\Config::getInstance();
-        $dispatcher = \App\Config::getInstance()->getEventDispatcher();
+        $config = \Uni\Config::getInstance();
+        $dispatcher = $config->getEventDispatcher();
         $plugin = Plugin::getInstance();
 
 ///        $institution = \Uni\Config::getInstance()->getInstitution()

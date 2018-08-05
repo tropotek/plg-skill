@@ -14,7 +14,7 @@ class PlacementManagerHandler implements Subscriber
 {
 
     /**
-     * @var \App\Db\Subject
+     * @var \App\Db\Subject|\Uni\Db\SubjectIface
      */
     private $subject = null;
 
@@ -26,7 +26,7 @@ class PlacementManagerHandler implements Subscriber
 
     /**
      * PlacementManagerHandler constructor.
-     * @param \App\Db\Subject $subject
+     * @param \App\Db\Subject|\Uni\Db\SubjectIface $subject
      */
     public function __construct($subject)
     {

@@ -40,7 +40,7 @@ class Results extends AdminIface
 
     /**
      * @param Request $request
-     * @throws \Tk\Exception
+     * @throws \Exception
      */
     public function doDefault(Request $request)
     {

@@ -14,7 +14,7 @@ class SidebarHandler implements Subscriber
 {
 
     /**
-     * @var \App\Db\Subject
+     * @var \App\Db\Subject|\Uni\Db\SubjectIface
      */
     private $subject = null;
 
@@ -27,7 +27,7 @@ class SidebarHandler implements Subscriber
 
     /**
      *  constructor.
-     * @param \App\Db\Subject $subject
+     * @param \App\Db\Subject|\Uni\Db\SubjectIface $subject
      */
     public function __construct($subject)
     {
@@ -73,9 +73,9 @@ class SidebarHandler implements Subscriber
                 $html = '';
                 if ($collection->requirePlacement) {        // Results views
                     if ($collection->gradable) {
-                        $html = sprintf('<li><a href="%s" title="View %s Results">%s</a></li>',
+                        $html = sprintf('<li><a href="%s" title="View %s Results"><i class="%s"></i> %s Results</a></li>',
                             htmlentities(\Uni\Uri::createSubjectUrl('/entryResults.html')->set('collectionId', $collection->getId())->toString()),
-                            $collection->name, $collection->name);
+                            $collection->name, $collection->icon, $collection->name);
                     }
                 } else if ($collection->role == \Skill\Db\Collection::ROLE_STUDENT) {
                     /** @var \Skill\Db\Entry $e */
