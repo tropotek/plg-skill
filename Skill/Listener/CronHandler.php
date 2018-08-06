@@ -3,6 +3,7 @@ namespace Skill\Listener;
 
 use Tk\Event\Subscriber;
 use Tk\Event\Event;
+use Symfony\Component\Console\Output\Output;
 
 /**
  * @author Michael Mifsud <info@tropotek.com>
@@ -31,27 +32,23 @@ class CronHandler implements Subscriber
                 'subjectId' => $subject->getId())
             );
             foreach ($collections as $collection) {
-                if ($config->isDebug()) {
-                    $students = \App\Db\UserMap::create()->findFiltered(array('subjectId' => $subject->getId(), 'role' => \App\Db\UserGroup::ROLE_STUDENT));
-                    $cronConsole->writeComment($subject->name . ' - ' . $collection->name);
-                    $cronConsole->writeComment('  - Collection ID: ' . $collection->getId());
-                    $cronConsole->writeComment('  - Subject ID:    ' . $subject->getId());
-                    $cronConsole->writeComment('  - Students:      ' . $students->count());
-                }
+                $students = \App\Db\UserMap::create()->findFiltered(array('subjectId' => $subject->getId(), 'role' => \App\Db\UserGroup::ROLE_STUDENT));
+                $cronConsole->writeComment($subject->name . ' - ' . $collection->name, Output::VERBOSITY_VERBOSE);
+                $cronConsole->writeComment('  - Collection ID: ' . $collection->getId(), Output::VERBOSITY_VERBOSE);
+                $cronConsole->writeComment('  - Subject ID:    ' . $subject->getId(), Output::VERBOSITY_VERBOSE);
+                $cronConsole->writeComment('  - Students:      ' . $students->count(), Output::VERBOSITY_VERBOSE);
 
                 $res = \Skill\Util\Calculator::findSubjectAverageGrades($collection, $subject, true);  // re-cache results
                 if (!$res || !$res->count){
                     continue;
                 }
 
-                if ($config->isDebug()) {
-                    $cronConsole->writeComment('  - Entry Count:   ' . $res->subjectEntryCount);
-                    //$cronConsole->writeComment('  - Count:        ' . $res->count);
-                    $cronConsole->writeComment('  - Min:           ' . $res->min);
-                    $cronConsole->writeComment('  - Median:        ' . $res->median);
-                    $cronConsole->writeComment('  - Max:           ' . $res->max);
-                    $cronConsole->writeComment('  - Avg:           ' . $res->avg);
-                }
+                $cronConsole->writeComment('  - Entry Count:   ' . $res->subjectEntryCount, Output::VERBOSITY_VERBOSE);
+                $cronConsole->writeComment('  - Min:           ' . $res->min, Output::VERBOSITY_VERBOSE);
+                $cronConsole->writeComment('  - Median:        ' . $res->median, Output::VERBOSITY_VERBOSE);
+                $cronConsole->writeComment('  - Max:           ' . $res->max, Output::VERBOSITY_VERBOSE);
+                $cronConsole->writeComment('  - Avg:           ' . $res->avg, Output::VERBOSITY_VERBOSE);
+
             }
 
         }
