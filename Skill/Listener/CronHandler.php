@@ -40,6 +40,7 @@ class CronHandler implements Subscriber
 
                 $res = \Skill\Util\Calculator::findSubjectAverageGrades($collection, $subject, true);  // re-cache results
                 if (!$res || !$res->count){
+                    $cronConsole->writeComment('  - Entry Count:   0', Output::VERBOSITY_VERBOSE);
                     continue;
                 }
 
