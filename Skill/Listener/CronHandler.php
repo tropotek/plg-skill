@@ -54,9 +54,7 @@ class CronHandler implements Subscriber
                 $cronConsole->writeComment('  - Median:        ' . $res->median, Output::VERBOSITY_VERY_VERBOSE);
                 $cronConsole->writeComment('  - Max:           ' . $res->max, Output::VERBOSITY_VERY_VERBOSE);
                 $cronConsole->writeComment('  - Avg:           ' . $res->avg, Output::VERBOSITY_VERY_VERBOSE);
-
             }
-
         }
 
     }
