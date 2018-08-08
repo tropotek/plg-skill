@@ -24,31 +24,36 @@ class CronHandler implements Subscriber
         /** @var \App\Console\Cron $cronConsole */
         $cronConsole = $event->get('console');
 
-        $subjects = \App\Db\SubjectMap::create()->findFiltered(array(), \Tk\Db\Tool::create('id DESC'));
+        $subjects = \App\Db\SubjectMap::create()->findFiltered(array('active' => true), \Tk\Db\Tool::create('id DESC'));
+        if ($subjects->count()) {
+            $cronConsole->write('');
+            $cronConsole->write(' - Updating gradable skill results cache.');
+        }
         foreach ($subjects as $subject) {
             $collections = \Skill\Db\CollectionMap::create()->findFiltered(array(
                 'gradable' => true,
                 'requirePlacement' => true,
                 'subjectId' => $subject->getId())
             );
+            $cronConsole->writeComment('', Output::VERBOSITY_VERY_VERBOSE);
             foreach ($collections as $collection) {
                 $students = \App\Db\UserMap::create()->findFiltered(array('subjectId' => $subject->getId(), 'role' => \App\Db\UserGroup::ROLE_STUDENT));
-                $cronConsole->writeComment($subject->name . ' - ' . $collection->name, Output::VERBOSITY_VERBOSE);
-                $cronConsole->writeComment('  - Collection ID: ' . $collection->getId(), Output::VERBOSITY_VERBOSE);
-                $cronConsole->writeComment('  - Subject ID:    ' . $subject->getId(), Output::VERBOSITY_VERBOSE);
-                $cronConsole->writeComment('  - Students:      ' . $students->count(), Output::VERBOSITY_VERBOSE);
+                $cronConsole->writeComment($subject->name . ' - ' . $collection->name, Output::VERBOSITY_VERY_VERBOSE);
+                $cronConsole->writeComment('  - Collection ID: ' . $collection->getId(), Output::VERBOSITY_VERY_VERBOSE);
+                $cronConsole->writeComment('  - Subject ID:    ' . $subject->getId(), Output::VERBOSITY_VERY_VERBOSE);
+                $cronConsole->writeComment('  - Students:      ' . $students->count(), Output::VERBOSITY_VERY_VERBOSE);
 
                 $res = \Skill\Util\Calculator::findSubjectAverageGrades($collection, $subject, true);  // re-cache results
                 if (!$res || !$res->count){
-                    $cronConsole->writeComment('  - Entry Count:   0', Output::VERBOSITY_VERBOSE);
+                    $cronConsole->writeComment('  - Entry Count:   0', Output::VERBOSITY_VERY_VERBOSE);
                     continue;
                 }
 
-                $cronConsole->writeComment('  - Entry Count:   ' . $res->subjectEntryCount, Output::VERBOSITY_VERBOSE);
-                $cronConsole->writeComment('  - Min:           ' . $res->min, Output::VERBOSITY_VERBOSE);
-                $cronConsole->writeComment('  - Median:        ' . $res->median, Output::VERBOSITY_VERBOSE);
-                $cronConsole->writeComment('  - Max:           ' . $res->max, Output::VERBOSITY_VERBOSE);
-                $cronConsole->writeComment('  - Avg:           ' . $res->avg, Output::VERBOSITY_VERBOSE);
+                $cronConsole->writeComment('  - Entry Count:   ' . $res->subjectEntryCount, Output::VERBOSITY_VERY_VERBOSE);
+                $cronConsole->writeComment('  - Min:           ' . $res->min, Output::VERBOSITY_VERY_VERBOSE);
+                $cronConsole->writeComment('  - Median:        ' . $res->median, Output::VERBOSITY_VERY_VERBOSE);
+                $cronConsole->writeComment('  - Max:           ' . $res->max, Output::VERBOSITY_VERY_VERBOSE);
+                $cronConsole->writeComment('  - Avg:           ' . $res->avg, Output::VERBOSITY_VERY_VERBOSE);
 
             }
 
