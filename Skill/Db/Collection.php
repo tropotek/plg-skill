@@ -148,7 +148,7 @@ class Collection extends \Tk\Db\Map\Model
 
     /**
      * @return \App\Db\Profile|null|\Tk\Db\Map\Model|\Tk\Db\ModelInterface
-     * @throws \Tk\Db\Exception
+     * @throws \Exception
      */
     public function getProfile()
     {

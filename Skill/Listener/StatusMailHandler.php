@@ -32,7 +32,7 @@ class StatusMailHandler implements Subscriber
                         'active' => true,
                         'profileId' => $message->get('placement::profileId'),
                         'role' => \Skill\Db\Collection::ROLE_COMPANY,
-                        'available' => $event->getStatus()->name,
+                        //'available' => $event->getStatus()->name,     // This stops
                         'requirePlacement' => true,
                         'placementTypeId' => $placement->placementTypeId
                     );
@@ -43,9 +43,14 @@ class StatusMailHandler implements Subscriber
                         $url = \Uni\Uri::createInstitutionUrl('/skillEdit.html', $placement->getSubject()->getInstitution())
                             ->set('h', $placement->getHash())
                             ->set('collectionId', $collection->getId());
+                        $avail = '';
+                        if (!$collection->isAvailable($placement)) {
+                            $avail = ' [Currently Unavailable]';
+                        }
                         $skillLinkHtml .= sprintf('<a href="%s" title="%s">%s</a> | ', htmlentities($url->toString()),
-                            htmlentities($collection->name), htmlentities($collection->name));
-                        $skillLinkText .= sprintf('%s: %s | ', htmlentities($collection->name), htmlentities($url->toString()));
+                            htmlentities($collection->name).$avail, htmlentities($collection->name).$avail);
+
+                        $skillLinkText .= sprintf('%s: %s | ', htmlentities($collection->name).$avail, htmlentities($url->toString()));
                     }
                 }
 
