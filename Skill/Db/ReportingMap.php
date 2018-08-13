@@ -297,7 +297,6 @@ GROUP BY a.user_id, b.id
 SQL;
         $sql .= $toolStr;
 
-        vd($sql);
 /* returns:
 1	1494	1	PD	Personal And Professional Development	0.05	10.00	4.45	8.9	Aaron Adno	637920
 1	1494	3	SB	Scientific Basis Of Clinical Practice	0.2	10.00	4.15	8.3	Aaron Adno	637920
