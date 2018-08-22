@@ -50,7 +50,7 @@ class CollectionManager extends \Skill\Controller\Collection\Manager
     {
         $template = parent::show();
 
-        $this->getActionPanel()->remove($this->getActionPanel()->findByTitle('New Collection'));
+        $this->getActionPanel()->remove($this->getActionPanel()->find('New Collection'));
 
         return $template;
     }
