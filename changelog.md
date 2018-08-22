@@ -1,5 +1,10 @@
 #CHANGELOG#
 
+Ver 2.0.42 [2018-08-23]:
+-------------------------------
+  - Fixed the Animals select plugin
+
+
 Ver 2.0.40 [2018-08-13]:
 -------------------------------
   - Added subject class min,med,max averages and cached them, refresh via cron
