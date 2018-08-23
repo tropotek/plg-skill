@@ -30,6 +30,10 @@ class SetupHandler implements Subscriber
         $config = \Uni\Config::getInstance();
         $dispatcher = $config->getEventDispatcher();
 
+        // TODO: figure a way out of this, this shows in the cmd list but fails to execute????
+        //$app = $config->getConsoleApplication()->add(new \Skill\Console\Cache());
+
+
         $dispatcher->addSubscriber(new \Skill\Listener\CronHandler());
 
         $this->setup();
