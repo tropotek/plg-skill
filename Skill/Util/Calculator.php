@@ -11,7 +11,7 @@ namespace Skill\Util;
 class Calculator
 {
 
-    const CACHE_TIMEOUT = 60*60*24*2;
+    const CACHE_TIMEOUT = 60*60*24*7;
 
 
     /**
