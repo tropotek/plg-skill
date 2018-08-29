@@ -76,7 +76,7 @@ class PlacementEditHandler implements Subscriber
                         ->set('h', $placement->getHash())
                         ->set('collectionId', $collection->getId());
 
-                    $form->addField(new \Tk\Form\Field\Input('collection-' . $collection->getId()))
+                    $form->addField(new \App\Form\Field\InputLink('collection-' . $collection->getId()))
                         ->setTabGroup('Details')->setReadonly()->setLabel($collection->name)
                         ->setFieldset('Company Skill Urls')->setValue($url->toString())
                         ->setNotes('Copy this URL to send to the ' .
