@@ -237,7 +237,8 @@ class Edit extends AdminEditIface
             $this->form->addField(new Field\Input('assessor'))->setFieldset('Entry Details')->setRequired();
             $this->form->addField(new Field\Input('absent'))->setFieldset('Entry Details');
         }
-        $this->form->addField(new Field\Textarea('notes'))->addCss('tkTextareaTool')->setLabel('Comments')->setFieldset('Entry Details');
+
+        $this->form->addField(new Field\Textarea('notes'))->addCss('')->setLabel('Comments')->setFieldset('Entry Details');
 
 
         $items = \Skill\Db\ItemMap::create()->findFiltered(array('collectionId' => $this->entry->getCollection()->getId()),
