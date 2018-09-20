@@ -348,7 +348,10 @@ class Edit extends AdminEditIface
         if ($this->entry->getCollection()->icon) {
             $template->setAttr('icon', 'class', $this->entry->getCollection()->icon);
         }
-        $template->insertHtml('instructions', $this->entry->getCollection()->instructions);
+        if ($this->entry->getCollection()->instructions) {
+            $template->insertHtml('instructions', $this->entry->getCollection()->instructions);
+            $template->show('instructions');
+        }
         if ($this->isPublic) {
             if (count($this->errors)) {
                 foreach ($this->errors as $error) {
@@ -409,8 +412,8 @@ CSS;
       <h4 class="panel-title"><i class="fa fa-pencil" var="icon"></i> <span var="panel-title">Skill Entry Edit</span></h4>
     </div>
     <div class="panel-body">
-      <div var="instructions" class="instructions"></div>
-      <hr/>
+      <div class="instructions" choice="instructions" var="instructions"></div>
+      <hr choice="instructions"/>
       <div var="form"></div>
     </div>
   </div>
