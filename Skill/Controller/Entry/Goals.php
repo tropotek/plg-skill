@@ -1,27 +1,15 @@
 <?php
 namespace Skill\Controller\Entry;
 
-use Dom\Template;
 use Tk\Request;
 
 
 /**
- *
- * @author Michael Mifsud <info@tropotek.com>
- * @see http://www.tropotek.com/
- * @license Copyright 2015 Michael Mifsud
- *
- *
- * 
  * @deprecated This is a temporary object to bridge from the old EMSII and ensure the links work.
- *
- *
+ * @todo: we can delete this safely after 2018
  */
 class Goals extends \App\Controller\Iface
 {
-
-
-
     /**
      * @param Request $request
      * @throws \Exception
@@ -36,51 +24,11 @@ class Goals extends \App\Controller\Iface
                 \Tk\Alert::addError('Invalid URL. Please contact your course coordinator.');
                 $this->getUser()->getHomeUrl()->redirect();
             }
-
-//            $url = \App\Uri::createInstitutionUrl('/skillEdit.html', $placement->getSubject()->getInstitution())
-//                ->set('collectionId', '1')
-//                ->set('userId', $placement->userId)
-//                ->set('subjectId', $placement->subjectId);
-//            //if ($message->get('placement::id'))
-//                $url->set('placementId', $placement->getId());
-
             $url = \App\Uri::createInstitutionUrl('/skillEdit.html', $placement->getSubject()->getInstitution())
                 ->set('h', $placement->getHash())
                 ->set('collectionId', '1');
-
             $url->redirect();
         }
-    }
-
-
-
-    /**
-     * @return Template
-     */
-    public function show()
-    {
-        $template = parent::show();
-
-
-        return $template;
-    }
-
-    /**
-     * DomTemplate magic method
-     *
-     * @return Template
-     */
-    public function __makeTemplate()
-    {
-        $xhtml = <<<HTML
-<div class="">
-
-  
-  
-</div>
-HTML;
-
-        return \Dom\Loader::load($xhtml);
     }
 
 }

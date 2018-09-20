@@ -39,15 +39,13 @@ class Manager extends AdminManagerIface
 
     /**
      * @param Request $request
-     * @throws \Tk\Db\Exception
-     * @throws \Tk\Exception
-     * @throws \Tk\Form\Exception
+     * @throws \Exception
      */
     public function doDefault(Request $request)
     {
         $this->collection = \Skill\Db\CollectionMap::create()->find($request->get('collectionId'));
 
-        $this->editUrl = \Uni\Uri::createHomeUrl('/skill/scaleEdit.html');
+        $this->editUrl = \Uni\Uri::createSubjectUrl('/scaleEdit.html');
 
         $u = clone $this->editUrl;
         $this->getActionPanel()->add(\Tk\Ui\Button::create('New Scale',
@@ -77,6 +75,10 @@ class Manager extends AdminManagerIface
 
     }
 
+    /**
+     * @return \Tk\Db\Map\ArrayObject
+     * @throws \Exception
+     */
     protected function getList()
     {
         $filter = $this->table->getFilterValues();

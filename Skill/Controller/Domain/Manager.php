@@ -46,7 +46,7 @@ class Manager extends AdminManagerIface
     {
         $this->collection = \Skill\Db\CollectionMap::create()->find($request->get('collectionId'));
 
-        $this->editUrl = \Uni\Uri::createHomeUrl('/skill/domainEdit.html');
+        $this->editUrl = \Uni\Uri::createSubjectUrl('/domainEdit.html');
 
         $u = clone $this->editUrl;
         $this->getActionPanel()->add(\Tk\Ui\Button::create('New Domain',
@@ -56,6 +56,7 @@ class Manager extends AdminManagerIface
         $this->table->setRenderer(\App\Config::getInstance()->createTableRenderer($this->table));
 
         $this->table->addCell(new \Tk\Table\Cell\Checkbox('id'));
+        $this->table->addCell(new \Tk\Table\Cell\Text('uid'))->setLabel('UID');
         $this->table->addCell(new \Tk\Table\Cell\Text('name'))->addCss('key')->setUrl(clone $this->editUrl);
         $this->table->addCell(new \Tk\Table\Cell\Text('label'));
         $this->table->addCell(new \Tk\Table\Cell\Text('weight'));
@@ -74,6 +75,10 @@ class Manager extends AdminManagerIface
 
     }
 
+    /**
+     * @return \Skill\Db\Domain[]|\Tk\Db\Map\ArrayObject
+     * @throws \Exception
+     */
     protected function getList()
     {
         $filter = $this->table->getFilterValues();

@@ -7,7 +7,6 @@ use Tk\Form\Field;
 use Tk\Request;
 
 
-
 /**
  * @author Michael Mifsud <info@tropotek.com>
  * @see http://www.tropotek.com/
@@ -17,15 +16,9 @@ class Manager extends AdminManagerIface
 {
 
     /**
-     * @var \App\Db\Profile
-     */
-    protected $profile = null;
-
-    /**
      * @var null|\Tk\Uri
      */
     protected $editUrl = null;
-
 
 
     /**
@@ -39,26 +32,10 @@ class Manager extends AdminManagerIface
 
     /**
      * @param Request $request
-     * @return null|\Tk\Db\Map\Model|\Tk\Db\ModelInterface
-     * @throws \Tk\Db\Exception
-     */
-    protected function findProfile(Request $request)
-    {
-        $profile = \App\Db\ProfileMap::create()->find($request->get('zoneId'));
-        if ($request->get('profileId')) {
-            $profile = \App\Db\ProfileMap::create()->find($request->get('profileId'));
-        }
-        return $profile;
-    }
-
-    /**
-     * @param Request $request
      * @throws \Exception
-     * @throws \Tk\Form\Exception
      */
     public function doDefault(Request $request)
     {
-        $this->profile = $this->findProfile($request);
         if ($this->editUrl === null)
             $this->editUrl = \Uni\Uri::createHomeUrl('/skill/collectionEdit.html');
 
@@ -66,19 +43,25 @@ class Manager extends AdminManagerIface
         $this->table->setRenderer(\Uni\Config::getInstance()->createTableRenderer($this->table));
 
         $this->table->addCell(new \Tk\Table\Cell\Checkbox('id'));
+        $this->actionsCell = new \Tk\Table\Cell\Actions();
+        $this->actionsCell->addButton(\Tk\Table\Cell\ActionButton::create('Edit Collection',
+            \Uni\Uri::createSubjectUrl('/collectionEdit.html'), 'fa fa-edit'))->setAppendQuery();
+        $this->actionsCell->addButton(\Tk\Table\Cell\ActionButton::create('View Entries',
+            \Uni\Uri::createSubjectUrl('/entryManager.html'), 'fa fa-files-o'))->setAppendQuery();
+
+        $this->table->addCell($this->actionsCell);
+
         $this->table->addCell(new \Tk\Table\Cell\Text('name'))->addCss('key')->setUrl(clone $this->editUrl);
         $this->table->addCell(new \Tk\Table\Cell\Text('role'));
         $this->table->addCell(new \Tk\Table\Cell\ArrayObject('available'))->setLabel('Placement Enabled Status');
         $this->table->addCell(new \Tk\Table\Cell\Boolean('gradable'));
         $this->table->addCell(new \Tk\Table\Cell\Boolean('viewGrade'));
         $this->table->addCell(new \Tk\Table\Cell\Boolean('requirePlacement'));
+        $this->table->addCell(new \Tk\Table\Cell\Boolean('publish'));
         $this->table->addCell(new \Tk\Table\Cell\Boolean('active'));
         $this->table->addCell(new \Tk\Table\Cell\Text('entries'))->setOnPropertyValue(function ($cell, $obj) {
             /** @var \Skill\Db\Collection $obj */
             $filter = array('collectionId' => $obj->getId());
-            if (\Uni\Config::getInstance()->getSubject()) {
-                $filter['subjectId'] = \Uni\Config::getInstance()->getSubject()->getId();
-            }
             return \Skill\Db\EntryMap::create()->findFiltered($filter)->count();
         });
         $this->table->addCell(new \Tk\Table\Cell\Date('modified'));
@@ -102,7 +85,7 @@ class Manager extends AdminManagerIface
     protected function getList()
     {
         $filter = $this->table->getFilterValues();
-        $filter['profileId'] = $this->profile->getId();
+        $filter['subjectId'] = $this->getSubjectId();
         return \Skill\Db\CollectionMap::create()->findFiltered($filter, $this->table->getTool());
     }
 
@@ -113,7 +96,7 @@ class Manager extends AdminManagerIface
     {
         $u = clone $this->editUrl;
         $this->getActionPanel()->add(\Tk\Ui\Button::create('New Collection',
-            $u->set('profileId', $this->profile->getId()), 'fa fa-graduation-cap fa-add-action'));
+            $u, 'fa fa-graduation-cap fa-add-action'));
 
         $template = parent::show();
 

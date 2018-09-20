@@ -64,7 +64,7 @@ class PlacementEditHandler implements Subscriber
 
             $this->collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array(
                 'active' => true,
-                'profileId' => $this->subject->profileId,
+                'subjectId' => $this->subject->getId(),
                 'available' => $placement->status,
                 'placementTypeId' => $placement->placementTypeId,
                 'requirePlacement' => true
@@ -108,10 +108,16 @@ class PlacementEditHandler implements Subscriber
                 if (!$collection->isAvailable($placement)) continue;
                 $entry = \Skill\Db\EntryMap::create()->findFiltered(array('collectionId' => $collection->getId(),
                     'placementId' => $placement->getId()))->current();
-                $btn = $actionPanel->add(\Tk\Ui\Button::create($collection->name,
-                    \Uni\Uri::createSubjectUrl('/entryEdit.html')->set('collectionId', $collection->getId())
+
+                $url = \Uni\Uri::createSubjectUrl('/entryEdit.html');
+                if ($entry) {
+                    $url->set('entryId', $entry->getId());
+                } else {
+                    $url->set('collectionId', $collection->getId())
                         ->set('placementId', $placement->getId())->set('subjectId', $this->subject->getId())
-                        ->set('userId', $placement->getId()), $collection->icon));
+                        ->set('userId', $placement->getId());
+                }
+                $btn = $actionPanel->add(\Tk\Ui\Button::create($collection->name, $url, $collection->icon));
 
                 if ($entry) {
                     $btn->addCss('btn-default');

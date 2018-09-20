@@ -101,17 +101,18 @@ class Edit extends AdminEditIface
         }
         if (preg_match('/[0-9a-f]{32}/i', $request->get('h'))) {
             // EG: h=13644394c4d1473f1547513fc21d7934
-            // http://ems.vet.unimelb.edu.au/goals.html?h=13644394c4d1473f1547513fc21d7934
+            // http://ems.vet.unimelb.edu.au/goals.html?h=13644394c4d1473f1547513fc21d7934&collectionId=2
             $this->placement = \App\Db\PlacementMap::create()->findByHash($request->get('h'));
             if (!$this->placement) {
                 \Tk\Alert::addError('Invalid URL. Please contact your course coordinator.');
                 $this->getUser()->getHomeUrl()->redirect();
             }
             $e = \Skill\Db\EntryMap::create()->findFiltered(array(
-                    'collectionId' => 1,
+                    'collectionId' => $request->get('collectionId'),
                     'placementId' => $this->placement->getId()
                 )
             )->current();
+
             if ($e) {
                 $this->entry = $e;
             } else {

@@ -60,6 +60,7 @@ class View extends AdminEditIface
     {
         $this->form = \App\Config::getInstance()->createForm('entryEdit');
         $this->form->setRenderer(\App\Config::getInstance()->createFormRenderer($this->form));
+        $this->form->addCss('form-horizontal');
 
         $this->form->addField(new Field\Html('title', htmlentities($this->entry->title)))->setFieldset('Entry Details');
         //if($this->entry->getCollection()->gradable && $this->getUser()->isStaff()) {

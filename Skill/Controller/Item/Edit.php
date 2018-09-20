@@ -62,6 +62,11 @@ class Edit extends AdminEditIface
         $this->form = \App\Config::getInstance()->createForm('itemEdit');
         $this->form->setRenderer(\App\Config::getInstance()->createFormRenderer($this->form));
 
+        $layout = $this->form->getRenderer()->getLayout();
+        $layout->addRow('categoryId', 'col-md-6');
+        $layout->removeRow('domainId', 'col-md-6');
+
+
         //$this->form->addField(new Field\Input('uid'))->setNotes('(optional) Use this to match up questions from other collections, for generating reports');
 
         $list = \Skill\Db\CategoryMap::create()->findFiltered(array('collectionId' => $this->item->getCollection()->getId()));
@@ -75,7 +80,7 @@ class Edit extends AdminEditIface
         }
         $this->form->addField(new Field\Input('question'))->setRequired()->setNotes('The question text to display');
         $this->form->addField(new Field\Input('description'))->setNotes('Description or help text');
-        $this->form->addField(new Field\Checkbox('publish'))->setNotes('');
+        $this->form->addField(new Field\Checkbox('publish'))->setLabel('')->setCheckboxLabel('Publish');
 
         $this->form->addField(new Event\Submit('update', array($this, 'doSubmit')));
         $this->form->addField(new Event\Submit('save', array($this, 'doSubmit')));

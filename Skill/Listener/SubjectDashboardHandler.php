@@ -50,13 +50,11 @@ class SubjectDashboardHandler implements Subscriber
         if ($this->controller instanceof \App\Controller\Staff\SubjectDashboard) {
             $userList = $this->controller->getSubjectUserList();
             $userList->setOnShowUser(function (\Dom\Template $template, \App\Db\User $user) use ($subject) {
-                //$collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('profileId' => $subject->profileId, 'gradable' => true));
-                $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('profileId' => $subject->profileId, 'gradable' => true, 'requirePlacement' => true));
+                $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(
+                    array('subjectId' => $subject->getId(), 'gradable' => true, 'requirePlacement' => true));
                 /** @var \Skill\Db\Collection $collection */
                 foreach ($collectionList as $collection) {
-                    //if (!$collection->isAvailable() || !$collection->isAvailableToSubject($subject)) continue;
                     if (!$collection->isAvailable()) continue;
-
                     // if user has a placement of at least one of the types and status
                     $entryList = \Skill\Db\EntryMap::create()->findFiltered(array(
                         'userId' => $user->getId(),
@@ -65,22 +63,20 @@ class SubjectDashboardHandler implements Subscriber
                     ));
                     if (!$entryList->count()) continue;
 
-                    if ($entryList->count()) {
-                        $btn = \Tk\Ui\Button::create($collection->name . ' Results', \Uni\Uri::createSubjectUrl('/entryResults.html')->
-                            set('userId', $user->getId())->set('collectionId', $collection->getId()), $collection->icon);
-                        $btn->addCss('btn-primary btn-xs');
-                        $btn->setAttr('title', 'View Student ' . $collection->name . ' Results');
-                        $template->prependTemplate('utr-row2', $btn->show());
-                    }
+                    $btn = \Tk\Ui\Button::create($collection->name . ' Results', \Uni\Uri::createSubjectUrl('/entryResults.html')
+                        ->set('userId', $user->getId())->set('collectionId', $collection->getId()), $collection->icon);
+                    $btn->addCss('btn-primary btn-xs');
+                    $btn->setAttr('title', 'View Student ' . $collection->name . ' Results');
+                    $template->prependTemplate('utr-row2', $btn->show());
+
                 }
 
-                $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('profileId' => $subject->profileId, 'requirePlacement' => false));
+                $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('subjectId' => $subject->getId(), 'requirePlacement' => false));
                 /** @var \Skill\Db\Collection $collection */
                 foreach ($collectionList as $collection) {
-                    //if (!$collection->isAvailable() || !$collection->isAvailableToSubject($subject)) continue;
                     if (!$collection->isAvailable()) continue;
-                    $btn = \Tk\Ui\Button::create($collection->name, \Uni\Uri::createSubjectUrl('/entryEdit.html')->
-                        set('userId', $user->getId())->set('collectionId', $collection->getId()), $collection->icon);
+                    $btn = \Tk\Ui\Button::create($collection->name, \Uni\Uri::createSubjectUrl('/entryEdit.html')
+                        ->set('userId', $user->getId())->set('collectionId', $collection->getId()), $collection->icon);
                     $entry = \Skill\Db\EntryMap::create()->findFiltered(
                         array(
                             'collectionId' => $collection->getId(),
@@ -95,8 +91,6 @@ class SubjectDashboardHandler implements Subscriber
                         $btn->setAttr('title', 'View Student ' . $collection->name);
                     } else {
                         continue;
-//                        $btn->addCss('btn-success btn-xs');
-//                        $btn->setAttr('title', 'Create Student ' . $collection->name);
                     }
 
                     $template->prependTemplate('utr-row2', $btn->show());
@@ -111,10 +105,9 @@ class SubjectDashboardHandler implements Subscriber
             $placementList = $this->controller->getPlacementList();
             $actionsCell = $placementList->getActionsCell();
 
-            $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('profileId' => $subject->profileId, 'requirePlacement' => true));
+            $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('subjectId' => $subject->getId(), 'requirePlacement' => true));
             foreach ($collectionList as $collection) {
-                if (!$collection->isAvailable()) continue;
-                //if (!$collection->isAvailable() || !$collection->isAvailableToSubject($subject)) continue;
+                if (!$collection->isAvailable() || !$collection->publish) continue;
                 $actionsCell->addButton(\Tk\Table\Cell\ActionButton::create($collection->name,
                     \Uni\Uri::createSubjectUrl('/entryView.html'), $collection->icon))
                     ->setShowLabel()

@@ -36,7 +36,6 @@ class Edit extends AdminEditIface
      *
      * @param Request $request
      * @throws \Exception
-     * @throws \Tk\Db\Exception
      */
     public function doDefault(Request $request)
     {
@@ -53,13 +52,12 @@ class Edit extends AdminEditIface
     }
 
     /**
-     * @throws \Tk\Db\Exception
-     * @throws \Tk\Form\Exception
+     * @throws \Exception
      */
     protected function buildForm() 
     {
-        $this->form = \App\Config::getInstance()->createForm('scaleEdit');
-        $this->form->setRenderer(\App\Config::getInstance()->createFormRenderer($this->form));
+        $this->form = \Uni\Config::getInstance()->createForm('scaleEdit');
+        $this->form->setRenderer(\Uni\Config::getInstance()->createFormRenderer($this->form));
 
         // text, textblock, select, checkbox, date, file(????)
         $this->form->addField(new Field\Input('name'))->setNotes('');
@@ -75,9 +73,7 @@ class Edit extends AdminEditIface
     /**
      * @param \Tk\Form $form
      * @param \Tk\Form\Event\Iface $event
-     * @throws \ReflectionException
-     * @throws \Tk\Db\Exception
-     * @throws \Tk\Exception
+     * @throws \Exception
      */
     public function doSubmit($form, $event)
     {

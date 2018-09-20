@@ -34,13 +34,11 @@ class Edit extends AdminEditIface
     /**
      * @param Request $request
      * @throws \Exception
-     * @throws \Tk\Db\Exception
-     * @throws \Tk\Form\Exception
      */
     public function doDefault(Request $request)
     {
         $this->collection = new \Skill\Db\Collection();
-        $this->collection->profileId = (int)$request->get('profileId');
+        $this->collection->subjectId = $this->getSubjectId();
         if ($request->get('collectionId')) {
             $this->collection = \Skill\Db\CollectionMap::create()->find($request->get('collectionId'));
         }
@@ -52,15 +50,22 @@ class Edit extends AdminEditIface
     }
 
     /**
-     * @throws \ReflectionException
-     * @throws \Tk\Db\Exception
-     * @throws \Tk\Exception
-     * @throws \Tk\Form\Exception
+     * @throws \Exception
      */
     protected function buildForm() 
     {
-        $this->form = \App\Config::getInstance()->createForm('collectionEdit');
-        $this->form->setRenderer(\App\Config::getInstance()->createFormRenderer($this->form));
+        $this->form = \Uni\Config::getInstance()->createForm('collectionEdit');
+        $this->form->setRenderer(\Uni\Config::getInstance()->createFormRenderer($this->form));
+
+        $layout = $this->form->getRenderer()->getLayout();
+        $layout->addRow('name', 'col-md-6');
+        $layout->removeRow('role', 'col-md-6');
+        $layout->addRow('icon', 'col-md-6');
+        $layout->removeRow('color', 'col-md-6');
+        $layout->addRow('publish', 'col-md-6');
+        $layout->removeRow('active', 'col-md-6');
+        $layout->addRow('gradable', 'col-md-6');
+        $layout->removeRow('includeZero', 'col-md-6');
 
         $tab = 'Details';
         $this->form->addField(new Field\Input('name'))->setTabGroup($tab)->setNotes('Create a label for this collection');
@@ -68,49 +73,51 @@ class Edit extends AdminEditIface
         $this->form->addField(new Field\Select('role', $list))->setTabGroup($tab)->prependOption('-- Select --', '')
             ->setNotes('');
 
-        $this->form->addField(new Field\Input('icon'))->setTabGroup($tab)
-            ->setNotes('TODO: Create a jquery plugin to select icons.... Select an Icon for this collection.');
-
-        $list = array('fa fa-eye', 'fa fa-check', 'fa fa-commenting-o', 'fa fa-cutlery', 'fa fa-desktop', 'fa fa-drivers-license'
-        , 'fa fa-question', 'fa fa-database', 'fa fa-cut', 'fa fa-euro', 'fa fa-cube', 'fa fa-crop', 'tk tk-goals');
+        $list = array('tk tk-clear', 'tk tk-goals', 'fa fa-eye', 'fa fa-user-circle-o', 'fa fa-bell', 'fa fa-certificate', 'fa fa-tv', 'fa fa-drivers-license',
+            'fa fa-leaf', 'fa fa-trophy', 'fa fa-ambulance', 'fa fa-rebel', 'fa fa-empire', 'fa fa-font-awesome', 'fa fa-heartbeat',
+            'fa fa-medkit', 'fa fa-user-md', 'fa fa-user-secret', 'fa fa-heart');
         $this->form->addField(new Field\Select('icon', Field\Select::arrayToSelectList($list, false)))->setTabGroup($tab)
             ->addCss('iconpicker')->setNotes('Select an icon for this collection');
 
-
         $this->form->addField(new Field\Input('color'))->setAttr('type', 'color')->setTabGroup($tab)
-            ->setNotes('Select a color scheme for this collection');
+            ->setNotes('Select a base color for this collection. Used to highlight the question background.');
 
+
+        $this->form->addField(new Field\Checkbox('publish'))->setTabGroup($tab)
+            ->setCheckboxLabel('Allow public users to view/edit their skill submissions');
         $this->form->addField(new Field\Checkbox('active'))->setTabGroup($tab)
-            ->setNotes('Enable this collection for user submissions.');
+            ->setCheckboxLabel('Enable/Disable this collection for the subject.');
         $this->form->addField(new Field\Checkbox('gradable'))->setTabGroup($tab)
-            ->setNotes('Calculate totals for all results. If enabled then the student can view a summary of the results. (This can be enabled in the subject settings page)');
+            ->setCheckboxLabel('If enabled then the student can view a summary of the results if the collection is published.');
         $this->form->addField(new Field\Checkbox('includeZero'))->setTabGroup($tab)
-            ->setNotes('Should the zero values be included in the weighted average calculation.');
-
+            ->setCheckboxLabel('Should the zero values be included in the weighted average calculation.');
+        
         $this->form->addField(new Field\Input('confirm'))->setTabGroup($tab)
-            ->setNotes('If enabled, the user will be prompted with the given text before they can submit their entry.');
+            ->setNotes('If set, the user will be prompted with the given text before they can submit their entry.');
+
+        $tab = 'Information';
         $this->form->addField(new Field\Textarea('instructions'))->setTabGroup($tab)
             ->addCss('mce')->setNotes('Enter any student instructions on how to complete placement entries.');
-        $this->form->addField(new Field\Textarea('notes'))->setTabGroup($tab)
-            ->addCss('tkTextareaTool')->setNotes('Staff only notes that can only be vied in this edit screen.');
+//        $this->form->addField(new Field\Textarea('notes'))->setTabGroup($tab)
+//            ->addCss('tkTextareaTool')->setNotes('Staff only notes that can only be vied in this edit screen.');
 
 
         $tab = 'Placement';
 
         $this->form->addField(new Field\Checkbox('requirePlacement'))->addCss('tk-input-toggle')->setTabGroup($tab)
-            ->setNotes('If a collection entry requires a placement to be associated with.');
+            ->setCheckboxLabel('If a collection entry requires a placement to be associated with.');
 
-        $list = \Tk\Form\Field\Select::arrayToSelectList(\Tk\ObjectUtil::getClassConstants('\App\Db\Placement', 'STATUS'));
-        $this->form->addField(new Field\Select('available[]', $list))->setTabGroup($tab)
-            ->addCss('tk-dual-select')->setAttr('data-title', 'Placement Status')
-            ->setNotes('Enable this collection on the following placement status');
-
-        $list = \App\Db\PlacementTypeMap::create()->findFiltered(array('profileId' => $this->collection->getProfile()->getId()));
+        $list = \App\Db\PlacementTypeMap::create()->findFiltered(array('subjectId' => $this->collection->getSubject()->getId()));
         $ptiField = $this->form->addField(new Field\Select('placementTypeId[]', \Tk\Form\Field\Option\ArrayObjectIterator::create($list)))
             ->setTabGroup($tab)->addCss('tk-dual-select')->setAttr('data-title', 'Placement Types')
             ->setNotes('Enable this collection for the selected placement types.');
         $list = \Skill\Db\CollectionMap::create()->findPlacementTypes($this->collection->getId());
         $ptiField->setValue($list);
+
+        $list = \Tk\Form\Field\Select::arrayToSelectList(\Tk\ObjectUtil::getClassConstants('\App\Db\Placement', 'STATUS'));
+        $this->form->addField(new Field\Select('available[]', $list))->setTabGroup($tab)
+            ->addCss('tk-dual-select')->setAttr('data-title', 'Placement Status')
+            ->setNotes('Enable this collection on the following placement status');
 
 
         if ($this->collection->getId())
@@ -124,9 +131,7 @@ class Edit extends AdminEditIface
     /**
      * @param \Tk\Form $form
      * @param \Tk\Form\Event\Iface $event
-     * @throws \ReflectionException
-     * @throws \Tk\Db\Exception
-     * @throws \Tk\Exception
+     * @throws \Exception
      */
     public function doSubmit($form, $event)
     {
@@ -166,10 +171,11 @@ class Edit extends AdminEditIface
     {
         $template = parent::show();
         if ($this->collection->getId()) {
-            $this->getActionPanel()->add(\Tk\Ui\Button::create('Domains', \Uni\Uri::createHomeUrl('/skill/domainManager.html')->set('collectionId', $this->collection->getId()), 'fa fa-black-tie'));
-            $this->getActionPanel()->add(\Tk\Ui\Button::create('Categories', \Uni\Uri::createHomeUrl('/skill/categoryManager.html')->set('collectionId', $this->collection->getId()), 'fa fa-folder-o'));
-            $this->getActionPanel()->add(\Tk\Ui\Button::create('Scale', \Uni\Uri::createHomeUrl('/skill/scaleManager.html')->set('collectionId', $this->collection->getId()), 'fa fa-balance-scale'));
-            $this->getActionPanel()->add(\Tk\Ui\Button::create('Items', \Uni\Uri::createHomeUrl('/skill/itemManager.html')->set('collectionId', $this->collection->getId()), 'fa fa-question'));
+            $this->getActionPanel()->add(\Tk\Ui\Button::create('View Entries', \Uni\Uri::createSubjectUrl('/entryManager.html')->set('collectionId', $this->collection->getId()), 'fa fa-files-o'));
+            $this->getActionPanel()->add(\Tk\Ui\Button::create('Domains', \Uni\Uri::createSubjectUrl('/domainManager.html')->set('collectionId', $this->collection->getId()), 'fa fa-black-tie'));
+            $this->getActionPanel()->add(\Tk\Ui\Button::create('Categories', \Uni\Uri::createSubjectUrl('/categoryManager.html')->set('collectionId', $this->collection->getId()), 'fa fa-folder-o'));
+            $this->getActionPanel()->add(\Tk\Ui\Button::create('Scale', \Uni\Uri::createSubjectUrl('/scaleManager.html')->set('collectionId', $this->collection->getId()), 'fa fa-balance-scale'));
+            $this->getActionPanel()->add(\Tk\Ui\Button::create('Items', \Uni\Uri::createSubjectUrl('/itemManager.html')->set('collectionId', $this->collection->getId()), 'fa fa-question'));
         }
 
         // Render the form

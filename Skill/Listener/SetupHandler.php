@@ -69,11 +69,8 @@ class SetupHandler implements Subscriber
 
         $profile = \App\Config::getInstance()->getProfile();
         if ($profile && $plugin->isZonePluginEnabled(Plugin::ZONE_SUBJECT_PROFILE, $profile->getId())) {
-            //\Tk\Log::debug($plugin->getName() . ': Sample init subject profile plugin stuff: ' . $profile->name);
-            $dispatcher->addSubscriber(new \Skill\Listener\ProfileEditHandler($profile->getId()));
             $subject = \Uni\Config::getInstance()->getSubject();
             if ($subject) {
-                $dispatcher->addSubscriber(new \Skill\Listener\SubjectEditHandler($subject));
                 $dispatcher->addSubscriber(new \Skill\Listener\PlacementEditHandler($subject));
                 $dispatcher->addSubscriber(new \Skill\Listener\SubjectDashboardHandler($subject));
                 $dispatcher->addSubscriber(new \Skill\Listener\PlacementManagerHandler($subject));
@@ -83,6 +80,7 @@ class SetupHandler implements Subscriber
             }
         }
 
+        $dispatcher->addSubscriber(new \Skill\Listener\SubjectEditHandler());
         $dispatcher->addSubscriber(new \Skill\Listener\StatusMailHandler());
 
     }

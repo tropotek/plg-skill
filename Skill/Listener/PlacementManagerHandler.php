@@ -56,7 +56,7 @@ class PlacementManagerHandler implements Subscriber
     public function addActions(\Tk\Event\TableEvent $event)
     {
         if ($this->controller) {
-            $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('profileId' => $this->subject->profileId,
+            $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('subjectId' => $this->subject->getId(),
                 'active' => true, 'requirePlacement' => true));
 
             /** @var \Tk\Table\Cell\Actions $actionsCell */
@@ -100,7 +100,7 @@ class PlacementManagerHandler implements Subscriber
     {
         if ($this->controller) {
 
-            $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('profileId' => $this->subject->profileId,
+            $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('subjectId' => $this->subject->getId(),
                 'active' => true, 'requirePlacement' => true));
 
             $table = $event->getTable();
@@ -110,7 +110,7 @@ class PlacementManagerHandler implements Subscriber
                     $value = '';
                     /** @var \Skill\Db\Collection $collection */
                     foreach ($collectionList as $collection) {
-                        $url = \App\Uri::createInstitutionUrl('/skillEdit.html', $collection->getProfile()->getInstitution())
+                        $url = \App\Uri::createInstitutionUrl('/skillEdit.html', $collection->getSubject()->getInstitution())
                             ->set('h', $obj->getHash())
                             ->set('collectionId', $collection->getId());
                         if ($collection->isAvailable($obj)) {
@@ -126,7 +126,7 @@ class PlacementManagerHandler implements Subscriber
 
                     /** @var \Skill\Db\Collection $collection */
                     foreach ($collectionList as $collection) {
-                        $url = \App\Uri::createInstitutionUrl('/skillEdit.html', $collection->getProfile()->getInstitution())
+                        $url = \App\Uri::createInstitutionUrl('/skillEdit.html', $collection->getSubject()->getInstitution())
                             ->set('h', $obj->getHash())
                             ->set('collectionId', $collection->getId());
                         if ($collection->isAvailable($obj)) {

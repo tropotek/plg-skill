@@ -28,9 +28,7 @@ class StudentManagerButtonHandler implements Subscriber
      * Check the user has access to this controller
      *
      * @param Event $event
-     * @throws \Tk\Db\Exception
-     * @throws \Tk\Exception
-     * @throws \Tk\Plugin\Exception
+     * @throws \Exception
      */
     public function onControllerInit(Event $event)
     {
@@ -38,7 +36,7 @@ class StudentManagerButtonHandler implements Subscriber
         $controller = $event->get('controller');
         if ($controller instanceof \App\Controller\User\StudentManager) {
 
-            $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('profileId' => $this->subject->profileId, 'active' => true, 'requirePlacement' => false));
+            $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('subjectId' => $this->subject->getId(), 'active' => true, 'requirePlacement' => false));
             $actionsCell = $controller->getActionsCell();
 
             /** @var \Skill\Db\Collection $collection */

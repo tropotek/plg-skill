@@ -16,6 +16,11 @@ class Scale extends \Tk\Db\Map\Model
     public $id = 0;
 
     /**
+     * @var string
+     */
+    public $uid = '';
+
+    /**
      * @var int
      */
     public $collectionId = 0;

@@ -22,9 +22,19 @@ class Collection extends \Tk\Db\Map\Model
     public $id = 0;
 
     /**
+     * @var string
+     */
+    public $uid = '';
+
+    /**
      * @var int
      */
-    public $profileId = 0;
+    //public $profileId = 0;
+
+    /**
+     * @var int
+     */
+    public $subjectId = 0;
 
     /**
      * @var string
@@ -54,7 +64,13 @@ class Collection extends \Tk\Db\Map\Model
     public $available = array();
 
     /**
-     * enable/disable user submission/editing
+     * enable/disable public user submission/editing/viewing
+     * @var boolean
+     */
+    public $publish = true;
+
+    /**
+     * enable/disable collection from all users of the ems
      * @var boolean
      */
     public $active = true;
@@ -122,9 +138,9 @@ class Collection extends \Tk\Db\Map\Model
 
 
     /**
-     * @var \App\Db\Profile
+     * @var \Uni\Db\SubjectIface
      */
-    private $profile = null;
+    private $subject = null;
 
 
 
@@ -147,19 +163,19 @@ class Collection extends \Tk\Db\Map\Model
     }
 
     /**
-     * @return \App\Db\Profile|null|\Tk\Db\Map\Model|\Tk\Db\ModelInterface
+     * @return \Uni\Db\SubjectIface
      * @throws \Exception
      */
-    public function getProfile()
+    public function getSubject()
     {
-        if (!$this->profile) {
-            $this->profile = \App\Db\ProfileMap::create()->find($this->profileId);
+        if (!$this->subject) {
+            $this->subject = \Uni\Config::getInstance()->getSubjectMapper()->find($this->subjectId);
         }
-        return $this->profile;
+        return $this->subject;
     }
 
     /**
-     * Use this to test if the public user can submit an entry
+     * Use this to test if the public user or student can submit/view an entry
      *
      * @param \App\Db\Placement $placement (optional)
      * @return bool
@@ -176,21 +192,10 @@ class Collection extends \Tk\Db\Map\Model
     }
 
     /**
-     * @param \App\Db\Subject|\Uni\Db\SubjectIface|int $subjectId
-     * @return bool
-     */
-    public function isAvailableToSubject($subjectId)
-    {
-        if ($subjectId instanceof \App\Db\Subject) $subjectId = $subjectId->getId();
-        $b = \Skill\Db\CollectionMap::create()->hasSubject($subjectId, $this->getId());
-        return $b;
-    }
-
-    /**
      * Get the total number of scale ticks/records for this collection
      *
      * @return int
-     * @throws \Tk\Db\Exception
+     * @throws \Exception
      */
     public function getScaleLength()
     {
@@ -206,8 +211,8 @@ class Collection extends \Tk\Db\Map\Model
     {
         $errors = array();
 
-        if ((int)$this->profileId <= 0) {
-            $errors['profileId'] = 'Invalid profile ID';
+        if ((int)$this->subjectId <= 0) {
+            $errors['subjectId'] = 'Invalid subject ID';
         }
         if (!$this->name) {
             $errors['name'] = 'Please enter a valid name for this collection';

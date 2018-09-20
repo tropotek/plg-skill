@@ -30,13 +30,11 @@ class StatusMailHandler implements Subscriber
                 if ($placement) {
                     $filter = array(
                         'active' => true,
-                        'profileId' => $message->get('placement::profileId'),
+                        'subjectId' => $message->get('placement::subjectId'),
                         'role' => \Skill\Db\Collection::ROLE_COMPANY,
-                        //'available' => $event->getStatus()->name,     // This stops
                         'requirePlacement' => true,
                         'placementTypeId' => $placement->placementTypeId
                     );
-
                     $collections = \Skill\Db\CollectionMap::create()->findFiltered($filter);
                     /** @var \Skill\Db\Collection $collection */
                     foreach ($collections as $collection) {

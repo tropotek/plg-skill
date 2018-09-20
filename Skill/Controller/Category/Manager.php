@@ -39,15 +39,13 @@ class Manager extends AdminManagerIface
 
     /**
      * @param Request $request
-     * @throws \Tk\Db\Exception
-     * @throws \Tk\Exception
-     * @throws \Tk\Form\Exception
+     * @throws \Exception
      */
     public function doDefault(Request $request)
     {
         $this->collection = \Skill\Db\CollectionMap::create()->find($request->get('collectionId'));
 
-        $this->editUrl = \Uni\Uri::createHomeUrl('/skill/categoryEdit.html');
+        $this->editUrl = \Uni\Uri::createSubjectUrl('/categoryEdit.html');
 
         $u = clone $this->editUrl;
         $this->getActionPanel()->add(\Tk\Ui\Button::create('New Category',
@@ -57,7 +55,9 @@ class Manager extends AdminManagerIface
         $this->table->setRenderer(\App\Config::getInstance()->createTableRenderer($this->table));
 
         $this->table->addCell(new \Tk\Table\Cell\Checkbox('id'));
+        $this->table->addCell(new \Tk\Table\Cell\Text('uid'))->setLabel('UID');
         $this->table->addCell(new \Tk\Table\Cell\Text('name'))->addCss('key')->setUrl(clone $this->editUrl);
+        $this->table->addCell(new \Tk\Table\Cell\Text('label'));
         $this->table->addCell(new \Tk\Table\Cell\Boolean('publish'));
         $this->table->addCell(new \Tk\Table\Cell\Date('modified'));
         $this->table->addCell(new \Tk\Table\Cell\OrderBy('orderBy'));
@@ -76,8 +76,7 @@ class Manager extends AdminManagerIface
 
     /**
      * @return \Skill\Db\Category[]|\Tk\Db\Map\ArrayObject
-     * @throws \Tk\Db\Exception
-     * @throws \Tk\Exception
+     * @throws \Exception
      */
     protected function getList()
     {

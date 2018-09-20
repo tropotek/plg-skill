@@ -1,5 +1,5 @@
 <?php
-namespace Skill\Controller\Collection;
+namespace Skill\Controller\Reports;
 
 use Dom\Template;
 use Tk\Request;
@@ -9,7 +9,7 @@ use Tk\Request;
  * @see http://www.tropotek.com/
  * @license Copyright 2015 Michael Mifsud
  */
-class Report extends \App\Controller\AdminManagerIface
+class CollectionReport extends \App\Controller\AdminManagerIface
 {
 
     /**
@@ -150,7 +150,7 @@ class Report extends \App\Controller\AdminManagerIface
 
         $tool = $this->table->getTool('d.name, a.name');
         $filter = $this->table->getFilterValues();
-        $filter['profileId'] = $this->getSubject()->profileId;
+        //$filter['profileId'] = $this->getSubject()->profileId;
         $filter['subjectId'] = $this->getSubject()->getId();
 
 
@@ -161,11 +161,12 @@ class Report extends \App\Controller\AdminManagerIface
         }
         if (!empty($filter['subjectId'])) {
             $where .= sprintf('c.subject_id = %d AND ', (int)$filter['subjectId']);
-        } else {
-            if (!empty($filter['profileId'])) {
-                $where .= sprintf('b.profile_id = %d AND ', (int)$filter['profileId']);
-            }
         }
+//        else {
+//            if (!empty($filter['profileId'])) {
+//                $where .= sprintf('b.profile_id = %d AND ', (int)$filter['profileId']);
+//            }
+//        }
 
         if (!empty($filter['dateStart']) && !empty($filter['dateEnd'])) {     // Contains
             $start = $filter['dateStart'];

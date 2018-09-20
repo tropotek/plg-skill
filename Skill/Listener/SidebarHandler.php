@@ -49,9 +49,7 @@ class SidebarHandler implements Subscriber
      * Check the user has access to this controller
      *
      * @param Event $event
-     * @throws \Dom\Exception
-     * @throws \Tk\Db\Exception
-     * @throws \Tk\Exception
+     * @throws \Exception
      */
     public function onSidebarShow(Event $event)
     {
@@ -64,12 +62,12 @@ class SidebarHandler implements Subscriber
         if ($user->isStudent()) {
 
             $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(
-                array('subjectId' => $subject->getId())
+                array('subjectId' => $subject->getId(), 'publish' => true)
             );
 
             /** @var \Skill\Db\Collection $collection */
             foreach ($collectionList as $collection) {
-                if (!$collection->isAvailable() || !$collection->isAvailableToSubject($subject)) continue;
+                if (!$collection->isAvailable()) continue;
                 $html = '';
                 if ($collection->requirePlacement) {        // Results views
                     if ($collection->gradable) {
@@ -85,13 +83,13 @@ class SidebarHandler implements Subscriber
                                     'userId' => $user->getId())
                     )->current();
                     if ($e && $e->status == \Skill\Db\Entry::STATUS_APPROVED) {
-                        $html = sprintf('<li><a href="%s" title="View %s">%s</a></li>',
+                        $html = sprintf('<li><a href="%s" title="View %s"><i class="%s"></i> %s</a></li>',
                             htmlentities(\Uni\Uri::createSubjectUrl('/entryView.html')->set('entryId', $e->getId())->toString()),
-                            $collection->name, $collection->name);
+                            $collection->name, $collection->icon, $collection->name);
                     } else {
-                        $html = sprintf('<li><a href="%s" title="Create %s">%s</a></li>',
+                        $html = sprintf('<li><a href="%s" title="Create %s"><i class="%s"></i> %s</a></li>',
                             htmlentities(\Uni\Uri::createSubjectUrl('/entryEdit.html')->set('collectionId', $collection->getId())->toString()),
-                            $collection->name, $collection->name);
+                            $collection->name, $collection->icon, $collection->name);
                     }
                 }
                 if ($html)

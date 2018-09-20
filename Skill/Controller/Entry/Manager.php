@@ -53,7 +53,6 @@ class Manager extends AdminManagerIface
     /**
      * @param Request $request
      * @throws \Exception
-     * @throws \Tk\Form\Exception
      */
     public function doDefault(Request $request)
     {
@@ -61,11 +60,6 @@ class Manager extends AdminManagerIface
 
         if ($this->editUrl === null)
             $this->editUrl = \Uni\Uri::createSubjectUrl('/entryEdit.html');
-        
-        if ($this->collection->gradable) {
-            $this->getActionPanel()->add(\Tk\Ui\Button::create('Grade Report',
-                \Uni\Uri::createSubjectUrl('/collectionReport.html')->set('collectionId', $this->collection->getId()), 'fa fa-pie-chart'));
-        }
 
         $this->actionsCell = new \Tk\Table\Cell\Actions();
         $this->actionsCell->addButton(\Tk\Table\Cell\ActionButton::create('View Entry',
@@ -80,10 +74,15 @@ class Manager extends AdminManagerIface
         $this->table->addCell(new \Tk\Table\Cell\Text('average'));
         $this->table->addCell(new \Tk\Table\Cell\Text('status'));
         $this->table->addCell(new \Tk\Table\Cell\Text('userId'))->setOnPropertyValue(function ($cell, $obj) {
+            /** @var \Tk\Table\Cell\Text $cell */
             /** @var \Skill\Db\Entry $obj */
-            if ($obj->getUser())
-                return $obj->getUser()->name;
-            return '';
+            if ($obj->getUser()) {
+                $value = $obj->getUser()->name;
+                $url = \Uni\Uri::createSubjectUrl('/entryResults.html')->set('userId', $obj->userId)->set('collectionId', $obj->collectionId);
+                $cell->setUrl($url, '');
+                $cell->setAttr('title', 'View student results for this subject.');
+            }
+            return $value;
         });
         $this->table->addCell(new \Tk\Table\Cell\Text('assessor'));
         $this->table->addCell(new \Tk\Table\Cell\Text('absent'));
@@ -116,10 +115,14 @@ class Manager extends AdminManagerIface
 
     /**
      * @return \Dom\Template
-     * @throws \Tk\Exception
      */
     public function show()
     {
+        $this->getActionPanel()->add(\Tk\Ui\Button::create('Edit', \Uni\Uri::createSubjectUrl('/collectionEdit.html')->set('collectionId', $this->collection->getId()), 'fa fa-edit'));
+        if ($this->collection->gradable) {
+            $this->getActionPanel()->add(\Tk\Ui\Button::create('Grade Report',
+                \Uni\Uri::createSubjectUrl('/collectionReport.html')->set('collectionId', $this->collection->getId()), 'fa fa-pie-chart'));
+        }
         $template = parent::show();
 
         $template->replaceTemplate('table', $this->table->getRenderer()->show());

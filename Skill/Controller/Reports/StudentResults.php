@@ -1,5 +1,5 @@
 <?php
-namespace Skill\Controller\Entry;
+namespace Skill\Controller\Reports;
 
 use App\Controller\AdminIface;
 use Dom\Template;
@@ -11,7 +11,7 @@ use Tk\Request;
  * @see http://www.tropotek.com/
  * @license Copyright 2015 Michael Mifsud
  */
-class Results extends AdminIface
+class StudentResults extends AdminIface
 {
 
     /**

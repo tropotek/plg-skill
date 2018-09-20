@@ -15,7 +15,7 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
      *
      * @param \App\Db\Status $status
      * @return boolean
-     * @throws \Tk\Db\Exception
+     * @throws \Exception
      */
     public function triggerStatusChange($status)
     {
@@ -41,7 +41,7 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
      * @param \App\Db\Status $status
      * @param \App\Db\MailTemplate $mailTemplate
      * @return null|\Tk\Mail\CurlyMessage
-     * @throws \Tk\Exception
+     * @throws \Exception
      */
     public function makeStatusMessage($status, $mailTemplate)
     {

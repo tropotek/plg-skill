@@ -39,15 +39,13 @@ class Manager extends AdminManagerIface
 
     /**
      * @param Request $request
-     * @throws \Tk\Db\Exception
-     * @throws \Tk\Exception
-     * @throws \Tk\Form\Exception
+     * @throws \Exception
      */
     public function doDefault(Request $request)
     {
         $this->collection = \Skill\Db\CollectionMap::create()->find($request->get('collectionId'));
 
-        $this->editUrl = \Uni\Uri::createHomeUrl('/skill/itemEdit.html');
+        $this->editUrl = \Uni\Uri::createSubjectUrl('/itemEdit.html');
 
         $u = clone $this->editUrl;
         $this->getActionPanel()->add(\Tk\Ui\Button::create('New Item',
@@ -57,7 +55,7 @@ class Manager extends AdminManagerIface
         $this->table->setRenderer(\App\Config::getInstance()->createTableRenderer($this->table));
 
         $this->table->addCell(new \Tk\Table\Cell\Checkbox('id'));
-        //$this->table->addCell(new \Tk\Table\Cell\Text('uid'))->setLabel('UID');
+        $this->table->addCell(new \Tk\Table\Cell\Text('uid'))->setLabel('UID');
         $this->table->addCell(new \Tk\Table\Cell\Text('question'))->addCss('key')->setUrl(clone $this->editUrl);
         $this->table->addCell(new \Tk\Table\Cell\Text('categoryId'))->setOnPropertyValue(function ($cell, $obj, $value) {
             /** @var \Skill\Db\Item $obj */
@@ -72,6 +70,7 @@ class Manager extends AdminManagerIface
                 return 'None';
             });
         }
+        $this->table->addCell(new \Tk\Table\Cell\Boolean('publish'));
         $this->table->addCell(new \Tk\Table\Cell\Date('modified'));
         $this->table->addCell(new \Tk\Table\Cell\OrderBy('orderBy'));
 
@@ -79,7 +78,7 @@ class Manager extends AdminManagerIface
         $this->table->addFilter(new Field\Input('keywords'))->setAttr('placeholder', 'Keywords');
 
         // Actions
-        $this->table->addAction(\Tk\Table\Action\ColumnSelect::create()->setDisabled(array('id', 'name')));
+        $this->table->addAction(\Tk\Table\Action\ColumnSelect::create()->setDisabled(array('id', 'name'))->setUnselected(array('uid', 'publish', 'modified')));
         $this->table->addAction(\Tk\Table\Action\Csv::create());
         $this->table->addAction(\Tk\Table\Action\Delete::create());
 
@@ -89,8 +88,7 @@ class Manager extends AdminManagerIface
 
     /**
      * @return \Skill\Db\Item[]|\Tk\Db\Map\ArrayObject
-     * @throws \Tk\Db\Exception
-     * @throws \Tk\Exception
+     * @throws \Exception
      */
     protected function getList()
     {

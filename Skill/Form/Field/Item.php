@@ -24,21 +24,20 @@ class Item extends \Tk\Form\Field\Input
      * __construct
      *
      * @param \Skill\Db\Item $item
-     * @throws \Tk\Db\Exception
-     * @throws \Tk\Form\Exception
+     * @throws \Exception
      */
     public function __construct($item)
     {
         parent::__construct('item-'.$item->getId());
         $this->item = $item;
-        $this->setFieldset($this->item->getCategory()->name);
+        $this->setFieldset($this->item->getCategory()->getLabel());
     }
 
     /**
      * Get the element HTML
      *
      * @return string|\Dom\Template
-     * @throws \Tk\Db\Exception
+     * @throws \Exception
      */
     public function show()
     {

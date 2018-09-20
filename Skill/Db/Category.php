@@ -16,6 +16,11 @@ class Category extends \Tk\Db\Map\Model
     public $id = 0;
 
     /**
+     * @var string
+     */
+    public $uid = '';
+
+    /**
      * @var int
      */
     public $collectionId = 0;
@@ -80,16 +85,30 @@ class Category extends \Tk\Db\Map\Model
         parent::save();
     }
 
+
     /**
-     * @return \App\Db\Profile|null|\Tk\Db\Map\Model|\Tk\Db\ModelInterface
-     * @throws \Tk\Db\Exception
+     * @return Collection
      */
     public function getCollection()
     {
         if (!$this->collection) {
-            $this->collection = CollectionMap::create()->find($this->collectionId);
+            try {
+                $this->collection = CollectionMap::create()->find($this->collectionId);
+            } catch(\Exception $e) { \Tk\Log::warning($e->__toString()); }
         }
         return $this->collection;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLabel()
+    {
+        $l = $this->name;
+        if ($this->label) {
+            $l .= ' - [' . $this->label . ']';
+        }
+        return $l;
     }
 
     /**

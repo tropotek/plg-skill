@@ -17,7 +17,6 @@ class ItemMap extends \App\Db\Mapper
 
     /**
      * @return \Tk\DataMap\DataMap
-     * @throws \Tk\Db\Exception
      */
     public function getDbMap()
     {
@@ -59,27 +58,12 @@ class ItemMap extends \App\Db\Mapper
     }
 
     /**
-     * @param string $question
-     * @param int $profileId
-     * @param int $categoryId
-     * @return null|Item|\Tk\Db\ModelInterface
-     * @throws \Tk\Db\Exception
-     */
-    public function findByName($question, $profileId, $categoryId = null) {
-        $filter = array('profileId' => $profileId, 'question' => $question);
-        if ($categoryId !== null) {
-            $filter['categoryId'] = $categoryId;
-        }
-        return $this->findFiltered($filter)->current();
-    }
-
-    /**
      * Find filtered records
      *
      * @param array $filter
      * @param Tool $tool
      * @return ArrayObject|Item[]
-     * @throws \Tk\Db\Exception
+     * @throws \Exception
      */
     public function findFiltered($filter = array(), $tool = null)
     {
@@ -101,6 +85,10 @@ class ItemMap extends \App\Db\Mapper
             }
         }
 
+
+        if (!empty($filter['uid'])) {
+            $where .= sprintf('a.uid = %s AND ', $this->quote($filter['uid']));
+        }
         if (!empty($filter['collectionId'])) {
             $where .= sprintf('a.collection_id = %s AND ', (int)$filter['collectionId']);
         }

@@ -25,12 +25,15 @@ class CollectionMap extends \App\Db\Mapper
             $this->setTable('skill_collection');
             $this->dbMap = new \Tk\DataMap\DataMap();
             $this->dbMap->addPropertyMap(new Db\Integer('id'), 'key');
-            $this->dbMap->addPropertyMap(new Db\Integer('profileId', 'profile_id'));
+            $this->dbMap->addPropertyMap(new Db\Integer('uid'));
+            //$this->dbMap->addPropertyMap(new Db\Integer('profileId', 'profile_id'));
+            $this->dbMap->addPropertyMap(new Db\Integer('subjectId', 'subject_id'));
             $this->dbMap->addPropertyMap(new Db\Text('name'));
             $this->dbMap->addPropertyMap(new Db\Text('role'));
             $this->dbMap->addPropertyMap(new Db\Text('icon'));
             $this->dbMap->addPropertyMap(new Db\Text('color'));
             $this->dbMap->addPropertyMap(new Db\ArrayObject('available'));
+            $this->dbMap->addPropertyMap(new Db\Boolean('publish'));
             $this->dbMap->addPropertyMap(new Db\Boolean('active'));
             $this->dbMap->addPropertyMap(new Db\Boolean('gradable'));
             $this->dbMap->addPropertyMap(new Db\Boolean('requirePlacement', 'require_placement'));
@@ -54,12 +57,15 @@ class CollectionMap extends \App\Db\Mapper
         if (!$this->formMap) {
             $this->formMap = new \Tk\DataMap\DataMap();
             $this->formMap->addPropertyMap(new Form\Integer('id'), 'key');
-            $this->formMap->addPropertyMap(new Form\Integer('profileId'));
+            $this->formMap->addPropertyMap(new Form\Integer('uid'));
+            //$this->formMap->addPropertyMap(new Form\Integer('profileId'));
+            $this->formMap->addPropertyMap(new Form\Integer('subjectId'));
             $this->formMap->addPropertyMap(new Form\Text('name'));
             $this->formMap->addPropertyMap(new Form\Text('role'));
             $this->formMap->addPropertyMap(new Form\Text('icon'));
             $this->formMap->addPropertyMap(new Form\Text('color'));
             $this->formMap->addPropertyMap(new Form\ObjectMap('available'));
+            $this->formMap->addPropertyMap(new Form\Boolean('publish'));
             $this->formMap->addPropertyMap(new Form\Boolean('active'));
             $this->formMap->addPropertyMap(new Form\Boolean('gradable'));
             $this->formMap->addPropertyMap(new Form\Boolean('requirePlacement'));
@@ -71,17 +77,6 @@ class CollectionMap extends \App\Db\Mapper
             $this->formMap->addPropertyMap(new Form\Text('notes'));
         }
         return $this->formMap;
-    }
-
-    /**
-     * @param string $name
-     * @param int $profileId
-     * @return null|Category|\Tk\Db\ModelInterface
-     * @throws \Exception
-     */
-    public function findByName($name, $profileId)
-    {
-        return $this->findFiltered(array('name' => $name, 'profileId' => $profileId))->current();
     }
 
     /**
@@ -112,8 +107,16 @@ class CollectionMap extends \App\Db\Mapper
             }
         }
 
-        if (!empty($filter['profileId'])) {
-            $where .= sprintf('a.profile_id = %s AND ', (int)$filter['profileId']);
+//        if (!empty($filter['profileId'])) {
+//            $where .= sprintf('a.profile_id = %s AND ', (int)$filter['profileId']);
+//        }
+
+        if (!empty($filter['uid'])) {
+            $where .= sprintf('a.uid = %s AND ', $this->quote($filter['uid']));
+        }
+
+        if (!empty($filter['subjectId'])) {
+            $where .= sprintf('a.subject_id = %s AND ', (int)$filter['subjectId']);
         }
 
         if (!empty($filter['name'])) {
@@ -136,15 +139,19 @@ class CollectionMap extends \App\Db\Mapper
             $where .= sprintf('a.active = %s AND ', (int)$filter['active']);
         }
 
-        if (isset($filter['enabledSubjectId'])) {      // Only selects collections that have been enabled in the subject
-            $from .= sprintf(', %s c', $this->quoteTable('skill_collection_subject'));
-            $where .= sprintf('a.id = c.collection_id AND c.subject_id = %s AND ', (int)$filter['enabledSubjectId']);
+        if (!empty($filter['publish'])) {
+            $where .= sprintf('a.publish = %s AND ', (int)$filter['publish']);
         }
 
-        if (!empty($filter['subjectId'])) {
-            $from .= sprintf(', %s d', $this->quoteTable('subject'));
-            $where .= sprintf('a.profile_id = d.profile_id AND d.id = %s AND ', (int)$filter['subjectId']);
-        }
+//        if (isset($filter['enabledSubjectId'])) {      // Only selects collections that have been enabled in the subject
+//            $from .= sprintf(', %s c', $this->quoteTable('skill_collection_subject'));
+//            $where .= sprintf('a.id = c.collection_id AND c.subject_id = %s AND ', (int)$filter['enabledSubjectId']);
+//        }
+
+//        if (!empty($filter['subjectId'])) {
+//            $from .= sprintf(', %s d', $this->quoteTable('subject'));
+//            $where .= sprintf('a.profile_id = d.profile_id AND d.id = %s AND ', (int)$filter['subjectId']);
+//        }
 
         if (!empty($filter['placementTypeId'])) {
             $from .= sprintf(' LEFT JOIN %s b ON (a.id = b.collection_id) ',
@@ -249,19 +256,19 @@ class CollectionMap extends \App\Db\Mapper
     }
 
 
-    public function findSubjectAverage($collectionId, $subjectId)
-    {
-        $stm = $this->getDb()->prepare('SELECT * 
-          FROM skill_value a, skill_entry b LEFT JOIN skill_item c ON (b.item_id = c.id) LEFT JOIN skill_domain d ON (c.domain_id = d.id)   
-          WHERE a.id = b.entry_id AND collection_id = ? AND subject_id = ? ');
-        $stm->bindParam(1, $collectionId);
-        $stm->execute();
-        $arr = array();
-        foreach($stm as $row) {
-            $arr[] = $row->placement_type_id;
-        }
-        return $arr;
-    }
+//    public function findSubjectAverage($collectionId, $subjectId)
+//    {
+//        $stm = $this->getDb()->prepare('SELECT *
+//          FROM skill_value a, skill_entry b LEFT JOIN skill_item c ON (b.item_id = c.id) LEFT JOIN skill_domain d ON (c.domain_id = d.id)
+//          WHERE a.id = b.entry_id AND collection_id = ? AND subject_id = ? ');
+//        $stm->bindParam(1, $collectionId);
+//        $stm->execute();
+//        $arr = array();
+//        foreach($stm as $row) {
+//            $arr[] = $row->placement_type_id;
+//        }
+//        return $arr;
+//    }
 
 
 

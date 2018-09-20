@@ -25,6 +25,7 @@ class CategoryMap extends \App\Db\Mapper
             $this->setTable('skill_category');
             $this->dbMap = new \Tk\DataMap\DataMap();
             $this->dbMap->addPropertyMap(new Db\Integer('id'), 'key');
+            $this->dbMap->addPropertyMap(new Db\Integer('uid'));
             $this->dbMap->addPropertyMap(new Db\Integer('collectionId', 'collection_id'));
             $this->dbMap->addPropertyMap(new Db\Text('name'));
             $this->dbMap->addPropertyMap(new Db\Text('label'));
@@ -45,6 +46,7 @@ class CategoryMap extends \App\Db\Mapper
         if (!$this->formMap) {
             $this->formMap = new \Tk\DataMap\DataMap();
             $this->formMap->addPropertyMap(new Form\Integer('id'), 'key');
+            $this->formMap->addPropertyMap(new Form\Integer('uid'));
             $this->formMap->addPropertyMap(new Form\Integer('collectionId'));
             $this->formMap->addPropertyMap(new Form\Text('name'));
             $this->formMap->addPropertyMap(new Form\Text('label'));
@@ -55,23 +57,12 @@ class CategoryMap extends \App\Db\Mapper
     }
 
     /**
-     * @param string $name
-     * @param int $profileId
-     * @return null|Category|\Tk\Db\ModelInterface
-     * @throws \Tk\Db\Exception
-     */
-    public function findByName($name, $profileId)
-    {
-        return $this->findFiltered(array('name' => $name, 'profileId' => $profileId))->current();
-    }
-
-    /**
      * Find filtered records
      *
      * @param array $filter
      * @param Tool $tool
      * @return ArrayObject|Category[]
-     * @throws \Tk\Db\Exception
+     * @throws \Exception
      */
     public function findFiltered($filter = array(), $tool = null)
     {
@@ -91,6 +82,10 @@ class CategoryMap extends \App\Db\Mapper
             if ($w) {
                 $where .= '(' . substr($w, 0, -3) . ') AND ';
             }
+        }
+
+        if (!empty($filter['uid'])) {
+            $where .= sprintf('a.uid = %s AND ', $this->quote($filter['uid']));
         }
 
         if (!empty($filter['collectionId'])) {

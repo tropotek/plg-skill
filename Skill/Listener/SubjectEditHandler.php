@@ -14,11 +14,6 @@ class SubjectEditHandler implements Subscriber
 {
 
     /**
-     * @var \App\Db\Subject
-     */
-    private $subject = null;
-
-    /**
      * @var \App\Controller\Subject\Edit
      */
     protected $controller = null;
@@ -28,9 +23,9 @@ class SubjectEditHandler implements Subscriber
     /**
      * @param $subject
      */
-    public function __construct($subject)
+    public function __construct()
     {
-        $this->subject = $subject;
+
     }
 
 
@@ -60,60 +55,77 @@ class SubjectEditHandler implements Subscriber
             /** @var \Tk\Ui\Admin\ActionPanel $actionPanel */
             $actionPanel = $this->controller->getActionPanel();
             $actionPanel->add(\Tk\Ui\Button::create('Skill Collections',
-                \Uni\Uri::createSubjectUrl('/entryCollectionManager.html'), 'fa fa-graduation-cap'));
+                \Uni\Uri::createSubjectUrl('/collectionManager.html'), 'fa fa-graduation-cap'));
         }
     }
 
     /**
-     * @param \Tk\Event\FormEvent $event
-     * @throws \Tk\Db\Exception
-     * @throws \Tk\Form\Exception
-     */
-    public function onFormInit($event)
-    {
-        if (!$this->controller) return;
-
-        $form = $event->getForm();
-
-        $list = \Skill\Db\CollectionMap::create()->findFiltered(
-            array('profileId' => $this->subject->profileId)
-        );
-        $field = $form->addField(new \Tk\Form\Field\Select(\Skill\Db\Collection::FIELD_ENABLE_RESULTS.'[]', \Tk\Form\Field\Option\ArrayObjectIterator::create($list)))->addCss('tk-dual-select')
-            ->setAttr('data-title', 'Enabled Skill Collections')->setNotes('Enable/Disable the Skill Collections students can access.');
-        $selected = \Skill\Db\CollectionMap::create()->findFiltered(
-            array('enabledSubjectId' => $this->subject->getId())
-        );
-        $field->setValue($selected->toArray('id'));
-
-        $form->addEventCallback('update', array($this, 'doSubmit'));
-        $form->addEventCallback('save', array($this, 'doSubmit'));
-    }
-
-
-
-    /**
-     * @param \Tk\Form $form
-     * @param \Tk\Form\Event\Iface $event
+     * @param \Bs\Event\DbEvent $event
      * @throws \Exception
      */
-    public function doSubmit($form, $event)
+    public function onCreateSubject(\Bs\Event\DbEvent $event)
     {
-        $list = $form->getFieldValue(\Skill\Db\Collection::FIELD_ENABLE_RESULTS);
-        if (!is_array($list)) {
-            $form->addFieldError(\Skill\Db\Collection::FIELD_ENABLE_RESULTS, 'Invalid collection values given.');
+        /** @var \Uni\Db\Subject $model */
+        $model = $event->getModel();
+        if (!$model instanceof \Uni\Db\SubjectIface) return;
+        $previous = \Uni\Config::getInstance()->getLastCreatedSubject();
+        if ($model->getId() == $previous->getId()) {
+            $previous = \Uni\Config::getInstance()->getLastCreatedSubject(true);
         }
+        $subjectId = $previous->getId();
+        $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('subjectId' => $subjectId), \Tk\Db\Tool::create('id'));
 
-        if ($form->hasErrors()) {
-            return;
+        // Copy Subject Collections
+        foreach ($collectionList as $collection) {
+            \Tk\Log::debug('Copying Skill Collection: ' . $collection->name);
+            $newC = clone $collection;
+            $newC->subjectId = $model->getVolatileId();
+            $newC->publish = false;
+            $newC->active = true;
+            $newC->save();
+            // Copy placement_type
+            \Tk\Log::debug('Copying Skill Placement Types');
+            $list = \Skill\Db\CollectionMap::create()->findPlacementTypes($collection->getId());
+            foreach ($list as $id) {
+                \Skill\Db\CollectionMap::create()->addPlacementType($newC->getId(), $id);
+            }
+            // Copy Domains
+            \Tk\Log::debug('Copying Skill Domains');
+            $list = \Skill\Db\DomainMap::create()->findFiltered(array('collectionId' => $collection->getId()));
+            foreach ($list as $src) {
+                $dst = clone $src;
+                $dst->collectionId = $newC->getId();
+                $dst->save();
+            }
+            // Copy Categories
+            \Tk\Log::debug('Copying Skill Categories');
+            $list = \Skill\Db\CategoryMap::create()->findFiltered(array('collectionId' => $collection->getId()));
+            foreach ($list as $src) {
+                $dst = clone $src;
+                $dst->collectionId = $newC->getId();
+                $dst->save();
+            }
+            // Copy Scale
+            \Tk\Log::debug('Copying Skill Scale');
+            $list = \Skill\Db\ScaleMap::create()->findFiltered(array('collectionId' => $collection->getId()));
+            foreach ($list as $src) {
+                $dst = clone $src;
+                $dst->collectionId = $newC->getId();
+                $dst->save();
+            }
+            // Copy Items
+            \Tk\Log::debug('Copying Skill Items');
+            $list = \Skill\Db\ItemMap::create()->findFiltered(array('collectionId' => $collection->getId()));
+            foreach ($list as $src) {
+                $dst = clone $src;
+                $dst->collectionId = $newC->getId();
+                $dst->save();
+            }
         }
-
-        // Save collection links
-        \Skill\Db\CollectionMap::create()->removeSubject($this->subject->getId());
-        foreach ($list as $collectionId) {
-            \Skill\Db\CollectionMap::create()->addSubject($this->subject->getId(), $collectionId);
-        }
-
+        \Tk\Log::debug('Copying Collections Complete');
     }
+
+
 
     /**
      * Returns an array of event names this subscriber wants to listen to.
@@ -140,7 +152,8 @@ class SubjectEditHandler implements Subscriber
         return array(
             \Tk\Kernel\KernelEvents::CONTROLLER => array('onKernelController', 0),
             \Tk\PageEvents::CONTROLLER_INIT => array('onControllerInit', 0),
-            \Tk\Form\FormEvents::FORM_LOAD => array('onFormInit', 0)
+            \Bs\DbEvents::MODEL_INSERT => array('onCreateSubject', 0),
+            //\Tk\Form\FormEvents::FORM_LOAD => array('onFormInit', 0)
         );
     }
     
