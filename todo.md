@@ -7,3 +7,4 @@
     Also optimise the current SQL queries as they are rather large and cumbersome, 
     This makes them hard to edit and maintain.
 
+  - delete tags 2.0.56 and 2.0.54 as that should have been pushed into 2.1.0 
