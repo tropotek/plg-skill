@@ -1,23 +1,14 @@
 -- ----------------------------------
 -- @author mifsudm@unimelb.edu.au
 -- ----------------------------------
-/*
-# Cant do this as this would put it all out of sync after a change is made to the collection GGGGRRRRRRRR!!!!!!!!!!!
-# ALTER TABLE skill_value ADD category_id int UNSIGNED DEFAULT 0 NOT NULL AFTER item_id;
-# ALTER TABLE skill_value ADD domain_id int UNSIGNED DEFAULT 0 NOT NULL AFTER category_id;
-# UPDATE `skill_value` a, `skill_item` b
-#   SET a.`category_id` = b.`category_id`, a.`domain_id` = b.`domain_id`
-#   WHERE a.item_id = b.id
-# ;
 
-# THAT DOES IT THEN ONE COLLECTION PER SUBJECT IS ALL I CAN DO!!!!!!!!!
-# A LOT OF DATA SPACE WILL BE USED GRRRRRRRR!!!!!!
-*/
 
+-- Update collection Icons
 UPDATE `skill_collection` SET `icon` = REPLACE(`icon`, 'fa fa-question', 'fa fa-user-circle-o');
 UPDATE `skill_collection` SET `icon` = REPLACE(`icon`, 'fa fa-commenting-o', 'fa fa-user-md');
 
-ALTER TABLE skill_collection ADD publish TINYINT DEFAULT 1 NOT NULL AFTER available;
+
+
 ALTER TABLE skill_collection ADD org_id int UNSIGNED DEFAULT 0 NOT NULL AFTER id;
 ALTER TABLE skill_collection ADD subject_id int UNSIGNED DEFAULT 0 NOT NULL AFTER profile_id;
 INSERT INTO skill_collection (org_id, uid, profile_id, subject_id, name, role, icon, color, available, active, gradable, require_placement, max_grade,
@@ -29,6 +20,17 @@ INSERT INTO skill_collection (org_id, uid, profile_id, subject_id, name, role, i
     WHERE a.profile_id = b.profile_id
   )
 ;
+
+CREATE INDEX skill_collection_subject_id_index ON skill_collection (subject_id);
+DROP INDEX profile_id ON skill_collection;
+
+ALTER TABLE skill_collection ADD publish TINYINT DEFAULT 0 NOT NULL AFTER available;
+UPDATE skill_collection a, skill_collection_subject b
+SET a.publish = 1
+WHERE a.org_id = b.collection_id AND a.subject_id = b.subject_id
+;
+
+
 
 -- Category
 ALTER TABLE skill_category ADD org_id int UNSIGNED DEFAULT 0 NOT NULL AFTER id;
