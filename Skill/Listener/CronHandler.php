@@ -35,9 +35,10 @@ class CronHandler implements Subscriber
                 'requirePlacement' => true,
                 'subjectId' => $subject->getId())
             );
-            $cronConsole->writeComment('', Output::VERBOSITY_VERY_VERBOSE);
             foreach ($collections as $collection) {
                 $students = \App\Db\UserMap::create()->findFiltered(array('subjectId' => $subject->getId(), 'role' => \App\Db\UserGroup::ROLE_STUDENT));
+
+                $cronConsole->writeComment('', Output::VERBOSITY_VERY_VERBOSE);
                 $cronConsole->writeComment($subject->name . ' - ' . $collection->name, Output::VERBOSITY_VERY_VERBOSE);
                 $cronConsole->writeComment('  - Collection ID: ' . $collection->getId(), Output::VERBOSITY_VERY_VERBOSE);
                 $cronConsole->writeComment('  - Subject ID:    ' . $subject->getId(), Output::VERBOSITY_VERY_VERBOSE);
