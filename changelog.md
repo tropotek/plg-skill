@@ -1,5 +1,10 @@
 #CHANGELOG#
 
+Ver 2.0.54 [2018-09-24]:
+-------------------------------
+  - Updated skill collections to be subject instances to retain historic data correctly
+
+
 Ver 2.0.52 [2018-09-04]:
 -------------------------------
 
