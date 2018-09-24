@@ -86,16 +86,19 @@ class CollectionMap extends \App\Db\Mapper
      */
     public function fixChangeoverEntries()
     {
-        $db = $this->getDb();
         \Tk\Log::info('Fixing Skill Entries and item Values... (Remove After: Jan 2019)');
+        if ($this->getConfig()->isDebug()) {
+            \Tk\Log::info('   - Stopped (debug mode)');
+            return;
+        }
 
         // Update Entry collection_id for old Link submissions
         try {
-            $db->exec('UPDATE skill_entry a, skill_collection b
+            $this->getDb()->exec('UPDATE skill_entry a, skill_collection b
     SET a.collection_id = b.id
     WHERE a.collection_id = b.org_id AND a.subject_id = b.subject_id');
 
-        $db->exec('UPDATE skill_entry c, skill_item b, skill_value a
+            $this->getDb()->exec('UPDATE skill_entry c, skill_item b, skill_value a
 SET a.item_id = b.id
 WHERE c.collection_id = b.collection_id AND a.item_id = b.org_id AND a.entry_id = c.id');
 
