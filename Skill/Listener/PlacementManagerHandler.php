@@ -42,7 +42,12 @@ class PlacementManagerHandler implements Subscriber
         /** @var \App\Controller\Placement\Edit $controller */
         $controller = $event->getController();
         if ($controller instanceof \App\Controller\Placement\Manager) {
+            $config = \Uni\Config::getInstance();
             $this->controller = $controller;
+
+            if (!$config->getUser()->isStudent()) {
+                \Skill\Db\CollectionMap::create()->fixChangeoverEntries();
+            }
         }
 
     }

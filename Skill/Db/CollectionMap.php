@@ -80,6 +80,31 @@ class CollectionMap extends \App\Db\Mapper
     }
 
     /**
+     * TODO: This can be removed by Jan 2019 as that would be enough time
+     * TODO:   for all old Entry links in emails to be no-longer valid...
+     *
+     */
+    public function fixChangeoverEntries()
+    {
+        $db = $this->getDb();
+        \Tk\Log::info('Fixing Skill Entries and item Values... (Remove After: Jan 2019)');
+
+        // Update Entry collection_id for old Link submissions
+        try {
+            $db->exec('UPDATE skill_entry a, skill_collection b
+    SET a.collection_id = b.id
+    WHERE a.collection_id = b.org_id AND a.subject_id = b.subject_id');
+
+        $db->exec('UPDATE skill_entry c, skill_item b, skill_value a
+SET a.item_id = b.id
+WHERE c.collection_id = b.collection_id AND a.item_id = b.org_id AND a.entry_id = c.id');
+
+        } catch (\Exception $e) {
+            \Tk\Log::error($e->__toString());
+        }
+    }
+
+    /**
      * Find filtered records
      *
      * @param array $filter

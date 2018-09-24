@@ -119,9 +119,12 @@ class Edit extends AdminEditIface
                 $this->entry->placementId = $this->placement->getId();
                 $this->entry->userId = $this->placement->userId;
                 $this->entry->subjectId = $this->placement->subjectId;
-                // TODO: Remove this once all old EMS II email urls are no longer valid, sometime after June 2018
-                if (!$this->entry->collectionId)
-                    $this->entry->collectionId = 1; // This should be supplied in the request.
+//                // TODO: Remove this once all old EMS II email urls are no longer valid, sometime after June 2018
+//                if (!$this->entry->collectionId)
+//                    $this->entry->collectionId = 1; // This should be supplied in the request.
+                if (!$this->entry->collectionId) {
+                    throw new \Tk\Exception('Invalid collection ID. Please contact the site Administrator.');
+                }
             }
         }
         if (!$this->entry->subjectId && $this->getSubject()) {
