@@ -84,7 +84,7 @@ class EntryMap extends \App\Db\Mapper
             $kw = '%' . $this->getDb()->escapeString($filter['keywords']) . '%';
             $w = '';
             $w .= sprintf('a.title LIKE %s OR ', $this->getDb()->quote($kw));
-            $w .= sprintf('a.location LIKE %s OR ', $this->getDb()->quote($kw));
+            $w .= sprintf('a.assessor LIKE %s OR ', $this->getDb()->quote($kw));
             if (is_numeric($filter['keywords'])) {
                 $id = (int)$filter['keywords'];
                 $w .= sprintf('a.id = %d OR ', $id);
