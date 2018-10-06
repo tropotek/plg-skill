@@ -87,6 +87,16 @@ INSERT INTO skill_item (org_id, uid, collection_id, category_id, domain_id, ques
     ORDER BY a.id
     )
 ;
+-- No domain
+INSERT INTO skill_item (org_id, uid, collection_id, category_id, question, description, publish, order_by, del, modified, created)
+    (
+    SELECT b.id, b.uid, a.id, c.id, b.question, b.description, b.publish, b.order_by, b.del, b.modified, b.created
+    FROM skill_collection a, skill_item b, skill_category c
+    WHERE a.org_id = 4 AND a.org_id = b.collection_id AND
+          a.id = c.collection_id AND b.category_id = c.org_id
+    ORDER BY a.id
+    )
+;
 
 -- Entry
 UPDATE skill_entry a, skill_collection b
