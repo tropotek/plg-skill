@@ -119,6 +119,11 @@ ALTER TABLE `skill_value` ADD INDEX(`entry_id`);
 ALTER TABLE `skill_value` ADD INDEX(`item_id`);
 
 
+UPDATE skill_entry c, skill_item b, skill_value a
+  SET a.item_id = b.id
+  WHERE c.collection_id = b.collection_id AND a.item_id = b.org_id AND a.entry_id = c.id
+;
+
 -- -----------------------------------------
 -- Delete temp and unneeded cols (may keep until all data is verified by Alana or someone?)
 -- -----------------------------------------
