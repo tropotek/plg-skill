@@ -114,8 +114,12 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
     {
         /** @var Entry $model */
         $model = $this->getStatus()->getModel();
-        $editUrl = \Uni\Uri::createSubjectUrl('/entryEdit.html')->set('collectionId', $model->collectionId)->
+
+        $editUrl = \Uni\Uri::createSubjectUrl('/entryEdit.html')->set('entryId', $model->getId());
+        if (!$model->getId()) {
+            $editUrl = \Uni\Uri::createSubjectUrl('/entryEdit.html')->set('collectionId', $model->collectionId)->
             set('userId', $model->userId)->set('placementId', $model->placementId);
+        }
 
         // TODO: get the icon from the entry collection
         $collection = $model->getCollection();
