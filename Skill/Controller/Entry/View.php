@@ -53,8 +53,7 @@ class View extends AdminEditIface
     }
 
     /**
-     * @throws \Tk\Db\Exception
-     * @throws \Tk\Form\Exception
+     * @throws \Exception
      */
     protected function buildForm() 
     {
@@ -66,13 +65,13 @@ class View extends AdminEditIface
         //if($this->entry->getCollection()->gradable && $this->getUser()->isStaff()) {
         if($this->entry->getCollection()->gradable) {
             $pct = round(($this->entry->calcAverage()/($this->entry->getCollection()->getScaleLength()-1))*100);
-            $this->form->addField(new Field\Html('average', sprintf('%.2f &nbsp; (%d%%)', $this->entry->calcAverage(), $pct)))->setFieldset('Entry Details');
+            $this->form->addField(new Field\Html('average', sprintf('%.2f &nbsp; (%d%%)', $this->entry->calcAverage(), $pct)))
+                ->setFieldset('Entry Details');
 //            if ($this->getUser()->isStaff()) {
 //                $pct = round(($this->entry->weightedAverage / ($this->entry->getCollection()->getScaleLength() - 1)) * 100);
 //                $this->form->addField(new Field\Html('weightedAverage', sprintf('%.2f &nbsp; (%d%%)', $this->entry->weightedAverage, $pct)))->setFieldset('Entry Details');
 //            }
         }
-
 
         $this->form->addField(new Field\Html('status'))->setFieldset('Entry Details');
         $this->form->addField(new Field\Html('assessor', htmlentities($this->entry->assessor)))->setFieldset('Entry Details');
@@ -112,7 +111,7 @@ class View extends AdminEditIface
         }
 
         // TODO: this is a bit hacky fix it properly....
-        $template->appendCss('.error-block { display: none !important; position: absolute !important;} ');
+        $template->appendCss('.error-block { display: none !important; position: absolute !important; } ');
 
         // Render the form
         $template->insertTemplate('form', $this->form->getRenderer()->show());
