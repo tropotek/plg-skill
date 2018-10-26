@@ -97,6 +97,16 @@ INSERT INTO skill_item (org_id, uid, collection_id, category_id, question, descr
     ORDER BY a.id
     )
 ;
+INSERT INTO skill_item (org_id, uid, collection_id, category_id, question, description, publish, order_by, del, modified, created)
+    (
+    SELECT b.id, b.uid, a.id, c.id, b.question, b.description, b.publish, b.order_by, b.del, b.modified, b.created
+    FROM skill_collection a, skill_item b, skill_category c
+    WHERE a.org_id = 5 AND a.org_id = b.collection_id AND
+          a.id = c.collection_id AND b.category_id = c.org_id
+    ORDER BY a.id
+    )
+;
+
 
 -- Entry
 UPDATE skill_entry a, skill_collection b
@@ -105,7 +115,7 @@ UPDATE skill_entry a, skill_collection b
 ;
 
 -- Value
-# TODO Take note, the speed of this query is fast and low mem usage because we left the slikk_value table until last ;-)
+# TODO Take note, the speed of this query is fast and low mem usage because we left the skill_value table until last ;-)
 # SELECT c.id as 'entry_id', a.item_id, a.value, b.id as 'new_item_id', b.collection_id
 # FROM skill_entry c, skill_item b, skill_value a
 #   WHERE c.collection_id = b.collection_id AND a.item_id = b.org_id AND a.entry_id = c.id
@@ -117,6 +127,65 @@ UPDATE skill_entry c, skill_item b, skill_value a
 ;
 ALTER TABLE `skill_value` ADD INDEX(`entry_id`);
 ALTER TABLE `skill_value` ADD INDEX(`item_id`);
+
+
+
+
+--- SAF custom fix
+
+
+
+UPDATE `skill_category` t SET t.`uid` = '1' WHERE t.`id` = 34;
+UPDATE `skill_category` t SET t.`uid` = '1' WHERE t.`id` = 31;
+UPDATE `skill_category` t SET t.`uid` = '3' WHERE t.`id` = 36;
+UPDATE `skill_category` t SET t.`uid` = '2' WHERE t.`id` = 35;
+UPDATE `skill_category` t SET t.`uid` = '2' WHERE t.`id` = 32;
+UPDATE `skill_category` t SET t.`uid` = '3' WHERE t.`id` = 33;
+
+UPDATE `skill_category` t SET t.`uid` = '3' WHERE t.`id` = 553;
+UPDATE `skill_category` t SET t.`uid` = '3' WHERE t.`id` = 550;
+UPDATE `skill_category` t SET t.`uid` = '1' WHERE t.`id` = 548;
+UPDATE `skill_category` t SET t.`uid` = '1' WHERE t.`id` = 551;
+UPDATE `skill_category` t SET t.`uid` = '2' WHERE t.`id` = 549;
+UPDATE `skill_category` t SET t.`uid` = '2' WHERE t.`id` = 552;
+
+UPDATE `skill_category` t SET t.`org_id` = 31 WHERE t.`id` = 551;
+UPDATE `skill_category` t SET t.`org_id` = 33 WHERE t.`id` = 550;
+UPDATE `skill_category` t SET t.`org_id` = 31 WHERE t.`id` = 548;
+UPDATE `skill_category` t SET t.`org_id` = 32 WHERE t.`id` = 549;
+UPDATE `skill_category` t SET t.`org_id` = 33 WHERE t.`id` = 553;
+UPDATE `skill_category` t SET t.`org_id` = 32 WHERE t.`id` = 552;
+
+
+UPDATE `skill_collection` t SET t.`org_id` = 4 WHERE t.`id` = 69;
+UPDATE `skill_collection` t SET t.`org_id` = 4 WHERE t.`id` = 70;
+
+INSERT INTO skill_item (org_id, uid, collection_id, category_id, question, description, publish, order_by, del, modified, created)
+    (
+    SELECT b.id, b.uid, a.id, c.id, b.question, b.description, b.publish, b.order_by, b.del, b.modified, b.created
+    FROM skill_collection a, skill_item b, skill_category c
+    WHERE (a.id = 69 OR a.id = 70) AND a.org_id = b.collection_id AND
+          a.id = c.collection_id AND b.category_id = c.org_id
+    ORDER BY a.id
+    )
+;
+
+
+
+
+INSERT INTO skill_item (org_id, uid, collection_id, category_id, question, description, publish, order_by, del, modified, created)
+    (
+    SELECT b.id, b.uid, a.id, c.id, b.question, b.description, b.publish, b.order_by, b.del, b.modified, b.created
+    FROM skill_collection a, skill_item b, skill_category c
+    WHERE (a.id = 22 OR a.id = 23) AND a.org_id = b.collection_id AND
+          a.id = c.collection_id AND b.category_id = c.org_id
+    ORDER BY a.id
+    )
+;
+
+
+
+
 
 
 
