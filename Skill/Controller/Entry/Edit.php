@@ -397,6 +397,15 @@ class Edit extends AdminEditIface
 CSS;
         $template->appendCss($css);
 
+        $js = <<<JS
+jQuery(function ($) {
+  if (config.role === 'staff') {
+    $('#entryEdit .tk-form-events').clone(true).appendTo($('.tk-form fieldset.EntryDetails'));
+  }
+});
+JS;
+        $template->appendJs($js);
+
         return $template;
     }
 
