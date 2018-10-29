@@ -1,5 +1,11 @@
 #CHANGELOG#
 
+Ver 2.1.14 [2018-10-30]:
+-------------------------------
+  - Added extra event buttons to goals edit entry page
+  - Fixed Placement Manager table cell errors.
+
+
 Ver 2.1.12 [2018-10-26]:
 -------------------------------
 
