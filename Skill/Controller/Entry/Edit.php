@@ -202,6 +202,10 @@ class Edit extends AdminEditIface
             }
         }
 
+        if (!$this->getUser()->isStudent()) {
+            \Skill\Db\CollectionMap::create()->fixChangeoverEntries();
+        }
+
     }
 
     /**
