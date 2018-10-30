@@ -123,7 +123,7 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     }
 
     /**
-     * @throws \Tk\Db\Exception
+     * @throws \Exception
      */
     public function save()
     {
@@ -141,7 +141,7 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 
     /**
      * @return \Skill\Db\Collection|null|\Tk\Db\Map\Model|\Tk\Db\ModelInterface
-     * @throws \Tk\Db\Exception
+     * @throws \Exception
      */
     public function getCollection()
     {
@@ -153,7 +153,7 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 
     /**
      * @return \App\Db\Subject|null|\Tk\Db\Map\Model|\Tk\Db\ModelInterface
-     * @throws \Tk\Db\Exception
+     * @throws \Exception
      */
     public function getSubject()
     {
@@ -165,7 +165,7 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 
     /**
      * @return \App\Db\User|null|\Tk\Db\Map\Model|\Tk\Db\ModelInterface
-     * @throws \Tk\Db\Exception
+     * @throws \Exception
      */
     public function getUser()
     {
@@ -177,7 +177,7 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 
     /**
      * @return \App\Db\Placement|null|\Tk\Db\Map\Model|\Tk\Db\ModelInterface
-     * @throws \Tk\Db\Exception
+     * @throws \Exception
      */
     public function getPlacement()
     {
@@ -200,7 +200,7 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     /**
      * @param bool $weighted
      * @return float
-     * @throws \Tk\Db\Exception
+     * @throws \Exception
      */
     public function calcDomainAverage($weighted = false)
     {
@@ -238,7 +238,7 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
      * Get the entry values average, this average is not weighted to the Domain.weight values
      *
      * @return float
-     * @throws \Tk\Db\Exception
+     * @throws \Exception
      */
     public function calcAverage()
     {
@@ -254,7 +254,7 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 
     /**
      * @return array
-     * @throws \Tk\Db\Exception
+     * @throws \Exception
      */
     public function validate()
     {

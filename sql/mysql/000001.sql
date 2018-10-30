@@ -213,3 +213,6 @@ INSERT INTO skill_item (org_id, uid, collection_id, category_id, question, descr
 
 #OPTIMIZE TABLE `skill_value`;
 
+
+-- Patch that fixed odd values being set
+-- UPDATE `skill_value` t SET t.`value` = '5' WHERE value > 5;

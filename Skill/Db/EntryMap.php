@@ -159,6 +159,7 @@ class EntryMap extends \App\Db\Mapper
      * @param int $entryId
      * @param int $itemId
      * @return array|\stdClass
+     * @throws \Exception
      */
     public function findValue($entryId, $itemId = 0)
     {
@@ -181,9 +182,18 @@ class EntryMap extends \App\Db\Mapper
      * @param int $entryId
      * @param int $itemId
      * @param string $value
+     * @throws \Exception
      */
     public function saveValue($entryId, $itemId, $value)
     {
+        /** @var Entry $entry */
+        $entry = $this->find($entryId);
+        if ($entry) {   // Ensure values entered do not exceed the number of scale items minus 1 because we start with 0
+            $scale = ($entry->getCollection()->getScaleLength() - 1);
+            if ($value < 0) $value = 0;
+            if ($value > $scale) $value = $scale;
+        }
+
         if ($this->hasValue($entryId, $itemId)) {
             $st = $this->getDb()->prepare('UPDATE skill_value SET value = ? WHERE entry_id = ? AND item_id = ? ');
         } else {
@@ -198,6 +208,7 @@ class EntryMap extends \App\Db\Mapper
     /**
      * @param int $entryId
      * @param int $itemId
+     * @throws \Exception
      */
     public function removeValue($entryId, $itemId = null)
     {
@@ -218,6 +229,7 @@ class EntryMap extends \App\Db\Mapper
      * @param int $entryId
      * @param int $itemId
      * @return bool
+     * @throws \Exception
      */
     public function hasValue($entryId, $itemId)
     {
