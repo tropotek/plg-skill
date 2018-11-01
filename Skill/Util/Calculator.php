@@ -31,7 +31,7 @@ class Calculator
 
         $res = $cache->fetch($hash);
         if (!$res || $force) {
-            $students = \App\Db\UserMap::create()->findFiltered(array('subjectId' => $subject->getId(), 'role' => \App\Db\UserGroup::ROLE_STUDENT));
+            $students = \App\Db\UserMap::create()->findFiltered(array('subjectId' => $subject->getId(), 'type' => \Uni\Db\ROLE::TYPE_STUDENT));
             $subjectCollectionResults = array();
             $subjectEntries = \Skill\Db\EntryMap::create()->findFiltered(array(
                 'collectionId' => $collection->getId(),
