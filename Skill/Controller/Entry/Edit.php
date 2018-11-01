@@ -103,7 +103,7 @@ class Edit extends AdminEditIface
             $this->placement = \App\Db\PlacementMap::create()->findByHash($request->get('h'));
             if (!$this->placement) {
                 \Tk\Alert::addError('Invalid URL. Please contact your course coordinator.');
-                $this->getUser()->getHomeUrl()->redirect();
+                $this->getConfig()->getUserHomeUrl()->redirect();
             }
             $e = \Skill\Db\EntryMap::create()->findFiltered(array(
                     'collectionId' => $request->get('collectionId'),

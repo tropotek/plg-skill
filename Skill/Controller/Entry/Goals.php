@@ -22,7 +22,7 @@ class Goals extends \App\Controller\Iface
             $placement = \App\Db\PlacementMap::create()->findByHash($request->get('h'));
             if (!$placement) {
                 \Tk\Alert::addError('Invalid URL. Please contact your course coordinator.');
-                $this->getUser()->getHomeUrl()->redirect();
+                $this->getConfig()->getUserHomeUrl()->redirect();
             }
             $url = \App\Uri::createInstitutionUrl('/skillEdit.html', $placement->getSubject()->getInstitution())
                 ->set('h', $placement->getHash())
