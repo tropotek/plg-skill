@@ -221,7 +221,6 @@ SQL;
             $filterStr = 'a.uid = ' . $this->getDb()->quote($filter['uid']) . ' AND ';
 
         /*
-         * TODO: We need to finish this as a query, may have to use a procedure or similar
          * See: https://stackoverflow.com/questions/17964078/mysql-query-to-dynamically-convert-rows-to-columns-on-the-basis-of-two-columns
          */
         $sql = <<<SQL
@@ -313,17 +312,31 @@ Student Number	Name	PD	SB	CS	AW	BIOS	PD Grade	SB Grade	CS Grade	AW Grade	BIOS Gr
         $stm->execute();
 
         $arr = array();
+        $total = 0;
+        $totalGrade = 0;
         foreach ($stm as $i => $row) {
-            //vd($row);
             if (!array_key_exists($row->user_id, $arr)) {
                 $arr[$row->user_id] = array('userId' => $row->user_id, 'uid' => $row->uid, 'name' => $row->name, 'maxGrade' => $row->max_grade);
             }
             $arr[$row->user_id][$row->label] = $row->avg;
             $arr[$row->user_id][$row->label.'_grade'] = $row->grade;
             $arr[$row->user_id][$row->label.'_weight'] = $row->weight;
+            if (!isset($arr[$row->user_id]['domain_count'])) {
+                $arr[$row->user_id]['domain_count'] = 0;
+                $arr[$row->user_id]['total'] = 0;
+                $arr[$row->user_id]['total_grade'] = 0;
+            }
+            $arr[$row->user_id]['domain_count']++;
+            $arr[$row->user_id]['total'] += $row->avg;
+            $arr[$row->user_id]['total_grade'] += $row->grade;
         }
-
-        //TODO:  Calculate the total grade
+        // Not Correct (Try to fix this)
+//        foreach ($arr as $uid => $row) {
+//            if ($row['domain_count']) {
+//                $row['total'] = round($row['total'] / $row['domain_count'], 2);
+//                $row['total_grade'] = round($row['total_grade'] / $row['domain_count'], 2);
+//            }
+//        }
 
         return $arr;
     }

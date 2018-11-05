@@ -82,6 +82,21 @@ class CollectionReport extends \App\Controller\AdminManagerIface
                 return '0.00';
             });
         }
+        $subject = $this->getSubject();
+        $collection = $this->collection;
+        $this->table->addCell(new \Tk\Table\Cell\Text('total'))->setOnPropertyValue(function ($cell, $obj, $value) use ($subject, $collection) {
+            /** @var \Tk\Table\Cell\Text $cell */
+            $cell->addCss('total');
+            $studentResult =  \Skill\Db\ReportingMap::create()->findStudentResult($collection->getId(), $subject->getId(), $obj->getId(), true);
+            if ($studentResult) {
+                return sprintf('%.2f', $studentResult*($collection->getScaleLength()-1));
+            }
+            return '0.00';
+        });
+
+
+
+
         foreach ($domains as $domain) {
             $this->table->addCell(new \Tk\Table\Cell\Text($domain->label.'Grade'))->setLabel($domain->label.' Grade')->setOnPropertyValue(function ($cell, $obj, $value) use ($domain, $results) {
                 /** @var \Tk\Table\Cell\Text $cell */
@@ -94,8 +109,15 @@ class CollectionReport extends \App\Controller\AdminManagerIface
                 }
                 return '0.00';
             });
-        }
-
+        };
+        $this->table->addCell(new \Tk\Table\Cell\Text('totalGrade'))->setOnPropertyValue(function ($cell, $obj, $value) use ($subject, $collection) {
+            /** @var \Tk\Table\Cell\Text $cell */
+            $studentResult =  \Skill\Db\ReportingMap::create()->findStudentResult($collection->getId(), $subject->getId(), $obj->getId(), true);
+            if ($studentResult) {
+                return sprintf('%.2f', $studentResult*$collection->maxGrade, $collection->maxGrade);
+            }
+            return '0.00';
+        });
 
         // Filters
         $this->table->addFilter(new \Tk\Form\Field\Input('uid'))->setAttr('placeholder', 'Student Number');
@@ -222,6 +244,7 @@ GROUP BY c.company_id, a.type_id
         $panelTitle = sprintf('%s Report', $this->collection->name);
         $template->insertText('panel-title', $panelTitle);
 
+        $template->appendCss('.tk-table td.total {border-right: double 3px #CCC; } ');
 
 
         return $template;

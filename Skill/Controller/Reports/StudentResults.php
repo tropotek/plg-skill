@@ -83,6 +83,10 @@ class StudentResults extends AdminIface
         $template->insertText('entryCount', $entryList->count());
         $studentResult =  \Skill\Db\ReportingMap::create()->findStudentResult($this->collection->getId(), $this->getSubject()->getId(), $this->user->getId(), true);
 
+        $template->setAttr('grade', 'title', $studentResult);
+        if ($this->getConfig()->isDebug()) {
+            $template->setChoice('debug');
+        }
         $template->insertText('avg', sprintf('%.2f / %d', $studentResult*($this->collection->getScaleLength()-1), $this->collection->getScaleLength()-1));
         $template->insertText('grade', sprintf('%.2f / %d', $studentResult*$this->collection->maxGrade, $this->collection->maxGrade));
         $template->insertText('gradePcnt', sprintf('%.2f', $studentResult*100) . '%');
@@ -101,6 +105,7 @@ class StudentResults extends AdminIface
             $row->insertText('name', $domain->name . ' (' . $domain->label . ')');
             $row->insertText('weight', round($domain->weight * 100) . '%');
             if ($obj) {
+                vd($obj->avg);
                 $row->insertText('avg', sprintf('%.2f', $obj->avg));
                 $row->insertText('grade', sprintf('%.2f', ($obj->avg / $obj->scale) * $this->collection->maxGrade));
             } else {
@@ -263,23 +268,23 @@ CSS;
           </tr>
           
           <tr>
-            <td class="kv-key"><i class="fa fa-thermometer-1 kv-icon kv-icon-tertiary"></i> Class Min.</td>
-            <td class="kv-value" var="class-min">0.00%</td>
+            <td class="kv-key"><i class="fa fa-thermometer-4 kv-icon kv-icon-primary"></i> Class Max.</td>
+            <td class="kv-value" var="class-max">0.00%</td>
           </tr>
           <tr>
             <td class="kv-key"><i class="fa fa-thermometer-3 kv-icon kv-icon-secondary"></i> Class Median</td>
             <td class="kv-value" var="class-median">0.00%</td>
           </tr>
           <tr>
-            <td class="kv-key"><i class="fa fa-thermometer-4 kv-icon kv-icon-primary"></i> Class Max.</td>
-            <td class="kv-value" var="class-max">0.00%</td>
+            <td class="kv-key"><i class="fa fa-thermometer-1 kv-icon kv-icon-tertiary"></i> Class Min.</td>
+            <td class="kv-value" var="class-min">0.00%</td>
           </tr>
           
-          <tr choice="hide">
+          <tr choice="debug">
             <td class="kv-key"><i class="fa fa-exchange kv-icon kv-icon-tertiary"></i> Average Response</td>
             <td class="kv-value" var="avg">0</td>
           </tr>
-          <tr choice="hide">
+          <tr choice="debug">
             <td class="kv-key"><i class="fa fa-graduation-cap kv-icon kv-icon-primary"></i> Calculated Grade</td>
             <td class="kv-value" var="grade">0.0</td>
           </tr>
