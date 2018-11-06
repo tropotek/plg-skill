@@ -1,5 +1,11 @@
 #CHANGELOG#
 
+Ver 2.1.16 [2018-11-07]:
+-------------------------------
+  - Added totals to the collection report page
+  - Updated user role and institution objects to use the \Uni libs
+
+
 Ver 2.1.14 [2018-10-30]:
 -------------------------------
   - Added extra event buttons to goals edit entry page
