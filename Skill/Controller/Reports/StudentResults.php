@@ -105,7 +105,6 @@ class StudentResults extends AdminIface
             $row->insertText('name', $domain->name . ' (' . $domain->label . ')');
             $row->insertText('weight', round($domain->weight * 100) . '%');
             if ($obj) {
-                vd($obj->avg);
                 $row->insertText('avg', sprintf('%.2f', $obj->avg));
                 $row->insertText('grade', sprintf('%.2f', ($obj->avg / $obj->scale) * $this->collection->maxGrade));
             } else {
