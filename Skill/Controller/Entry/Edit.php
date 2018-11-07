@@ -51,7 +51,7 @@ class Edit extends AdminEditIface
     {
         parent::__construct();
         $this->setPageTitle('Skill Entry Edit');
-        if ($this->getUser()->isStudent()) {
+        if ($this->getUser() && $this->getUser()->isStudent()) {
             $this->getActionPanel()->setEnabled(false);
         }
     }
@@ -89,7 +89,10 @@ class Edit extends AdminEditIface
     public function doDefault(Request $request)
     {
         $this->entry = new \Skill\Db\Entry();
-        $this->entry->userId = ($request->has('userId')) ? (int)$request->get('userId') : $this->getUser()->getId();
+        $this->entry->userId = (int)$request->get('userId', 0);
+        if ($this->getUser()) {
+            $this->entry->userId = $this->getUser()->getId();
+        }
         $this->entry->subjectId = (int)$request->get('subjectId');
         $this->entry->collectionId = (int)$request->get('collectionId');
         $this->entry->placementId = (int)$request->get('placementId');
@@ -147,7 +150,7 @@ class Edit extends AdminEditIface
                 $this->entry = $e;
         }
 
-        if (!$request->has('userId') && !$request->has('subjectId') && $this->getUser()->isStudent()) {         // Assumed to be student self assessment form
+        if (!$request->has('userId') && !$request->has('subjectId') && $this->getUser() && $this->getUser()->isStudent()) {         // Assumed to be student self assessment form
             $e = \Skill\Db\EntryMap::create()->findFiltered(array(
                     'collectionId' => $this->entry->collectionId,
                     'subjectId' => $this->entry->subjectId,
@@ -191,7 +194,7 @@ class Edit extends AdminEditIface
         $this->form->load(\Skill\Db\EntryMap::create()->unmapForm($this->entry));
         $this->form->execute($request);
 
-        if ($this->getUser()->isStaff()) {
+        if ($this->getUser() && $this->getUser()->isStaff()) {
             $this->statusTable = new \App\Ui\Table\Status(\App\Uri::createSubjectUrl('/mailLogManager.html'));
             if ($this->entry->getId()) {
                 $filter = $this->statusTable->getTable()->getFilterValues();
@@ -202,7 +205,7 @@ class Edit extends AdminEditIface
             }
         }
 
-        if (!$this->getUser()->isStudent()) {
+        if ($this->getUser() && !$this->getUser()->isStudent()) {
             \Skill\Db\CollectionMap::create()->fixChangeoverEntries();
         }
 
@@ -232,9 +235,11 @@ class Edit extends AdminEditIface
         }
 
         $urlRole = \Bs\Uri::create()->getRoleType($this->getConfig()->getAvailableUserRoleTypes());
-        if ($this->getUser()->isStaff() &&  $this->getUser()->getRoleType() == $urlRole) {
+        if ($this->getUser() && $this->getUser()->isStaff() && $this->getUser()->getRoleType() == $urlRole) {
             $this->form->addField(new \App\Form\Field\CheckSelect('status', \Skill\Db\Entry::getStatusList()))
                 ->setRequired()->prependOption('-- Status --', '')->setNotes('Set the status. Use the checkbox to disable notification emails.')->setFieldset('Entry Details');
+        } else {
+            $this->form->addField(new \Tk\Form\Field\Html('status'))->setFieldset('Entry Details');
         }
 
         if (!$this->isSelfAssessment($this->entry)) {
