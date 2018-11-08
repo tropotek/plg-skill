@@ -22,6 +22,8 @@ class CollectionReport extends \App\Controller\AdminManagerIface
      */
     protected $editUrl = null;
 
+    protected $resCache = array();
+
 
     /**
      * Iface constructor.
@@ -69,6 +71,7 @@ class CollectionReport extends \App\Controller\AdminManagerIface
         $filter['userId'] = 0;
         $results = \Skill\Db\ReportingMap::create()->findStudentResults($filter, \Tk\Db\Tool::create('', 0));
 
+
         $domains = \Skill\Db\DomainMap::create()->findFiltered(array('collectionId'=>$this->collection->getId(), 'active' => true));
         foreach ($domains as $domain) {
             $this->table->addCell(new \Tk\Table\Cell\Text($domain->label))->setLabel($domain->label)->setOnPropertyValue(function ($cell, $obj, $value) use ($results) {
@@ -87,8 +90,10 @@ class CollectionReport extends \App\Controller\AdminManagerIface
         $collection = $this->collection;
         $this->table->addCell(new \Tk\Table\Cell\Text('total'))->setOnPropertyValue(function ($cell, $obj, $value) use ($subject, $collection) {
             /** @var \Tk\Table\Cell\Text $cell */
+            /** @var \Uni\Db\User $obj */
             $cell->addCss('total');
             $studentResult =  \Skill\Db\ReportingMap::create()->findStudentResult($collection->getId(), $subject->getId(), $obj->getId(), true);
+            $obj->studentResult = $studentResult;
             if ($studentResult) {
                 return sprintf('%.2f', $studentResult*($collection->getScaleLength()-1));
             }
@@ -98,6 +103,7 @@ class CollectionReport extends \App\Controller\AdminManagerIface
         foreach ($domains as $domain) {
             $this->table->addCell(new \Tk\Table\Cell\Text($domain->label.'Grade'))->setLabel($domain->label.' Grade')->setOnPropertyValue(function ($cell, $obj, $value) use ($domain, $results) {
                 /** @var \Tk\Table\Cell\Text $cell */
+                /** @var \Uni\Db\User $obj */
                 $prop = $domain->label.'_grade';
                 $res = array();
                 if (!empty($results[$obj->getId()]))
@@ -110,7 +116,9 @@ class CollectionReport extends \App\Controller\AdminManagerIface
         };
         $this->table->addCell(new \Tk\Table\Cell\Text('totalGrade'))->setOnPropertyValue(function ($cell, $obj, $value) use ($subject, $collection) {
             /** @var \Tk\Table\Cell\Text $cell */
-            $studentResult =  \Skill\Db\ReportingMap::create()->findStudentResult($collection->getId(), $subject->getId(), $obj->getId(), true);
+            /** @var \Uni\Db\User $obj */
+            //$studentResult =  \Skill\Db\ReportingMap::create()->findStudentResult($collection->getId(), $subject->getId(), $obj->getId(), true);
+            $studentResult = $obj->studentResult;
             if ($studentResult) {
                 return sprintf('%.2f', $studentResult*$collection->maxGrade);
             }
@@ -118,7 +126,9 @@ class CollectionReport extends \App\Controller\AdminManagerIface
         });
         $this->table->addCell(new \Tk\Table\Cell\Text('totalPct'))->setOnPropertyValue(function ($cell, $obj, $value) use ($subject, $collection) {
             /** @var \Tk\Table\Cell\Text $cell */
-            $studentResult =  \Skill\Db\ReportingMap::create()->findStudentResult($collection->getId(), $subject->getId(), $obj->getId(), true);
+            /** @var \Uni\Db\User $obj */
+            //$studentResult =  \Skill\Db\ReportingMap::create()->findStudentResult($collection->getId(), $subject->getId(), $obj->getId(), true);
+            $studentResult = $obj->studentResult;
             if ($studentResult) {
                 return sprintf('%.2f%%', ($studentResult)*100);
             }
