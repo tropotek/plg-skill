@@ -38,7 +38,8 @@ class Calculator
         $res = $cache->fetch($hash);
 
         if ($res)
-            \Tk\Log::info('Caching Exists: ' . $collection->name);
+            \Tk\Log::info('Cache Exists: ' . $collection->name);
+
         if (!$res || $force) {
             \Tk\Log::warning('Caching Skills Results: ' . $collection->name);
 
