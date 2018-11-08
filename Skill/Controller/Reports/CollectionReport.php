@@ -114,7 +114,15 @@ class CollectionReport extends \App\Controller\AdminManagerIface
             /** @var \Tk\Table\Cell\Text $cell */
             $studentResult =  \Skill\Db\ReportingMap::create()->findStudentResult($collection->getId(), $subject->getId(), $obj->getId(), true);
             if ($studentResult) {
-                return sprintf('%.2f', $studentResult*$collection->maxGrade, $collection->maxGrade);
+                return sprintf('%.2f', $studentResult*$collection->maxGrade);
+            }
+            return '0.00';
+        });
+        $this->table->addCell(new \Tk\Table\Cell\Text('totalPct'))->setOnPropertyValue(function ($cell, $obj, $value) use ($subject, $collection) {
+            /** @var \Tk\Table\Cell\Text $cell */
+            $studentResult =  \Skill\Db\ReportingMap::create()->findStudentResult($collection->getId(), $subject->getId(), $obj->getId(), true);
+            if ($studentResult) {
+                return sprintf('%.2f%%', ($studentResult)*100);
             }
             return '0.00';
         });
