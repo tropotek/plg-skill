@@ -31,6 +31,8 @@ class CollectionReport extends \App\Controller\AdminManagerIface
     public function __construct()
     {
         set_time_limit(0);
+        ini_set('mysql.connect_timeout','0');
+        ini_set('max_execution_time', '0');
         parent::__construct();
         $this->setPageTitle('Collection Report');
     }
@@ -38,9 +40,6 @@ class CollectionReport extends \App\Controller\AdminManagerIface
     /**
      * @param Request $request
      * @throws \Exception
-     * @throws \Tk\Db\Exception
-     * @throws \Tk\Exception
-     * @throws \Tk\Form\Exception
      */
     public function doDefault(Request $request)
     {

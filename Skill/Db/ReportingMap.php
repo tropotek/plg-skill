@@ -53,6 +53,7 @@ class ReportingMap
      * @param string $entryStatus
      * @param string $placementStatus
      * @return array|int
+     * @throws \Tk\Db\Exception
      */
     public function findStudentResult($collectionId, $subjectId, $userId = 0, $valueOnly = false, $entryStatus = 'approved', $placementStatus = 'completed')
     {
@@ -132,6 +133,7 @@ SQL;
      * @param string $entryStatus
      * @param string $placementStatus
      * @return array
+     * @throws \Tk\Db\Exception
      */
     public function findSubjectAverages($collectionId, $subjectId, $valueOnly = false, $entryStatus = 'approved', $placementStatus = 'completed')
     {
@@ -199,6 +201,7 @@ SQL;
      * @param string $entryStatus
      * @param string $placementStatus
      * @return array
+     * @throws \Tk\Db\Exception
      */
     public function findStudentResults($filter, $tool = null, $entryStatus = 'approved', $placementStatus = 'completed')
     {
@@ -219,6 +222,7 @@ SQL;
         $filterStr = '';
         if (!empty($filter['uid']))
             $filterStr = 'a.uid = ' . $this->getDb()->quote($filter['uid']) . ' AND ';
+
 
         /*
          * See: https://stackoverflow.com/questions/17964078/mysql-query-to-dynamically-convert-rows-to-columns-on-the-basis-of-two-columns
@@ -307,7 +311,7 @@ SQL;
 Student Number	Name	PD	SB	CS	AW	BIOS	PD Grade	SB Grade	CS Grade	AW Grade	BIOS Grade	Total 100%
 637920	Aaron Adno	4.45	4.15	2.29	2.29	4.00	8.90	8.30	4.58	4.57	8.00	57.11
 */
-vd($sql);
+
         $stm = $this->getDb()->prepare($sql);
         $stm->execute();
 
@@ -351,6 +355,7 @@ vd($sql);
      * @param string $entryStatus
      * @param string $placementStatus
      * @return array
+     * @throws \Tk\Db\Exception
      */
     public function findDomainAverages($collectionId, $subjectId, $userId = 0, $valueOnly = false, $entryStatus = 'approved', $placementStatus = 'completed')
     {
@@ -462,6 +467,7 @@ SQL;
      * @param string $entryStatus
      * @param string $placementStatus
      * @return array
+     * @throws \Tk\Db\Exception
      */
     public function findItemAverages($collectionId, $subjectId, $userId = null, $valueOnly = false, $entryStatus = 'approved', $placementStatus = 'completed')
     {
