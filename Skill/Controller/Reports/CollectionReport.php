@@ -117,6 +117,7 @@ class CollectionReport extends \App\Controller\AdminManagerIface
         $this->table->addCell(new \Tk\Table\Cell\Text('totalGrade'))->setOnPropertyValue(function ($cell, $obj, $value) use ($subject, $collection) {
             /** @var \Tk\Table\Cell\Text $cell */
             /** @var \Uni\Db\User $obj */
+            $cell->addCss('total');
             //$studentResult =  \Skill\Db\ReportingMap::create()->findStudentResult($collection->getId(), $subject->getId(), $obj->getId(), true);
             $studentResult = $obj->studentResult;
             if ($studentResult) {
@@ -144,15 +145,6 @@ class CollectionReport extends \App\Controller\AdminManagerIface
 
         $this->table->setList($this->getList());
 
-
-        //$list = \Skill\Db\ReportingMap::create()->findDomainAverages($this->collection->getId(), $this->getSubject()->getId(), 1494);
-
-        //  TODO:
-        //  TODO: We have to figure this one out, disable it for now.
-        //  TODO:
-        //  TODO:
-        //  TODO:
-
     }
 
 
@@ -165,12 +157,9 @@ class CollectionReport extends \App\Controller\AdminManagerIface
         $filter = $this->table->getFilterValues();
         $this->table->resetSessionTool();
 
-        //$filter['collectionId'] = $this->collection->getId();
         $filter['subjectId'] = $this->getSubject()->getId();
-        //$filter['userId'] = 0;
 
         return \App\Db\UserMap::create()->findFiltered($filter, $this->table->getTool('a.name', 0));
-        //return \Skill\Db\ReportingMap::create()->findStudentResults($filter, $this->table->getTool('a.name', 0));
     }
 
 
