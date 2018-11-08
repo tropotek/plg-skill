@@ -307,7 +307,7 @@ SQL;
 Student Number	Name	PD	SB	CS	AW	BIOS	PD Grade	SB Grade	CS Grade	AW Grade	BIOS Grade	Total 100%
 637920	Aaron Adno	4.45	4.15	2.29	2.29	4.00	8.90	8.30	4.58	4.57	8.00	57.11
 */
-
+vd($sql);
         $stm = $this->getDb()->prepare($sql);
         $stm->execute();
 
