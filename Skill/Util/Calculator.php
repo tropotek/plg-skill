@@ -27,7 +27,11 @@ class Calculator
         // Check cache
         $start = microtime(true);
 
-        $cachePath = \App\Config::getInstance()->getDataPath() . '/skillResultsCache';
+        $cachePath = \App\Config::getInstance()->getDataPath() . '/skillResultsCache/' . $collection->getSubject()->getInstitutionId();
+        if (!is_dir($cachePath)) {
+            mkdir($cachePath, 0777, true);
+        }
+
         $cache = \Tk\Cache\Cache::create(\Tk\Cache\Adapter\Filesystem::create($cachePath));
         $hash = hash('md5', sprintf('%s-%s', $collection->getId(), $subject->getId()));
 
