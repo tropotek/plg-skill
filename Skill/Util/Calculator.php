@@ -26,7 +26,9 @@ class Calculator
         set_time_limit(0);
         // Check cache
         $start = microtime(true);
-        $cache = \Tk\Cache\Cache::create(\Tk\Cache\Adapter\Filesystem::create(\App\Config::getInstance()->getCachePath() . '/skillResults'));
+
+        $cachePath = \App\Config::getInstance()->getDataPath() . '/skillResultsCache';
+        $cache = \Tk\Cache\Cache::create(\Tk\Cache\Adapter\Filesystem::create($cachePath));
         $hash = hash('md5', sprintf('%s-%s', $collection->getId(), $subject->getId()));
 
         $res = $cache->fetch($hash);
