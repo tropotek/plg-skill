@@ -26,18 +26,20 @@ class Calculator
         set_time_limit(0);
         // Check cache
         $start = microtime(true);
+        $config = \Uni\Config::getInstance();
 
-        $cachePath = \App\Config::getInstance()->getDataPath() . '/skillResultsCache/' . $collection->getSubject()->getInstitutionId();
+        $cachePath = $config->getDataPath() . '/skillResultsCache/' . $collection->getSubject()->getInstitutionId();
         if (!is_dir($cachePath)) {
             mkdir($cachePath, 0777, true);
         }
-
         $cache = \Tk\Cache\Cache::create(\Tk\Cache\Adapter\Filesystem::create($cachePath));
         $hash = hash('md5', sprintf('%s-%s', $collection->getId(), $subject->getId()));
 
         $res = $cache->fetch($hash);
         if (!$res || $force) {
-            $students = \App\Db\UserMap::create()->findFiltered(array('subjectId' => $subject->getId(), 'type' => \Uni\Db\ROLE::TYPE_STUDENT));
+            \Tk\Log::warning('Caching Skills Results: ' . $collection->name);
+
+            $students = $config->getUserMapper()->findFiltered(array('subjectId' => $subject->getId(), 'type' => \Uni\Db\ROLE::TYPE_STUDENT));
             $subjectCollectionResults = array();
             $subjectEntries = \Skill\Db\EntryMap::create()->findFiltered(array(
                 'collectionId' => $collection->getId(),
