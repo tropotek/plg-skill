@@ -36,6 +36,9 @@ class Calculator
         $hash = hash('md5', sprintf('%s-%s', $collection->getId(), $subject->getId()));
 
         $res = $cache->fetch($hash);
+
+        if ($res)
+            \Tk\Log::info('Caching Exists: ' . $collection->name);
         if (!$res || $force) {
             \Tk\Log::warning('Caching Skills Results: ' . $collection->name);
 

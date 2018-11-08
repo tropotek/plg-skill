@@ -28,6 +28,7 @@ class CollectionReport extends \App\Controller\AdminManagerIface
      */
     public function __construct()
     {
+        set_time_limit(0);
         parent::__construct();
         $this->setPageTitle('Collection Report');
     }
@@ -93,9 +94,6 @@ class CollectionReport extends \App\Controller\AdminManagerIface
             }
             return '0.00';
         });
-
-
-
 
         foreach ($domains as $domain) {
             $this->table->addCell(new \Tk\Table\Cell\Text($domain->label.'Grade'))->setLabel($domain->label.' Grade')->setOnPropertyValue(function ($cell, $obj, $value) use ($domain, $results) {

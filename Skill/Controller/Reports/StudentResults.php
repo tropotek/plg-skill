@@ -31,6 +31,7 @@ class StudentResults extends AdminIface
      */
     public function __construct()
     {
+        set_time_limit(0);
         parent::__construct();
         $this->setPageTitle('Results');
         if ($this->getUser()->isStudent()) {
