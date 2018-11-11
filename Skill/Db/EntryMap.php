@@ -219,7 +219,6 @@ class EntryMap extends \App\Db\Mapper
             $st->bindParam(1, $entryId);
             $st->bindParam(2, $itemId);
         }
-
         $st->execute();
     }
 
@@ -237,5 +236,69 @@ class EntryMap extends \App\Db\Mapper
         return $val != null;
     }
 
+
+    /**
+     * @param int $entryId
+     * @return \stdClass
+     * @throws \Tk\Db\Exception
+     */
+    public function getEntryGradeObject($entryId)
+    {
+        $sql = <<<SQL
+SELECT a.entry_id
+    ,SUM(a.value) as 'value_total'
+    ,COUNT(a.item_id) as 'item_count'
+    ,AVG(NULLIF(a.value, 0)) as 'avg'
+    ,AVG(a.value) as 'zero_avg'
+    ,AVG(NULLIF(a.value, 0))/d.scale_count as 'avg_ratio'
+    ,AVG(a.value)/d.scale_count as 'zero_avg_ratio'
+FROM skill_value a, skill_entry b, skill_collection c,
+     (
+     SELECT a.collection_id, COUNT(a.id) - 1 AS 'scale_count'
+     FROM skill_scale a
+     GROUP BY a.collection_id
+     ) d
+WHERE a.entry_id=? AND a.entry_id = b.id AND b.collection_id = c.id AND b.collection_id = d.collection_id
+SQL;
+        $st = $this->getDb()->prepare($sql);
+        $st->bindParam(1, $entryId);
+        $st->execute();
+
+        $obj = $st->fetch();
+        return $obj;
+    }
+
+
+    /**
+     * @param int $entryId
+     * @param bool $zeroAvg If set to true the 0 values are included into the average calculation
+     * @return float
+     * @throws \Tk\Db\Exception
+     */
+    public function getEntryAverage($entryId, $zeroAvg = false)
+    {
+        $obj = $this->getEntryGradeObject($entryId);
+        if ($zeroAvg)
+            return $obj->zero_avg;
+        return $obj->avg;
+    }
+
+
+    /**
+     * Get the students average ratio. Calculated by avg/scale_count
+     * Multiply this value by 100 to get a percentage
+     *
+     * @param int $entryId
+     * @param bool $zeroAvg If set to true the 0 values are included into the average calculation
+     * @return float
+     * @throws \Tk\Db\Exception
+     */
+    public function getEntryGrade($entryId, $zeroAvg = false)
+    {
+        $obj = $this->getEntryGradeObject($entryId);
+        if ($zeroAvg)
+            return $obj->zero_avg_ratio;
+        return $obj->avg_ratio;
+    }
 
 }

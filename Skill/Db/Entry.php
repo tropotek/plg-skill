@@ -242,13 +242,14 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
      */
     public function calcAverage()
     {
-        $grades = array();
-        $valueList = EntryMap::create()->findValue($this->getId());
-        foreach ($valueList as $value) {
-            if (!$value->value && !$this->getCollection()->includeZero) continue;
-            $grades[$value->item_id] = $value->value;
-        }
-        return \Tk\Math::average($grades);
+        return EntryMap::create()->getEntryAverage($this->getId(), $this->getCollection()->includeZero);
+//        $grades = array();
+//        $valueList = EntryMap::create()->findValue($this->getId());
+//        foreach ($valueList as $value) {
+//            if (!$value->value && !$this->getCollection()->includeZero) continue;
+//            $grades[$value->item_id] = $value->value;
+//        }
+//        return \Tk\Math::average($grades);
     }
 
 
