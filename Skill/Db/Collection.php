@@ -134,7 +134,12 @@ class Collection extends \Tk\Db\Map\Model
     /**
      * @var int
      */
-    private $scaleLength = 0;
+    private $scaleCount = 0;
+
+    /**
+     * @var int
+     */
+    private $domainCount = 0;
 
 
     /**
@@ -192,16 +197,29 @@ class Collection extends \Tk\Db\Map\Model
     }
 
     /**
+     * Get the total number of domains for this collection
+     *
+     * @return int
+     * @throws \Exception
+     */
+    public function getDomainCount()
+    {
+        if (!$this->domainCount)
+            $this->domainCount = DomainMap::create()->findFiltered(array('collectionId' => $this->getVolatileId()))->count();
+        return $this->domainCount;
+    }
+
+    /**
      * Get the total number of scale ticks/records for this collection
      *
      * @return int
      * @throws \Exception
      */
-    public function getScaleLength()
+    public function getScaleCount()
     {
-        if (!$this->scaleLength)
-            $this->scaleLength = ScaleMap::create()->findFiltered(array('collectionId' => $this->getVolatileId()))->count();
-        return $this->scaleLength;
+        if (!$this->scaleCount)
+            $this->scaleCount = ScaleMap::create()->findFiltered(array('collectionId' => $this->getVolatileId()))->count();
+        return $this->scaleCount;
     }
 
     /**

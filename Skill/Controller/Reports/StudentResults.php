@@ -27,7 +27,6 @@ class StudentResults extends AdminIface
 
     /**
      * Results constructor.
-     * @throws \Tk\Db\Exception
      */
     public function __construct()
     {
@@ -45,6 +44,7 @@ class StudentResults extends AdminIface
      */
     public function doDefault(Request $request)
     {
+
         $this->user = \App\Db\UserMap::create()->find($request->get('userId'));
         if (!$this->user) {
             $this->user = $this->getUser();
@@ -55,6 +55,10 @@ class StudentResults extends AdminIface
         if (!$this->collection->active && !$this->getUser()->isStaff()) {
             throw new \Tk\Exception('This page is not available.');
         }
+
+        $calc = new \Skill\Util\GradeCalculator($this->collection);
+        $calc->setCacheEnabled(false);
+        $calc->getStudentGrade($this->user);
     }
 
     /**
@@ -88,7 +92,7 @@ class StudentResults extends AdminIface
         if ($this->getConfig()->isDebug()) {
             $template->setChoice('debug');
         }
-        $template->insertText('avg', sprintf('%.2f / %d', $studentResult*($this->collection->getScaleLength()-1), $this->collection->getScaleLength()-1));
+        $template->insertText('avg', sprintf('%.2f / %d', $studentResult*($this->collection->getScaleCount()-1), $this->collection->getScaleCount()-1));
         $template->insertText('grade', sprintf('%.2f / %d', $studentResult*$this->collection->maxGrade, $this->collection->maxGrade));
         $template->insertText('gradePcnt', sprintf('%.2f', $studentResult*100) . '%');
 
@@ -167,7 +171,7 @@ class StudentResults extends AdminIface
 }
 CSS;
         $template->appendCss($css);
-        $template->setAttr('line-chart', 'data-ymax', $this->collection->getScaleLength()-1);
+        $template->setAttr('line-chart', 'data-ymax', $this->collection->getScaleCount()-1);
         $template->setAttr('line-chart', 'data-type', 'float');
 
         $dataRow = $template->getRepeat('chart-row');
@@ -190,7 +194,7 @@ CSS;
         $dataRow->appendRepeat();
 
         // Get subject class totals
-        $res = \Skill\Util\Calculator::findSubjectAverageGrades($this->collection, $this->getSubject());
+        $res = \Skill\Util\GradeCalculator::findSubjectAverageGrades($this->collection, $this->getSubject());
         if ($res->count) {
             $template->insertText('class-min', round($res->min*100, 2) . '%');
             $template->insertText('class-median', round($res->median*100, 2) . '%');

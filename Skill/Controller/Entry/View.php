@@ -64,7 +64,7 @@ class View extends AdminEditIface
         $this->form->addField(new Field\Html('title', htmlentities($this->entry->title)))->setFieldset('Entry Details');
         //if($this->entry->getCollection()->gradable && $this->getUser()->isStaff()) {
         if($this->entry->getCollection()->gradable) {
-            $pct = round(($this->entry->calcAverage()/($this->entry->getCollection()->getScaleLength()-1))*100);
+            $pct = round(($this->entry->calcAverage()/($this->entry->getCollection()->getScaleCount()-1))*100);
             $this->form->addField(new Field\Html('average', sprintf('%.2f &nbsp; (%d%%)', $this->entry->calcAverage(), $pct)))
                 ->setFieldset('Entry Details');
 //            if ($this->getUser()->isStaff()) {
@@ -100,7 +100,7 @@ class View extends AdminEditIface
 
     /**
      * @return \Dom\Template
-     * @throws \Tk\Db\Exception
+     * @throws \Exception
      */
     public function show()
     {

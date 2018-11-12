@@ -230,7 +230,7 @@ class Edit extends AdminEditIface
 
         if ($this->entry->getId() && $this->entry->getCollection()->gradable && !$this->isPublic) {
             $avg = $this->entry->calcAverage();
-            $pct = round(($avg / ($this->entry->getCollection()->getScaleLength() - 1)) * 100);
+            $pct = round(($avg / ($this->entry->getCollection()->getScaleCount() - 1)) * 100);
             $this->form->addField(new Field\Html('average', sprintf('%.2f &nbsp; (%d%%)', $avg, $pct)))->setFieldset('Entry Details');
         }
 

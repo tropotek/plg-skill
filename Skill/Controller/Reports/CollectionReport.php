@@ -145,7 +145,7 @@ class CollectionReport extends \App\Controller\AdminManagerIface
             \Tk\Log::alert('\Skill\Db\ReportingMap::create()->findStudentResult(...)');
             $obj->studentResult = $studentResult;
             if ($studentResult) {
-                return sprintf('%.2f', $studentResult*($collection->getScaleLength()-1));
+                return sprintf('%.2f', $studentResult*($collection->getScaleCount()-1));
             }
             return '0.00';
         });

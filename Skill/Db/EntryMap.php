@@ -189,7 +189,7 @@ class EntryMap extends \App\Db\Mapper
         /** @var Entry $entry */
         $entry = $this->find($entryId);
         if ($entry) {   // Ensure values entered do not exceed the number of scale items minus 1 because we start with 0
-            $scale = ($entry->getCollection()->getScaleLength() - 1);
+            $scale = ($entry->getCollection()->getScaleCount() - 1);
             if ($value < 0) $value = 0;
             if ($value > $scale) $value = $scale;
         }
@@ -270,6 +270,9 @@ SQL;
 
 
     /**
+     * This is not a grade average using the domain weights
+     * It is just an average of all the entries item values
+     *
      * @param int $entryId
      * @param bool $zeroAvg If set to true the 0 values are included into the average calculation
      * @return float

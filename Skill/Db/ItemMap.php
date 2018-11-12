@@ -58,6 +58,42 @@ class ItemMap extends \App\Db\Mapper
     }
 
     /**
+     *
+     * @param int $userId
+     * @param int $itemId
+     * @param string $instanceStatus
+     * @param string $placementStatus
+     * @return float
+     * @throws \Tk\Db\Exception
+     */
+    public function findAverage($userId, $itemId, $instanceStatus = 'approved', $placementStatus = 'completed')
+    {
+        $db = $this->getDb();
+
+        $sql = <<<SQL
+SELECT AVG(b.`value`) as 'avg'
+FROM  skill_entry a LEFT JOIN skill_value b ON (a.id = b.entry_id) LEFT JOIN placement c ON (a.placement_id = c.id)
+WHERE a.user_id = ? AND b.item_id = ? AND b.value > 0 AND a.`status` = ?
+SQL;
+        if ($placementStatus)
+            $sql .= ' AND c.`status` = ?';
+
+        $stmt = $db->prepare($sql);
+        if ($placementStatus)
+            $stmt->execute(array((int)$userId, (int)$itemId, $instanceStatus, $placementStatus));
+        else
+            $stmt->execute(array((int)$userId, (int)$itemId, $instanceStatus));
+
+        $avg = 0.0;
+        while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
+            if (isset($row['avg'])) {
+                $avg = (float)$row['avg'];
+            }
+        }
+        return $avg;
+    }
+
+    /**
      * Find filtered records
      *
      * @param array $filter

@@ -47,7 +47,7 @@ class CronHandler implements Subscriber
                 $cronConsole->writeComment('  - Subject ID:    ' . $subject->getId(), Output::VERBOSITY_VERY_VERBOSE);
                 $cronConsole->writeComment('  - Students:      ' . $students->count(), Output::VERBOSITY_VERY_VERBOSE);
 
-                $res = \Skill\Util\Calculator::findSubjectAverageGrades($collection, $subject, true);  // re-cache results
+                $res = \Skill\Util\GradeCalculator::findSubjectAverageGrades($collection, $subject, true);  // re-cache results
                 if (!$res || !$res->count){
                     $cronConsole->writeComment('  - Entry Count:   0', Output::VERBOSITY_VERY_VERBOSE);
                     $cronConsole->writeComment('', Output::VERBOSITY_VERY_VERBOSE);
