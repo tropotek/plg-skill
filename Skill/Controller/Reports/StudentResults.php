@@ -30,7 +30,6 @@ class StudentResults extends AdminIface
      */
     public function __construct()
     {
-        set_time_limit(0);
         parent::__construct();
         $this->setPageTitle('Results');
         if ($this->getUser()->isStudent()) {
@@ -55,10 +54,6 @@ class StudentResults extends AdminIface
         if (!$this->collection->active && !$this->getUser()->isStaff()) {
             throw new \Tk\Exception('This page is not available.');
         }
-
-        $calc = new \Skill\Util\GradeCalculator($this->collection);
-        $calc->setCacheEnabled(false);
-        $calc->getStudentGrade($this->user);
     }
 
     /**
@@ -92,6 +87,7 @@ class StudentResults extends AdminIface
         if ($this->getConfig()->isDebug()) {
             $template->setChoice('debug');
         }
+
         $template->insertText('avg', sprintf('%.2f / %d', $studentResult*($this->collection->getScaleCount()-1), $this->collection->getScaleCount()-1));
         $template->insertText('grade', sprintf('%.2f / %d', $studentResult*$this->collection->maxGrade, $this->collection->maxGrade));
         $template->insertText('gradePcnt', sprintf('%.2f', $studentResult*100) . '%');
@@ -106,7 +102,6 @@ class StudentResults extends AdminIface
                 $obj = $domainResults[$domain->getId()];
 
             $row = $template->getRepeat('domain-row');
-
             $row->insertText('name', $domain->name . ' (' . $domain->label . ')');
             $row->insertText('weight', round($domain->weight * 100) . '%');
             if ($obj) {
@@ -194,14 +189,17 @@ CSS;
         $dataRow->appendRepeat();
 
         // Get subject class totals
-        $res = \Skill\Util\GradeCalculator::findSubjectAverageGrades($this->collection, $this->getSubject());
+
+        $calc = new \Skill\Util\GradeCalculator($this->collection);
+        //$calc->setCacheEnabled(false);
+        $res = $calc->findSubjectAverageGrades();
+
+        //$res = \Skill\Util\GradeCalculator::findSubjectAverageGrades($this->collection, $this->getSubject());
         if ($res->count) {
             $template->insertText('class-min', round($res->min*100, 2) . '%');
             $template->insertText('class-median', round($res->median*100, 2) . '%');
             $template->insertText('class-max', round($res->max*100, 2) . '%');
         }
-
-
 
 
         return $template;
@@ -239,7 +237,7 @@ CSS;
     }
     .EntryResults .item-row .question {
       padding-left: 20px;
-      margin: 5px 0px;
+      margin: 5px 0;
     }
     .EntryResults .item-row .question .lineNo {
       display: inline-block;

@@ -30,9 +30,6 @@ class CollectionReport extends \App\Controller\AdminManagerIface
      */
     public function __construct()
     {
-        set_time_limit(0);
-        ini_set('mysql.connect_timeout','0');
-        ini_set('max_execution_time', '0');
         parent::__construct();
         $this->setPageTitle('Collection Report');
     }
@@ -69,119 +66,86 @@ class CollectionReport extends \App\Controller\AdminManagerIface
         $filter['subjectId'] = $this->getSubject()->getId();
         $filter['userId'] = 0;
 
-        // OK this query seems optimised
+        //
         \Tk\Log::alert('\Skill\Db\ReportingMap::create()->findStudentResult(..START..)');
-        $results = \Skill\Db\ReportingMap::create()->findStudentResults($filter, \Tk\Db\Tool::create('', 0));
-        \Tk\Log::alert('\Skill\Db\ReportingMap::create()->findStudentResult(..END..)');
-        //vd($results);
 
+        //$results = \Skill\Db\ReportingMap::create()->findStudentResults($filter, \Tk\Db\Tool::create('', 0));
+        $calc = new \Skill\Util\GradeCalculator($this->collection);
+        //$calc->setCacheEnabled(false);
+        $results = $calc->getSubjectGrades();
+
+        \Tk\Log::alert('\Skill\Db\ReportingMap::create()->findStudentResult(..END..)');
+
+
+        $gradeList = $results->gradeList;
         $domains = \Skill\Db\DomainMap::create()->findFiltered(array('collectionId'=>$this->collection->getId(), 'active' => true));
         foreach ($domains as $domain) {
-            $this->table->addCell(new \Tk\Table\Cell\Text($domain->label))->setLabel($domain->label)->setOnPropertyValue(function ($cell, $obj, $value) use ($results) {
+            $this->table->addCell(new \Tk\Table\Cell\Text($domain->label))->setLabel($domain->label)->setOnPropertyValue(function ($cell, $obj, $value) use ($domain, $gradeList) {
                 /** @var \Tk\Table\Cell\Text $cell */
-                $res = array();
-                if (!empty($results[$obj->getId()]))
-                    $res = $results[$obj->getId()];
+                /** @var \Uni\Db\User $obj */
 
-                if (array_key_exists($cell->getProperty(), $res)) {
-                    return sprintf('%.2f', $res[$cell->getProperty()]);
+                if ($gradeList[$obj->getId()]) {
+                    /** @var \Skill\Util\Grade $grade */
+                    $grade = $gradeList[$obj->getId()];
+                    $list = $grade->getDomainAvgList();
+                    if (!empty($list[$domain->getId()])) {
+                        return sprintf('%.2f', $list[$domain->getId()]['avg']);
+                    }
                 }
+
                 return '0.00';
             });
         }
-        $subject = $this->getSubject();
-        $collection = $this->collection;
-//        $this->table->addCell(new \Tk\Table\Cell\Text('total'))->setOnPropertyValue(function ($cell, $obj, $value) use ($results) {
-//            /** @var \Tk\Table\Cell\Text $cell */
-//            $res = array();
-//            if (!empty($results[$obj->getId()]))
-//                $res = $results[$obj->getId()];
-//
-//            if (array_key_exists($cell->getProperty(), $res)) {
-//                return sprintf('%.2f', $res[$cell->getProperty()]);
-//            }
-//            return '0.00';
-//        });
-//        $this->table->addCell(new \Tk\Table\Cell\Text('total_grade'))->setOnPropertyValue(function ($cell, $obj, $value) use ($results) {
-//            /** @var \Tk\Table\Cell\Text $cell */
-//            $res = array();
-//            if (!empty($results[$obj->getId()]))
-//                $res = $results[$obj->getId()];
-//
-//            if (array_key_exists($cell->getProperty(), $res)) {
-//                return sprintf('%.2f', $res[$cell->getProperty()]);
-//            }
-//            return '0.00';
-//        });
-//        $this->table->addCell(new \Tk\Table\Cell\Text('total_zero'))->setOnPropertyValue(function ($cell, $obj, $value) use ($results) {
-//            /** @var \Tk\Table\Cell\Text $cell */
-//            $res = array();
-//            if (!empty($results[$obj->getId()]))
-//                $res = $results[$obj->getId()];
-//
-//            if (array_key_exists($cell->getProperty(), $res)) {
-//                return sprintf('%.2f', $res[$cell->getProperty()]);
-//            }
-//            return '0.00';
-//        });
-//        $this->table->addCell(new \Tk\Table\Cell\Text('total_grade_zero'))->setOnPropertyValue(function ($cell, $obj, $value) use ($results) {
-//            /** @var \Tk\Table\Cell\Text $cell */
-//            $res = array();
-//            if (!empty($results[$obj->getId()]))
-//                $res = $results[$obj->getId()];
-//
-//            if (array_key_exists($cell->getProperty(), $res)) {
-//                return sprintf('%.2f', $res[$cell->getProperty()]);
-//            }
-//            return '0.00';
-//        });
-        $this->table->addCell(new \Tk\Table\Cell\Text('total'))->setOnPropertyValue(function ($cell, $obj, $value) use ($subject, $collection) {
+
+        $this->table->addCell(new \Tk\Table\Cell\Text('total'))->setOnPropertyValue(function ($cell, $obj, $value) use ($gradeList) {
             /** @var \Tk\Table\Cell\Text $cell */
             /** @var \Uni\Db\User $obj */
             $cell->addCss('total');
 
-            // TODO: This query is called fore each displayed row/student and is slow as
-            $studentResult =  \Skill\Db\ReportingMap::create()->findStudentResult($collection->getId(), $subject->getId(), $obj->getId(), true);
-            \Tk\Log::alert('\Skill\Db\ReportingMap::create()->findStudentResult(...)');
-            $obj->studentResult = $studentResult;
-            if ($studentResult) {
-                return sprintf('%.2f', $studentResult*($collection->getScaleCount()-1));
+            if ($gradeList[$obj->getId()]) {
+                /** @var \Skill\Util\Grade $grade */
+                $grade = $gradeList[$obj->getId()];
+                return sprintf('%.2f', $grade->getGrade() / ($grade->getCollection()->maxGrade/$grade->getCollection()->getScaleCount()));
             }
             return '0.00';
         });
 
         foreach ($domains as $domain) {
-            $this->table->addCell(new \Tk\Table\Cell\Text($domain->label.'Grade'))->setLabel($domain->label.' Grade')->setOnPropertyValue(function ($cell, $obj, $value) use ($domain, $results) {
+            $this->table->addCell(new \Tk\Table\Cell\Text($domain->label.'Grade'))->setLabel($domain->label.' Grade')->
+            setOnPropertyValue(function ($cell, $obj, $value) use ($domain, $gradeList) {
                 /** @var \Tk\Table\Cell\Text $cell */
                 /** @var \Uni\Db\User $obj */
-                $prop = $domain->label.'_grade';
-                $res = array();
-                if (!empty($results[$obj->getId()]))
-                    $res = $results[$obj->getId()];
-                if (array_key_exists($prop, $res)) {
-                    return sprintf('%.2f', round($res[$prop], 2));
+                if ($gradeList[$obj->getId()]) {
+                    /** @var \Skill\Util\Grade $grade */
+                    $grade = $gradeList[$obj->getId()];
+                    $list = $grade->getDomainAvgList();
+                    if (!empty($list[$domain->getId()])) {
+                        return sprintf('%.2f', $list[$domain->getId()]['grade']);
+                    }
                 }
                 return '0.00';
             });
         };
-        $this->table->addCell(new \Tk\Table\Cell\Text('totalGrade'))->setOnPropertyValue(function ($cell, $obj, $value) use ($subject, $collection) {
+        $this->table->addCell(new \Tk\Table\Cell\Text('totalGrade'))->setOnPropertyValue(function ($cell, $obj, $value) use ($gradeList) {
             /** @var \Tk\Table\Cell\Text $cell */
             /** @var \Uni\Db\User $obj */
             $cell->addCss('total');
-            //$studentResult =  \Skill\Db\ReportingMap::create()->findStudentResult($collection->getId(), $subject->getId(), $obj->getId(), true);
-            $studentResult = $obj->studentResult;
-            if ($studentResult) {
-                return sprintf('%.2f', $studentResult*$collection->maxGrade);
+
+            if ($gradeList[$obj->getId()]) {
+                /** @var \Skill\Util\Grade $grade */
+                $grade = $gradeList[$obj->getId()];
+                return sprintf('%.2f', $grade->getGrade());
             }
             return '0.00';
         });
-        $this->table->addCell(new \Tk\Table\Cell\Text('totalPct'))->setOnPropertyValue(function ($cell, $obj, $value) use ($subject, $collection) {
+        $this->table->addCell(new \Tk\Table\Cell\Text('totalPct'))->setOnPropertyValue(function ($cell, $obj, $value) use ($gradeList) {
             /** @var \Tk\Table\Cell\Text $cell */
             /** @var \Uni\Db\User $obj */
-            //$studentResult =  \Skill\Db\ReportingMap::create()->findStudentResult($collection->getId(), $subject->getId(), $obj->getId(), true);
-            $studentResult = $obj->studentResult;
-            if ($studentResult) {
-                return sprintf('%.2f%%', ($studentResult)*100);
+
+            if ($gradeList[$obj->getId()]) {
+                /** @var \Skill\Util\Grade $grade */
+                $grade = $gradeList[$obj->getId()];
+                return sprintf('%.2f%%', $grade->getGrade() * (100/$grade->getCollection()->maxGrade) );
             }
             return '0.00';
         });

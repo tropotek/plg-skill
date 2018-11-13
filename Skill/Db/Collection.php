@@ -108,7 +108,7 @@ class Collection extends \Tk\Db\Map\Model
      * Should the zero values be included in the weighted average calculation
      * @var boolean
      */
-    public $includeZero = false;
+    //public $includeZero = false;
 
     /**
      * @var string
@@ -160,11 +160,13 @@ class Collection extends \Tk\Db\Map\Model
     }
 
     /**
-     *
+     * @throws \Exception
      */
     public function save()
     {
         parent::save();
+        $calc = new \Skill\Util\GradeCalculator($this->getId());
+        $calc->deleteSubjectGradeCache();
     }
 
     /**
@@ -200,12 +202,14 @@ class Collection extends \Tk\Db\Map\Model
      * Get the total number of domains for this collection
      *
      * @return int
-     * @throws \Exception
      */
     public function getDomainCount()
     {
-        if (!$this->domainCount)
-            $this->domainCount = DomainMap::create()->findFiltered(array('collectionId' => $this->getVolatileId()))->count();
+        if (!$this->domainCount) {
+            try {
+                $this->domainCount = DomainMap::create()->findFiltered(array('collectionId' => $this->getVolatileId(), 'active' => true))->count();
+            } catch (\Exception $e) { \Tk\Log::warning($e->__toString()); }
+        }
         return $this->domainCount;
     }
 
@@ -213,12 +217,16 @@ class Collection extends \Tk\Db\Map\Model
      * Get the total number of scale ticks/records for this collection
      *
      * @return int
-     * @throws \Exception
      */
     public function getScaleCount()
     {
-        if (!$this->scaleCount)
-            $this->scaleCount = ScaleMap::create()->findFiltered(array('collectionId' => $this->getVolatileId()))->count();
+        if (!$this->scaleCount) {
+            try {
+                $this->scaleCount = ScaleMap::create()->findFiltered(array('collectionId' => $this->getVolatileId()))->count()-1;
+            } catch (\Exception $e) {
+                \Tk\Log::warning($e->__toString());
+            }
+        }
         return $this->scaleCount;
     }
 

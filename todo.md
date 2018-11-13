@@ -1,10 +1,22 @@
 #TODO
 
 
+  - We need to research a better way to manage all the entry values and report on them
+    Currently it is slow and bulky... ;-?
+       
+    
+    
+    
+    
+    
+    
+## NOTES 
+
+
 HOW TO CALCULATE GRADES (GOALS)
 
   1. For each individual entry we calculate the domain average excluding the zero values.
-     So when viewing a single Entries result we have the average caclulated without the zero values.
+     So when viewing a single Entries result we have the average calculated without the zero values.
      (This should be cached for fast data access)
   2. When calculating a students overall grade. 
     1. We compile the domain averages for each of the entries that exclude the zero values. (as above)
@@ -14,26 +26,3 @@ HOW TO CALCULATE GRADES (GOALS)
        each average domain value by the doamin.weight value.  
     4. Finally add all the domain values and divide by the number of domains to get the average grade. 
     5. Divide this value by the scale and multiply by 100 to get the percentage grade
-  
-
-
-
-
-
-  - The entire grade results system of caclculation is not working efficiently, we need to implement
-    more caching and more optimised speedy queries to make it fully functional.
-
-  - Grade Results: Refactor the grading system. Would be good to have all grade data in cache tables
-    so we can query results over time and generate fast reports of data across all subjects in the same profile. 
-    Also optimise the current SQL queries as they are rather large and cumbersome, 
-    This makes them hard to edit and maintain.
-    
-  - Skills Results: Check that the skills results is as optimised as possible. Convert the SQL 
-    back to PHP if need be, redesign the tables if needed.   
-    
-    
-    
-    
-    
-    
-    

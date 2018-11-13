@@ -67,10 +67,6 @@ class View extends AdminEditIface
             $pct = round(($this->entry->calcAverage()/($this->entry->getCollection()->getScaleCount()-1))*100);
             $this->form->addField(new Field\Html('average', sprintf('%.2f &nbsp; (%d%%)', $this->entry->calcAverage(), $pct)))
                 ->setFieldset('Entry Details');
-//            if ($this->getUser()->isStaff()) {
-//                $pct = round(($this->entry->weightedAverage / ($this->entry->getCollection()->getScaleLength() - 1)) * 100);
-//                $this->form->addField(new Field\Html('weightedAverage', sprintf('%.2f &nbsp; (%d%%)', $this->entry->weightedAverage, $pct)))->setFieldset('Entry Details');
-//            }
         }
 
         $this->form->addField(new Field\Html('status'))->setFieldset('Entry Details');

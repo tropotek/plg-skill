@@ -58,15 +58,16 @@ class ItemMap extends \App\Db\Mapper
     }
 
     /**
+     * Get a basic un weighted average of an entry
      *
      * @param int $userId
      * @param int $itemId
-     * @param string $instanceStatus
+     * @param string $entryStatus
      * @param string $placementStatus
      * @return float
      * @throws \Tk\Db\Exception
      */
-    public function findAverage($userId, $itemId, $instanceStatus = 'approved', $placementStatus = 'completed')
+    public function findAverage($userId, $itemId, $entryStatus = 'approved', $placementStatus = 'completed')
     {
         $db = $this->getDb();
 
@@ -80,9 +81,9 @@ SQL;
 
         $stmt = $db->prepare($sql);
         if ($placementStatus)
-            $stmt->execute(array((int)$userId, (int)$itemId, $instanceStatus, $placementStatus));
+            $stmt->execute(array((int)$userId, (int)$itemId, $entryStatus, $placementStatus));
         else
-            $stmt->execute(array((int)$userId, (int)$itemId, $instanceStatus));
+            $stmt->execute(array((int)$userId, (int)$itemId, $entryStatus));
 
         $avg = 0.0;
         while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {

@@ -111,6 +111,7 @@ class DomainMap extends \App\Db\Mapper
         }
 
         $res = $this->selectFrom($from, $where, $tool);
+        //vd($this->getDb()->getLastQuery());
         return $res;
     }
 

@@ -39,7 +39,7 @@ class CollectionMap extends \App\Db\Mapper
             $this->dbMap->addPropertyMap(new Db\Boolean('requirePlacement', 'require_placement'));
             $this->dbMap->addPropertyMap(new Db\Decimal('maxGrade', 'max_grade'));
             //$this->dbMap->addPropertyMap(new Db\Boolean('viewGrade', 'view_grade'));
-            $this->dbMap->addPropertyMap(new Db\Boolean('includeZero', 'include_zero'));
+            //$this->dbMap->addPropertyMap(new Db\Boolean('includeZero', 'include_zero'));
             $this->dbMap->addPropertyMap(new Db\Text('confirm'));
             $this->dbMap->addPropertyMap(new Db\Text('instructions'));
             $this->dbMap->addPropertyMap(new Db\Text('notes'));
@@ -71,7 +71,7 @@ class CollectionMap extends \App\Db\Mapper
             $this->formMap->addPropertyMap(new Form\Boolean('requirePlacement'));
             $this->formMap->addPropertyMap(new Form\Decimal('maxGrade'));
             $this->formMap->addPropertyMap(new Form\Boolean('viewGrade'));
-            $this->formMap->addPropertyMap(new Form\Boolean('includeZero'));
+            //$this->formMap->addPropertyMap(new Form\Boolean('includeZero'));
             $this->formMap->addPropertyMap(new Form\Text('confirm'));
             $this->formMap->addPropertyMap(new Form\Text('instructions'));
             $this->formMap->addPropertyMap(new Form\Text('notes'));

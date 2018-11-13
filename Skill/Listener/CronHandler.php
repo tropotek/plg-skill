@@ -21,16 +21,19 @@ class CronHandler implements Subscriber
     /**
      * @param Event $event
      * @throws \Exception
+     * @deprecated
      */
     public function onCron(Event $event)
     {
         /** @var \App\Console\Cron $cronConsole */
         $cronConsole = $event->get('console');
-
         $cronConsole->write(' - Checking and repairing old Entry collection_id and item_id values. (Remove After: Jan 2019)');
         \Skill\Db\CollectionMap::create()->fixChangeoverEntries();
 
-        $subjects = \App\Db\SubjectMap::create()->findFiltered(array('active' => true), \Tk\Db\Tool::create('id DESC'));
+        $subjects = \App\Db\SubjectMap::create()->findFiltered(array(
+            //'active' => true
+        ), \Tk\Db\Tool::create('id DESC'));
+
         if ($subjects->count()) {
             $cronConsole->write(' - Updating gradable skill results cache:');
         }
@@ -47,13 +50,17 @@ class CronHandler implements Subscriber
                 $cronConsole->writeComment('  - Subject ID:    ' . $subject->getId(), Output::VERBOSITY_VERY_VERBOSE);
                 $cronConsole->writeComment('  - Students:      ' . $students->count(), Output::VERBOSITY_VERY_VERBOSE);
 
-                $res = \Skill\Util\GradeCalculator::findSubjectAverageGrades($collection, $subject, true);  // re-cache results
+                $calc = new \Skill\Util\GradeCalculator($collection);
+                $calc->setCacheEnabled(false);
+                //$res = $calc->findSubjectAverageGrades();
+                $res = $calc->getSubjectGrades();
+
                 if (!$res || !$res->count){
                     $cronConsole->writeComment('  - Entry Count:   0', Output::VERBOSITY_VERY_VERBOSE);
                     $cronConsole->writeComment('', Output::VERBOSITY_VERY_VERBOSE);
                     continue;
                 }
-                $cronConsole->writeComment('  - Entry Count:   ' . $res->subjectEntryCount, Output::VERBOSITY_VERY_VERBOSE);
+                $cronConsole->writeComment('  - Entry Count:   ' . $res->entryCount, Output::VERBOSITY_VERY_VERBOSE);
                 $cronConsole->writeComment('  - Min:           ' . $res->min, Output::VERBOSITY_VERY_VERBOSE);
                 $cronConsole->writeComment('  - Median:        ' . $res->median, Output::VERBOSITY_VERY_VERBOSE);
                 $cronConsole->writeComment('  - Max:           ' . $res->max, Output::VERBOSITY_VERY_VERBOSE);

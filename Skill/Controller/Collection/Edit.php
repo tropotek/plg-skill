@@ -65,7 +65,7 @@ class Edit extends AdminEditIface
         $layout->addRow('publish', 'col-md-6');
         $layout->removeRow('active', 'col-md-6');
         $layout->addRow('gradable', 'col-md-6');
-        $layout->removeRow('includeZero', 'col-md-6');
+        //$layout->removeRow('includeZero', 'col-md-6');
 
         $tab = 'Details';
         $this->form->addField(new Field\Input('name'))->setTabGroup($tab)->setNotes('Create a label for this collection');
@@ -89,8 +89,8 @@ class Edit extends AdminEditIface
             ->setCheckboxLabel('Enable/Disable this collection for the subject.');
         $this->form->addField(new Field\Checkbox('gradable'))->setTabGroup($tab)
             ->setCheckboxLabel('If enabled then the student can view a summary of the results if the collection is published.');
-        $this->form->addField(new Field\Checkbox('includeZero'))->setTabGroup($tab)
-            ->setCheckboxLabel('Should the zero values be included in the weighted average calculation.');
+//        $this->form->addField(new Field\Checkbox('includeZero'))->setTabGroup($tab)
+//            ->setCheckboxLabel('Should the zero values be included in the weighted average calculation.');
         
         $this->form->addField(new Field\Input('confirm'))->setTabGroup($tab)
             ->setNotes('If set, the user will be prompted with the given text before they can submit their entry.');

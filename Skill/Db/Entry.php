@@ -122,6 +122,18 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
         $this->created = \Tk\Date::create();
     }
 
+
+    /**
+     * @return int
+     * @throws \Exception
+     */
+    public function update()
+    {
+        $calc = new \Skill\Util\GradeCalculator($this->getCollection());
+        $calc->deleteStudentGradeCache($this->getUser());
+        return parent::update();
+    }
+
     /**
      * @throws \Exception
      */
@@ -129,6 +141,7 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     {
         $this->average = $this->calcAverage();
         $this->weightedAverage = $this->calcDomainAverage(true);
+
         parent::save();
     }
 
@@ -207,7 +220,8 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
         $grades = array();
         $valueList = EntryMap::create()->findValue($this->getId());
         foreach ($valueList as $value) {
-            if (!$value->value && !$this->getCollection()->includeZero) continue;
+            //if (!$value->value && !$this->getCollection()->includeZero) continue;
+            if (!$value->value) continue;
             /** @var \Skill\Db\Item $item */
             $item = \Skill\Db\ItemMap::create()->find($value->item_id);
             //$val = (int)$value->value;
@@ -242,14 +256,7 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
      */
     public function calcAverage()
     {
-        return EntryMap::create()->getEntryAverage($this->getId(), $this->getCollection()->includeZero);
-//        $grades = array();
-//        $valueList = EntryMap::create()->findValue($this->getId());
-//        foreach ($valueList as $value) {
-//            if (!$value->value && !$this->getCollection()->includeZero) continue;
-//            $grades[$value->item_id] = $value->value;
-//        }
-//        return \Tk\Math::average($grades);
+        return EntryMap::create()->getEntryAverage($this->getId());
     }
 
 

@@ -238,20 +238,23 @@ class EntryMap extends \App\Db\Mapper
 
 
     /**
+     * Return a basic average for an entry
+     *
+     * NOTE: does not include domain weights and should not be used to
+     *       calculate the students final grade
+     *
      * @param int $entryId
      * @return \stdClass
      * @throws \Tk\Db\Exception
      */
-    public function getEntryGradeObject($entryId)
+    public function getEntryResultObject($entryId)
     {
         $sql = <<<SQL
 SELECT a.entry_id
     ,SUM(a.value) as 'value_total'
     ,COUNT(a.item_id) as 'item_count'
     ,AVG(NULLIF(a.value, 0)) as 'avg'
-    ,AVG(a.value) as 'zero_avg'
     ,AVG(NULLIF(a.value, 0))/d.scale_count as 'avg_ratio'
-    ,AVG(a.value)/d.scale_count as 'zero_avg_ratio'
 FROM skill_value a, skill_entry b, skill_collection c,
      (
      SELECT a.collection_id, COUNT(a.id) - 1 AS 'scale_count'
@@ -274,15 +277,12 @@ SQL;
      * It is just an average of all the entries item values
      *
      * @param int $entryId
-     * @param bool $zeroAvg If set to true the 0 values are included into the average calculation
      * @return float
      * @throws \Tk\Db\Exception
      */
-    public function getEntryAverage($entryId, $zeroAvg = false)
+    public function getEntryAverage($entryId)
     {
-        $obj = $this->getEntryGradeObject($entryId);
-        if ($zeroAvg)
-            return $obj->zero_avg;
+        $obj = $this->getEntryResultObject($entryId);
         return $obj->avg;
     }
 
@@ -292,15 +292,12 @@ SQL;
      * Multiply this value by 100 to get a percentage
      *
      * @param int $entryId
-     * @param bool $zeroAvg If set to true the 0 values are included into the average calculation
      * @return float
      * @throws \Tk\Db\Exception
      */
-    public function getEntryGrade($entryId, $zeroAvg = false)
+    public function getEntryRatio($entryId)
     {
-        $obj = $this->getEntryGradeObject($entryId);
-        if ($zeroAvg)
-            return $obj->zero_avg_ratio;
+        $obj = $this->getEntryResultObject($entryId);
         return $obj->avg_ratio;
     }
 
