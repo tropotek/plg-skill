@@ -30,8 +30,10 @@ class CronHandler implements Subscriber
         $cronConsole->write(' - Checking and repairing old Entry collection_id and item_id values. (Remove After: Jan 2019)');
         \Skill\Db\CollectionMap::create()->fixChangeoverEntries();
 
+
+
         $subjects = \App\Db\SubjectMap::create()->findFiltered(array(
-            //'active' => true
+            'active' => true
         ), \Tk\Db\Tool::create('id DESC'));
 
         if ($subjects->count()) {
