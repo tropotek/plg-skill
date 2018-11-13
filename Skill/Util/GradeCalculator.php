@@ -209,10 +209,10 @@ class GradeCalculator
             ));
             $data = (object)array(
                 'processingTime' => round(microtime(true) - $start, 4),
-                'min' => (count($gradeValueList) > 0) ? min($gradeValueList) * $this->collection->maxGrade : 0,
-                'median' => \Tk\Math::median($gradeValueList) * $this->collection->maxGrade,
-                'max' => (count($gradeValueList) > 0) ? max($gradeValueList) * $this->collection->maxGrade : 0,
-                'avg' => \Tk\Math::average($gradeValueList),
+                'min' => (count($gradeValueList) > 0) ? round(min($gradeValueList) * $this->collection->maxGrade, 2) : 0,
+                'median' => round(\Tk\Math::median($gradeValueList) * $this->collection->maxGrade, 2),
+                'max' => (count($gradeValueList) > 0) ? round(max($gradeValueList) * $this->collection->maxGrade, 2) : 0,
+                'avg' => round(\Tk\Math::average($gradeValueList), 2),
                 'count' => count($gradeValueList),
                 'gradeValueList' => $gradeValueList,
                 'gradeList' => $gradeList,
@@ -271,10 +271,10 @@ class GradeCalculator
 
             $data = (object)array(
                 'processingTime' => round(microtime(true) - $start, 4),
-                'min' => (count($gradeValueList) > 0) ? min($gradeValueList)*100 : 0,
-                'median' => \Tk\Math::median($gradeValueList)*100,
-                'max' => (count($gradeValueList) > 0) ? max($gradeValueList)*100 : 0,
-                'avg' => \Tk\Math::average($gradeValueList)*100,
+                'min' => (count($gradeValueList) > 0) ? round(min($gradeValueList)*100, 2) : 0,
+                'median' => round(\Tk\Math::median($gradeValueList)*100, 2),
+                'max' => (count($gradeValueList) > 0) ? round(max($gradeValueList)*100, 2) : 0,
+                'avg' => round(\Tk\Math::average($gradeValueList)*100, 2),
                 'count' => count($gradeValueList),
                 'gradeValueList' => $gradeValueList,
                 'entryCount' => $subjectEntries->count()

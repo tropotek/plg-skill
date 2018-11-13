@@ -89,7 +89,7 @@ class CollectionReport extends \App\Controller\AdminManagerIface
                     $grade = $gradeList[$obj->getId()];
                     $list = $grade->getDomainAvgList();
                     if (!empty($list[$domain->getId()])) {
-                        return sprintf('%.2f', $list[$domain->getId()]['avg']);
+                        return sprintf('%.2f', round($list[$domain->getId()]['avg'], 2));
                     }
                 }
 
@@ -105,7 +105,7 @@ class CollectionReport extends \App\Controller\AdminManagerIface
             if ($gradeList[$obj->getId()]) {
                 /** @var \Skill\Util\Grade $grade */
                 $grade = $gradeList[$obj->getId()];
-                return sprintf('%.2f', $grade->getGrade() / ($grade->getCollection()->maxGrade/$grade->getCollection()->getScaleCount()));
+                return sprintf('%.2f', round($grade->getGrade() / ($grade->getCollection()->maxGrade/$grade->getCollection()->getScaleCount()), 2) );
             }
             return '0.00';
         });
@@ -120,7 +120,7 @@ class CollectionReport extends \App\Controller\AdminManagerIface
                     $grade = $gradeList[$obj->getId()];
                     $list = $grade->getDomainAvgList();
                     if (!empty($list[$domain->getId()])) {
-                        return sprintf('%.2f', $list[$domain->getId()]['grade']);
+                        return sprintf('%.2f', round($list[$domain->getId()]['grade'], 2));
                     }
                 }
                 return '0.00';
@@ -134,7 +134,7 @@ class CollectionReport extends \App\Controller\AdminManagerIface
             if ($gradeList[$obj->getId()]) {
                 /** @var \Skill\Util\Grade $grade */
                 $grade = $gradeList[$obj->getId()];
-                return sprintf('%.2f', $grade->getGrade());
+                return sprintf('%.2f', round($grade->getGrade(), 2));
             }
             return '0.00';
         });
@@ -145,7 +145,7 @@ class CollectionReport extends \App\Controller\AdminManagerIface
             if ($gradeList[$obj->getId()]) {
                 /** @var \Skill\Util\Grade $grade */
                 $grade = $gradeList[$obj->getId()];
-                return sprintf('%.2f%%', $grade->getGrade() * (100/$grade->getCollection()->maxGrade) );
+                return sprintf('%.2f%%', round($grade->getGrade() * (100/$grade->getCollection()->maxGrade), 2) );
             }
             return '0.00';
         });
