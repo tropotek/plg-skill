@@ -189,7 +189,7 @@ class EntryMap extends \App\Db\Mapper
         /** @var Entry $entry */
         $entry = $this->find($entryId);
         if ($entry) {   // Ensure values entered do not exceed the number of scale items minus 1 because we start with 0
-            $scale = ($entry->getCollection()->getScaleCount() - 1);
+            $scale = ($entry->getCollection()->getScaleCount());
             if ($value < 0) $value = 0;
             if ($value > $scale) $value = $scale;
         }

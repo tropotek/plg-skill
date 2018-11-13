@@ -105,7 +105,7 @@ class CollectionReport extends \App\Controller\AdminManagerIface
             if ($gradeList[$obj->getId()]) {
                 /** @var \Skill\Util\Grade $grade */
                 $grade = $gradeList[$obj->getId()];
-                return sprintf('%.2f', round($grade->getGrade() / ($grade->getCollection()->maxGrade/$grade->getCollection()->getScaleCount()), 2) );
+                return sprintf('%.2f', round($grade->getAverage(), 2) );
             }
             return '0.00';
         });
@@ -145,7 +145,8 @@ class CollectionReport extends \App\Controller\AdminManagerIface
             if ($gradeList[$obj->getId()]) {
                 /** @var \Skill\Util\Grade $grade */
                 $grade = $gradeList[$obj->getId()];
-                return sprintf('%.2f%%', round($grade->getGrade() * (100/$grade->getCollection()->maxGrade), 2) );
+                //return sprintf('%.2f%%', round($grade->getGrade() * (100/$grade->getCollection()->maxGrade), 2) );
+                return sprintf('%.2f%%', round($grade->getPercent(), 2) );
             }
             return '0.00';
         });

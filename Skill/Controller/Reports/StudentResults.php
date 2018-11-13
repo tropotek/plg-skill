@@ -71,6 +71,13 @@ class StudentResults extends AdminIface
         $panelTitle = sprintf('%s Results for `%s`', $this->collection->name, $this->user->name);
         $template->insertText('panel-title', $panelTitle);
 
+        $calc = new \Skill\Util\GradeCalculator($this->collection);
+        //$calc->setCacheEnabled(false);
+        $results = $calc->getSubjectGrades();
+        /** @var \Skill\Util\Grade $studentGrade */
+        $studentGrade = $results->gradeList[$this->user->getId()];
+
+
         $filter = array(
             'userId' => $this->user->getId(),
             'collectionId' => $this->collection->getId(),
@@ -79,34 +86,28 @@ class StudentResults extends AdminIface
             'placementStatus' => \App\Db\Placement::STATUS_COMPLETED
         );
         $entryList = \Skill\Db\EntryMap::create()->findFiltered($filter, \Tk\Db\Tool::create('created DESC'));
-
         $template->insertText('entryCount', $entryList->count());
-        $studentResult =  \Skill\Db\ReportingMap::create()->findStudentResult($this->collection->getId(), $this->getSubject()->getId(), $this->user->getId(), true);
 
-        $template->setAttr('grade', 'title', $studentResult);
-        if ($this->getConfig()->isDebug()) {
-            $template->setChoice('debug');
-        }
+        $template->insertText('avg', sprintf('%.2f / %d', $studentGrade->getAverage(), $this->collection->getScaleCount()));
+        $template->insertText('grade', sprintf('%.2f / %d', $studentGrade->getGrade(), $this->collection->maxGrade));
+        $template->insertText('gradePcnt', sprintf('%.2f', $studentGrade->getPercent()) . '%');
 
-        $template->insertText('avg', sprintf('%.2f / %d', $studentResult*($this->collection->getScaleCount()-1), $this->collection->getScaleCount()-1));
-        $template->insertText('grade', sprintf('%.2f / %d', $studentResult*$this->collection->maxGrade, $this->collection->maxGrade));
-        $template->insertText('gradePcnt', sprintf('%.2f', $studentResult*100) . '%');
+        // Get class totals
+        $template->insertText('class-min', sprintf('%.2f%%', $results->min));
+        $template->insertText('class-median', sprintf('%.2f%%', $results->median));
+        $template->insertText('class-max', sprintf('%.2f%%', $results->max));
 
-        $domainResults = \Skill\Db\ReportingMap::create()->findDomainAverages($this->collection->getId(), $this->getSubject()->getId(), $this->user->getId());
+
         $domainList = \Skill\Db\DomainMap::create()->findFiltered(array('collectionId' => $this->collection->getId(), 'active' => true), \Tk\Db\Tool::create());
-
-        // TODO: Could look at using a pie chart for this information
         foreach ($domainList as $domain) {
-            $obj = null;
-            if (!empty($domainResults[$domain->getId()]))
-                $obj = $domainResults[$domain->getId()];
+            $domainAvg = (object)$studentGrade->getDomainAvg($domain->getId());
 
             $row = $template->getRepeat('domain-row');
             $row->insertText('name', $domain->name . ' (' . $domain->label . ')');
             $row->insertText('weight', round($domain->weight * 100) . '%');
-            if ($obj) {
-                $row->insertText('avg', sprintf('%.2f', $obj->avg));
-                $row->insertText('grade', sprintf('%.2f', ($obj->avg / $obj->scale) * $this->collection->maxGrade));
+            if ($domainAvg) {
+                $row->insertText('avg', sprintf('%.2f', round($domainAvg->avg, 2)));
+                $row->insertText('grade', sprintf('%.2f', round($domainAvg->grade, 2)));
             } else {
                 $row->insertText('avg', sprintf('%.2f', 0));
                 $row->insertText('grade', sprintf('%.2f', 0));
@@ -114,11 +115,9 @@ class StudentResults extends AdminIface
             $row->appendRepeat();
         }
 
-        $itemResults = \Skill\Db\ReportingMap::create()->findItemAverages($this->collection->getId(), $this->getSubject()->getId(), $this->user->getId());
         $catList = \Skill\Db\CategoryMap::create()->findFiltered(array(
             'collectionId' => $this->collection->getId()
         ));
-
         $i = 0;
         foreach ($catList as $category) {
             $catRow = $template->getRepeat('category-row');
@@ -130,19 +129,12 @@ class StudentResults extends AdminIface
             ));
             if (!$itemList->count()) continue;
             foreach ($itemList as $item) {
-                $obj = null;
-                if (isset($itemResults[$item->getId()]))
-                    $obj = $itemResults[$item->getId()];
-
                 $row = $catRow->getRepeat('item-row');
                 $row->insertText('lineNo', ($i+1).'. ');
                 $row->insertText('question', $item->question);
 
-                $avg = 0;
-                if($obj)
-                    $avg = $obj->avg;
-
-                $row->insertText('result', sprintf('%.2f', $avg));
+                $avg = $studentGrade->getItemAvg($item);
+                $row->insertText('result', sprintf('%.2f', round($avg, 2)));
                 if ($avg <= 0) {
                     $row->addCss('result', 'zero');
                 }
@@ -152,54 +144,8 @@ class StudentResults extends AdminIface
             $catRow->appendRepeat();
         }
 
-        
-        
-        // TODO: plot a graph of all completed entry averages
-
-        // include Flot
-        \App\Ui\Js::includeFlot($template);
-        // placement activity
-        $template->appendJsUrl(\Tk\Uri::create('/html/app/js/flot/monthlyLineGraph.js'));
-        $css = <<<CSS
-.plot {
-  height: 220px;
-}
-CSS;
-        $template->appendCss($css);
-        $template->setAttr('line-chart', 'data-ymax', $this->collection->getScaleCount()-1);
-        $template->setAttr('line-chart', 'data-type', 'float');
-
-        $dataRow = $template->getRepeat('chart-row');
-        $dataRow->insertText('chart-label', 'Calc. Grade');
-
-        $entryList = \Skill\Db\EntryMap::create()->findFiltered(array(
-            'userId' => $this->user->getId(), 'subjectId' => $this->getSubject()->getId(), 'status' => \Skill\Db\Entry::STATUS_APPROVED)
-        );
-        /** @var \Skill\Db\Entry $entry */
-        foreach ($entryList as $entry) {
-            $th = $template->getRepeat('month');
-            $th->insertText('month', $entry->created->format(\Tk\Date::FORMAT_MED_DATE));
-            $th->appendRepeat();
-
-            $data = $dataRow->getRepeat('chart-data');
-            $data->insertText('chart-data', $entry->weightedAverage);
-            $data->setAttr('chart-data', 'data-date', $entry->created->getTimestamp()*1000);
-            $data->appendRepeat();
-        }
-        $dataRow->appendRepeat();
-
-        // Get subject class totals
-
-        $calc = new \Skill\Util\GradeCalculator($this->collection);
-        //$calc->setCacheEnabled(false);
-        //$res = $calc->findSubjectAverageGrades();
-        $res = $calc->getSubjectGrades();
-
-        //$res = \Skill\Util\GradeCalculator::findSubjectAverageGrades($this->collection, $this->getSubject());
-        if ($res->count) {
-            $template->insertText('class-min', sprintf('%.2f%%', $res->min));
-            $template->insertText('class-median', sprintf('%.2f%%', $res->median));
-            $template->insertText('class-max', sprintf('%.2f%%', $res->max));
+        if ($this->getConfig()->isDebug()) {
+            $template->setChoice('debug');
         }
 
 
@@ -292,18 +238,6 @@ CSS;
             <td class="kv-value" var="grade">0.0</td>
           </tr>
           </tbody>
-        </table>
-      </div>
-      <div class="col-lg-4" choice="hide">
-        <table class="table line-chart" var="line-chart">
-          <tr>
-            <th>Entries</th>
-            <th repeat="month" var="month"></th>
-          </tr>
-          <tr repeat="chart-row">
-            <th var="chart-label">Average</th>
-            <td repeat="chart-data" var="chart-data">0.0</td>
-          </tr>
         </table>
       </div>
       <div class="col-lg-6">

@@ -23,8 +23,8 @@ class Grade implements \Serializable
     protected $userId = 0;
 
     /**
-     * This is the weighted average for all the domain averages
-     *
+     * This is the calculated weighted average for all the domain averages
+     * Includes the maxGrade calc...
      * @var float
      */
     protected $grade = 0.0;
@@ -121,6 +121,28 @@ class Grade implements \Serializable
     }
 
     /**
+     * @param int $domainId
+     * @return array|null
+     */
+    public function getDomainAvg($domainId)
+    {
+        if (isset($this->domainAvgList[$domainId]))
+            return $this->domainAvgList[$domainId];
+    }
+
+    /**
+     * @param \Skill\Db\Item $item
+     * @return float|null
+     */
+    public function getItemAvg($item)
+    {
+        $domainAvg = $this->getDomainAvg($item->domainId);
+        if (!empty($domainAvg['itemAvgList'][$item->getId()]))
+            return $domainAvg['itemAvgList'][$item->getId()];
+        return 0;
+    }
+
+    /**
      * Array format:
      *   array(
      *     'domainId' => 0,
@@ -143,6 +165,16 @@ class Grade implements \Serializable
     }
 
     /**
+     * @param float $grade
+     * @return Grade
+     */
+    public function setGrade($grade)
+    {
+        $this->grade = $grade;
+        return $this;
+    }
+
+    /**
      * @return float
      */
     public function getGrade()
@@ -151,13 +183,19 @@ class Grade implements \Serializable
     }
 
     /**
-     * @param float $grade
-     * @return Grade
+     * @return float
      */
-    public function setGrade($grade)
+    public function getAverage()
     {
-        $this->grade = $grade;
-        return $this;
+        return $this->getGrade() / ($this->getCollection()->maxGrade / $this->getCollection()->getScaleCount());
+    }
+
+    /**
+     * @return float
+     */
+    public function getPercent()
+    {
+        return $this->grade * (100 / $this->getCollection()->maxGrade);
     }
 
 
