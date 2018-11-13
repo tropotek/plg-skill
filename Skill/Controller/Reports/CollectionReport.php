@@ -170,10 +170,7 @@ class CollectionReport extends \App\Controller\AdminManagerIface
     protected function getList()
     {
         $filter = $this->table->getFilterValues();
-        $this->table->resetSessionTool();
-
         $filter['subjectId'] = $this->getSubject()->getId();
-
         return \App\Db\UserMap::create()->findFiltered($filter, $this->table->getTool('a.name', 0));
     }
 
