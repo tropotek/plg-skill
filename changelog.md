@@ -1,5 +1,10 @@
 #CHANGELOG#
 
+Ver 2.1.42 [2018-11-13]:
+-------------------------------
+  - Fixed the GOALS stats reporting issue
+
+
 Ver 2.1.40 [2018-11-13]:
 -------------------------------
   - Fixed the GOALS stats reporting issue
