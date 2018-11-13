@@ -43,7 +43,7 @@ class GradeCalculator
     {
         $this->collection = $collection;
         if (!$cachePath) {
-            $cachePath = $this->getConfig()->getDataPath() . '/skillResultsCache/' . $collection->getSubject()->getInstitutionId();
+            $cachePath = $this->getConfig()->getDataPath() . '/skillResultsCache/' . $collection->getSubject()->getInstitutionId() . '/' . $collection->getVolatileId();
         }
         $this->cachePath = $cachePath;
 
@@ -103,6 +103,14 @@ class GradeCalculator
         if (is_file($this->cachePath . '/' . $this->getSubjectGradesCacheId() . '_opt')) {
             unlink($this->cachePath . '/' . $this->getSubjectGradesCacheId() . '_opt');
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public function flushCache()
+    {
+        return \Tk\File::rmdir($this->cachePath);
     }
 
 
@@ -201,9 +209,9 @@ class GradeCalculator
             ));
             $data = (object)array(
                 'processingTime' => round(microtime(true) - $start, 4),
-                'min' => (count($gradeValueList) > 0) ? min($gradeValueList) : 0,
-                'median' => \Tk\Math::median($gradeValueList),
-                'max' => (count($gradeValueList) > 0) ? max($gradeValueList) : 0,
+                'min' => (count($gradeValueList) > 0) ? min($gradeValueList) * $this->collection->maxGrade : 0,
+                'median' => \Tk\Math::median($gradeValueList) * $this->collection->maxGrade,
+                'max' => (count($gradeValueList) > 0) ? max($gradeValueList) * $this->collection->maxGrade : 0,
                 'avg' => \Tk\Math::average($gradeValueList),
                 'count' => count($gradeValueList),
                 'gradeValueList' => $gradeValueList,
@@ -263,10 +271,10 @@ class GradeCalculator
 
             $data = (object)array(
                 'processingTime' => round(microtime(true) - $start, 4),
-                'min' => (count($gradeValueList) > 0) ? min($gradeValueList) : 0,
-                'median' => \Tk\Math::median($gradeValueList),
-                'max' => (count($gradeValueList) > 0) ? max($gradeValueList) : 0,
-                'avg' => \Tk\Math::average($gradeValueList),
+                'min' => (count($gradeValueList) > 0) ? min($gradeValueList)*100 : 0,
+                'median' => \Tk\Math::median($gradeValueList)*100,
+                'max' => (count($gradeValueList) > 0) ? max($gradeValueList)*100 : 0,
+                'avg' => \Tk\Math::average($gradeValueList)*100,
                 'count' => count($gradeValueList),
                 'gradeValueList' => $gradeValueList,
                 'entryCount' => $subjectEntries->count()

@@ -192,13 +192,14 @@ CSS;
 
         $calc = new \Skill\Util\GradeCalculator($this->collection);
         //$calc->setCacheEnabled(false);
-        $res = $calc->findSubjectAverageGrades();
+        //$res = $calc->findSubjectAverageGrades();
+        $res = $calc->getSubjectGrades();
 
         //$res = \Skill\Util\GradeCalculator::findSubjectAverageGrades($this->collection, $this->getSubject());
         if ($res->count) {
-            $template->insertText('class-min', round($res->min*100, 2) . '%');
-            $template->insertText('class-median', round($res->median*100, 2) . '%');
-            $template->insertText('class-max', round($res->max*100, 2) . '%');
+            $template->insertText('class-min', sprintf('%.2f%%', $res->min));
+            $template->insertText('class-median', sprintf('%.2f%%', $res->median));
+            $template->insertText('class-max', sprintf('%.2f%%', $res->max));
         }
 
 

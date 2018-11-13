@@ -51,8 +51,8 @@ class CronHandler implements Subscriber
                 $cronConsole->writeComment('  - Students:      ' . $students->count(), Output::VERBOSITY_VERY_VERBOSE);
 
                 $calc = new \Skill\Util\GradeCalculator($collection);
-                $calc->setCacheEnabled(false);
-                //$res = $calc->findSubjectAverageGrades();
+                $calc->flushCache();
+                //$calc->setCacheEnabled(false);
                 $res = $calc->getSubjectGrades();
 
                 if (!$res || !$res->count){
