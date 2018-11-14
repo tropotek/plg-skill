@@ -1,5 +1,12 @@
 #CHANGELOG#
 
+Ver 2.1.46 [2018-11-15]:
+-------------------------------
+  - Fixed individual entry percent grade
+  - Fixed table results and limit renderers
+  - Added Uri.js to the tk-base lib
+
+
 Ver 2.1.44 [2018-11-13]:
 -------------------------------
 
