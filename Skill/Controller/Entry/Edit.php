@@ -189,6 +189,8 @@ class Edit extends AdminEditIface
             $this->entry->assessor = $this->entry->getUser()->getName();
         }
 
+        $this->setPageTitle('Skill Edit');
+
         $this->buildForm();
 
         $this->form->load(\Skill\Db\EntryMap::create()->unmapForm($this->entry));
@@ -230,8 +232,10 @@ class Edit extends AdminEditIface
 
         if ($this->entry->getId() && $this->entry->getCollection()->gradable && !$this->isPublic) {
             $avg = $this->entry->calcAverage();
-            $pct = round(($avg / ($this->entry->getCollection()->getScaleCount() - 1)) * 100);
-            $this->form->addField(new Field\Html('average', sprintf('%.2f &nbsp; (%d%%)', $avg, $pct)))->setFieldset('Entry Details');
+            $avg = \Skill\Db\EntryMap::create()->getEntryAverage($this->entry->getId());
+            $ratio = \Skill\Db\EntryMap::create()->getEntryRatio($this->entry->getId()) * 100;
+            //$pct = round(($avg / ($this->entry->getCollection()->getScaleCount() - 1)) * 100);
+            $this->form->addField(new Field\Html('average', sprintf('%.2f &nbsp; (%d%%)', $avg, $ratio)))->setFieldset('Entry Details');
         }
 
         $urlRole = \Bs\Uri::create()->getRoleType($this->getConfig()->getAvailableUserRoleTypes());
@@ -349,7 +353,7 @@ class Edit extends AdminEditIface
     {
         $template = parent::show();
 
-        $template->insertText('panel-title', $this->entry->getCollection()->name . ' Edit');
+        $template->insertText('panel-title', $this->entry->getCollection()->name . ': ' . $this->entry->getPlacement()->getTitle(true));
         if ($this->entry->getCollection()->icon) {
             $template->setAttr('icon', 'class', $this->entry->getCollection()->icon);
         }
