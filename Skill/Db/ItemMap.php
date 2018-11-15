@@ -67,7 +67,7 @@ class ItemMap extends \App\Db\Mapper
      * @return float
      * @throws \Tk\Db\Exception
      */
-    public function findAverage($userId, $itemId, $entryStatus = 'approved', $placementStatus = 'completed')
+    public function findAverage($userId, $itemId, $entryStatus = 'approved', $placementStatus = 'completed', $filter = array())
     {
         $db = $this->getDb();
 
@@ -79,6 +79,14 @@ SQL;
         if ($placementStatus)
             $sql .= ' AND c.`status` = ?';
 
+
+        if (!empty($filter['companyId'])) {
+            $w = $this->makeMultiQuery($filter['companyId'], 'c.company_id', 'AND', '!=');
+            if ($w) {
+                $sql .= ' AND ('. $w . ')';
+            }
+        }
+        //vd($sql);
         $stmt = $db->prepare($sql);
         if ($placementStatus)
             $stmt->execute(array((int)$userId, (int)$itemId, $entryStatus, $placementStatus));

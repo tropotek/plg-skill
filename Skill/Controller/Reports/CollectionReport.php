@@ -72,7 +72,11 @@ class CollectionReport extends \App\Controller\AdminManagerIface
         //$results = \Skill\Db\ReportingMap::create()->findStudentResults($filter, \Tk\Db\Tool::create('', 0));
         $calc = new \Skill\Util\GradeCalculator($this->collection);
         //$calc->setCacheEnabled(false);
-        $results = $calc->getSubjectGrades();
+        $filter = array();
+        if($this->table->getFilterSession()->has('exclude')) {
+            $filter['companyId'] = explode(',', str_replace(' ', '', $this->table->getFilterSession()->get('exclude')));
+        }
+        $results = $calc->getSubjectGrades($filter);
 
         \Tk\Log::alert('\Skill\Db\ReportingMap::create()->findStudentResult(..END..)');
 
@@ -153,6 +157,11 @@ class CollectionReport extends \App\Controller\AdminManagerIface
 
         // Filters
         $this->table->addFilter(new \Tk\Form\Field\Input('uid'))->setAttr('placeholder', 'Student Number');
+        if ($this->getUser()->isCoordinator()) {
+            $this->table->addFilter(new \Tk\Form\Field\Input('exclude'))->setAttr('style', 'width: 250px;')
+                ->setAttr('placeholder', 'Exclude companyId (EG: 123, 412, 231)');
+        }
+
 
         // Actions
         //$this->table->addAction(\Tk\Table\Action\ColumnSelect::create()->setDisabled(array('id', 'name')));

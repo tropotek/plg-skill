@@ -71,9 +71,12 @@ class StudentResults extends AdminIface
         $panelTitle = sprintf('%s Results for `%s`', $this->collection->name, $this->user->name);
         $template->insertText('panel-title', $panelTitle);
 
+        $filter = array();
+        $filter['companyId'] = array(11344, 760);
+
         $calc = new \Skill\Util\GradeCalculator($this->collection);
         //$calc->setCacheEnabled(false);
-        $results = $calc->getSubjectGrades();
+        $results = $calc->getSubjectGrades($filter);
         /** @var \Skill\Util\Grade $studentGrade */
         $studentGrade = $results->gradeList[$this->user->getId()];
 
@@ -128,6 +131,8 @@ class StudentResults extends AdminIface
                 'categoryId' => $category->getId()
             ));
             if (!$itemList->count()) continue;
+
+            $itemAvg = array();
             foreach ($itemList as $item) {
                 $row = $catRow->getRepeat('item-row');
                 $row->insertText('lineNo', ($i+1).'. ');
@@ -137,10 +142,14 @@ class StudentResults extends AdminIface
                 $row->insertText('result', sprintf('%.2f', round($avg, 2)));
                 if ($avg <= 0) {
                     $row->addCss('result', 'zero');
+                } else {
+                    $itemAvg[] = $avg;
                 }
                 $row->appendRepeat();
                 $i++;
             }
+            $catRow->insertText('category-avg', sprintf('%.2f', round(\Tk\Math::average($itemAvg), 2)));
+
             $catRow->appendRepeat();
         }
 
@@ -195,6 +204,9 @@ class StudentResults extends AdminIface
     }
     .EntryResults .item-row .result.zero {
       color: #999;
+    }
+    .EntryResults .category-avg {
+      margin-right: 115px;
     }
   </style>
   <div class="panel panel-default">
@@ -260,7 +272,7 @@ class StudentResults extends AdminIface
 
       <div class="col-xs-12 category-row clearfix" repeat="category-row">
         <div class="col-xs-12">
-          <div><h4 class="category-name" var="name">Category Name</h4></div>
+          <div><span class="badge badge-primary category-avg pull-right" var="category-avg">0.00</span><h4 class="category-name" var="name">Category Name</h4></div>
           <div class="row item-row" repeat="item-row" var="item-row">
             <div class="col-xs-10 question"><span class="lineNo" var="lineNo">0.</span> <span var="question"></span>
             </div>

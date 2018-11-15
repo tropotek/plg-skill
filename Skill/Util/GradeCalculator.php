@@ -65,19 +65,21 @@ class GradeCalculator
 
     /**
      * @param \Uni\Db\UserIface $user
+     * @param array $filter
      * @return string
      */
-    public function getStudentGradeCacheId($user)
+    public function getStudentGradeCacheId($user, $filter = array())
     {
-        return sprintf('sg-%s-%s', $this->collection->getId(), $user->getId());
+        return sprintf('sg-%s-%s-%s', $this->collection->getId(), $user->getId(), md5(json_encode($filter)));
     }
 
     /**
+     * @param array $filter
      * @return string
      */
-    public function getSubjectGradesCacheId()
+    public function getSubjectGradesCacheId($filter = array())
     {
-        return sprintf('sgl-%s', $this->collection->getId());
+        return sprintf('sgl-%s-%s', $this->collection->getId(), md5(json_encode($filter)));
     }
 
     /**
@@ -114,23 +116,18 @@ class GradeCalculator
     }
 
 
-
-
     /**
      * @param \Uni\Db\UserIface $user
+     * @param array $filter
      * @return mixed|Grade
      * @throws \Exception
      */
-    public function getStudentGrade($user)
+    public function getStudentGrade($user, $filter = array())
     {
-        $start = microtime(true);
-        $cacheId = $this->getStudentGradeCacheId($user);
+        $cacheId = $this->getStudentGradeCacheId($user, $filter);
         $grade = $this->getCache()->fetch($cacheId);
 
-        //if ($grade) \Tk\Log::info('Student Grade Cache Exists: ' . $user->getName());
         if (!$grade || !$this->isCacheEnabled()) {
-            //\Tk\Log::info(' - Student Grade Calculating');
-
             $grade = new Grade($this->collection->getId(), $user->getId());
             $domainAvgList = $grade->getDomainAvgList();        // Domain Average List
 
@@ -153,7 +150,7 @@ class GradeCalculator
                         'itemAvgList' => array()
                     );
                 }
-                $avg = \Skill\Db\ItemMap::create()->findAverage($user->getId(), $item->getId());
+                $avg = \Skill\Db\ItemMap::create()->findAverage($user->getId(), $item->getId(), 'approved', 'completed', $filter);
                 $domainAvgList[$domain->getId()]['itemAvgList'][$item->getId()] = $avg;
             }
 
@@ -180,23 +177,22 @@ class GradeCalculator
 
 
     /**
+     * @param array $filter
      * @return mixed
      * @throws \Exception
      */
-    public function getSubjectGrades()
+    public function getSubjectGrades($filter = array())
     {
         $start = microtime(true);
-        $cacheId = $this->getSubjectGradesCacheId();
+        $cacheId = $this->getSubjectGradesCacheId($filter);
         $data = $this->getCache()->fetch($cacheId);
-        //if ($data) \Tk\Log::info('Subject Grade Cache Exists: ' . $this->collection->getSubject()->getName());
-        if (!$data || !$this->isCacheEnabled()) {
-            //\Tk\Log::info(' - Subject Grade Calculating');
 
+        if (!$data || !$this->isCacheEnabled()) {
             $gradeList = array();
             $gradeValueList = array();
             $studentList = \App\Db\UserMap::create()->findFiltered(array('subjectId' => $this->collection->subjectId));
             foreach ($studentList as $student) {
-                $result = $this->getStudentGrade($student);
+                $result = $this->getStudentGrade($student, $filter);
                 $gradeList[$student->getId()] = $result;
                 if ($result->getGrade() > 0)
                     $gradeValueList[$student->getId()] = $result->getGrade();
