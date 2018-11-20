@@ -125,9 +125,14 @@ class GradeCalculator
     public function getStudentGrade($user, $filter = array())
     {
         $cacheId = $this->getStudentGradeCacheId($user, $filter);
-        $grade = $this->getCache()->fetch($cacheId);
+        $grade = null;
 
-        if (!$grade || !$this->isCacheEnabled()) {
+        if (!$this->getConfig()->isRefreshCacheRequest() && $this->isCacheEnabled()) {
+            $grade = $this->getCache()->fetch($cacheId);
+        }
+
+        if (!$grade) {
+            \Tk\Log::notice('   - Student: ' . $user->getName());
             $grade = new Grade($this->collection->getId(), $user->getId());
             $domainAvgList = $grade->getDomainAvgList();        // Domain Average List
 
@@ -185,9 +190,14 @@ class GradeCalculator
     {
         $start = microtime(true);
         $cacheId = $this->getSubjectGradesCacheId($filter);
-        $data = $this->getCache()->fetch($cacheId);
+        $data = null;
+        if (!$this->getConfig()->isRefreshCacheRequest() || !$this->isCacheEnabled()) {
+            $data = $this->getCache()->fetch($cacheId);
+        }
 
-        if (!$data || !$this->isCacheEnabled()) {
+        if (!$data) {
+            \Tk\Log::notice('Refreshing Skills Collection Results Cache: ' . $this->collection->name);
+
             $gradeList = array();
             $gradeValueList = array();
             $studentList = \App\Db\UserMap::create()->findFiltered(array('subjectId' => $this->collection->subjectId));

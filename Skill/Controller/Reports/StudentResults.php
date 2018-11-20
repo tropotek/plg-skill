@@ -72,13 +72,24 @@ class StudentResults extends AdminIface
         $template->insertText('panel-title', $panelTitle);
 
         $filter = array();
-        $filter['companyId'] = array(11344, 760);
 
         $calc = new \Skill\Util\GradeCalculator($this->collection);
         //$calc->setCacheEnabled(false);
         $results = $calc->getSubjectGrades($filter);
+
+        // Get class totals
+        $template->insertText('class-min', sprintf('%.2f%%', $results->min));
+        $template->insertText('class-median', sprintf('%.2f%%', $results->median));
+        $template->insertText('class-max', sprintf('%.2f%%', $results->max));
+
+
         /** @var \Skill\Util\Grade $studentGrade */
-        $studentGrade = $results->gradeList[$this->user->getId()];
+        //$studentGrade = $results->gradeList[$this->user->getId()];
+        $studentGrade = $calc->getStudentGrade($this->user, $filter);
+
+        $template->insertText('avg', sprintf('%.2f / %d', $studentGrade->getAverage(), $this->collection->getScaleCount()));
+        $template->insertText('grade', sprintf('%.2f / %d', $studentGrade->getGrade(), $this->collection->maxGrade));
+        $template->insertText('gradePcnt', sprintf('%.2f', $studentGrade->getPercent()) . '%');
 
 
         $filter = array(
@@ -90,15 +101,6 @@ class StudentResults extends AdminIface
         );
         $entryList = \Skill\Db\EntryMap::create()->findFiltered($filter, \Tk\Db\Tool::create('created DESC'));
         $template->insertText('entryCount', $entryList->count());
-
-        $template->insertText('avg', sprintf('%.2f / %d', $studentGrade->getAverage(), $this->collection->getScaleCount()));
-        $template->insertText('grade', sprintf('%.2f / %d', $studentGrade->getGrade(), $this->collection->maxGrade));
-        $template->insertText('gradePcnt', sprintf('%.2f', $studentGrade->getPercent()) . '%');
-
-        // Get class totals
-        $template->insertText('class-min', sprintf('%.2f%%', $results->min));
-        $template->insertText('class-median', sprintf('%.2f%%', $results->median));
-        $template->insertText('class-max', sprintf('%.2f%%', $results->max));
 
 
         $domainList = \Skill\Db\DomainMap::create()->findFiltered(array('collectionId' => $this->collection->getId(), 'active' => true), \Tk\Db\Tool::create());
