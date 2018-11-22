@@ -51,7 +51,7 @@ class SubjectEditHandler implements Subscriber
     public function onControllerInit(Event $event)
     {
         if ($this->controller) {
-            if (!$this->controller->getUser()->isStaff()) return;
+            if (!$this->controller->getUser()->isStaff() || !$this->controller->getSubject()->getId()) return;
             /** @var \Tk\Ui\Admin\ActionPanel $actionPanel */
             $actionPanel = $this->controller->getActionPanel();
             $actionPanel->add(\Tk\Ui\Button::create('Skill Collections',
