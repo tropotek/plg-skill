@@ -86,7 +86,7 @@ class StudentResults extends AdminIface
         /** @var \Skill\Util\Grade $studentGrade */
         //$studentGrade = $results->gradeList[$this->user->getId()];
         $studentGrade = $calc->getStudentGrade($this->user, $filter);
-
+        
         $template->insertText('avg', sprintf('%.2f / %d', $studentGrade->getAverage(), $this->collection->getScaleCount()));
         $template->insertText('grade', sprintf('%.2f / %d', $studentGrade->getGrade(), $this->collection->maxGrade));
         $template->insertText('gradePcnt', sprintf('%.2f', $studentGrade->getPercent()) . '%');
@@ -258,14 +258,14 @@ class StudentResults extends AdminIface
         <table class="table table-bordered">
           <tr>
             <th>Domain</th>
-            <th>Avg.</th>
             <th>Weight</th>
+            <th>Avg.</th>
             <th>Grade</th>
           </tr>
           <tr repeat="domain-row" var="domain-row">
             <td var="name"></td>
-            <td var="avg"></td>
             <td var="weight"></td>
+            <td var="avg"></td>
             <td var="grade"></td>
           </tr>
         </table>

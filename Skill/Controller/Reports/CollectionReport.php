@@ -101,7 +101,7 @@ class CollectionReport extends \App\Controller\AdminManagerIface
             });
         }
 
-        $this->table->addCell(new \Tk\Table\Cell\Text('total'))->setOnPropertyValue(function ($cell, $obj, $value) use ($gradeList) {
+        $this->table->addCell(new \Tk\Table\Cell\Text('total'))->setLabel('Total Avg.')->setOnPropertyValue(function ($cell, $obj, $value) use ($gradeList) {
             /** @var \Tk\Table\Cell\Text $cell */
             /** @var \Uni\Db\User $obj */
             $cell->addCss('total');
@@ -270,7 +270,7 @@ GROUP BY c.company_id, a.type_id
         $panelTitle = sprintf('%s Report', $this->collection->name);
         $template->insertText('panel-title', $panelTitle);
 
-        $template->appendCss('.tk-table td.total {border-right: double 3px #CCC; } ');
+        $template->appendCss('.tk-table td.total {border-right: double 3px #CCC; border-left: double 3px #CCC; background-color: #EEE;} ');
 
 
         return $template;
