@@ -150,7 +150,9 @@ class StudentResults extends AdminIface
                 $row->appendRepeat();
                 $i++;
             }
-            $catRow->insertText('category-avg', sprintf('%.2f', round(\Tk\Math::average($itemAvg), 2)));
+            // Not sure we need this
+            //$catRow->insertText('category-avg', sprintf('%.2f', round(\Tk\Math::average($itemAvg), 2)));
+            //$catRow->setChoice('category-avg');
 
             $catRow->appendRepeat();
         }
@@ -274,7 +276,7 @@ class StudentResults extends AdminIface
 
       <div class="col-xs-12 category-row clearfix" repeat="category-row">
         <div class="col-xs-12">
-          <div><span class="badge badge-primary category-avg pull-right" var="category-avg">0.00</span><h4 class="category-name" var="name">Category Name</h4></div>
+          <div><span class="badge badge-primary category-avg pull-right" var="category-avg" choice="category-avg">0.00</span><h4 class="category-name" var="name">Category Name</h4></div>
           <div class="row item-row" repeat="item-row" var="item-row">
             <div class="col-xs-10 question"><span class="lineNo" var="lineNo">0.</span> <span var="question"></span>
             </div>
