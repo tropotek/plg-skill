@@ -170,7 +170,7 @@ class Collection extends \Tk\Db\Map\Model
     }
 
     /**
-     * @return \Uni\Db\SubjectIface
+     * @return \Uni\Db\SubjectIface|\App\Db\Subject
      * @throws \Exception
      */
     public function getSubject()

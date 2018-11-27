@@ -97,7 +97,8 @@ class Edit extends AdminEditIface
 
         $tab = 'Information';
         $this->form->addField(new Field\Textarea('instructions'))->setTabGroup($tab)
-            ->addCss('mce')->setNotes('Enter any student instructions on how to complete placement entries.');
+            ->setNotes('Enter any student instructions on how to complete placement entries.')->addCss('mce')
+            ->setAttr('data-elfinder-path', $this->collection->getSubject()->getProfile()->getInstitution()->getDataPath().'/media');
 //        $this->form->addField(new Field\Textarea('notes'))->setTabGroup($tab)
 //            ->addCss('tkTextareaTool')->setNotes('Staff only notes that can only be vied in this edit screen.');
 
