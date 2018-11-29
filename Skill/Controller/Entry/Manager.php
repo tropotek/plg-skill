@@ -92,6 +92,12 @@ class Manager extends AdminManagerIface
         // Filters
         $this->table->addFilter(new Field\Input('keywords'))->setAttr('placeholder', 'Keywords');
 
+        $list = \App\Db\CompanyMap::create()->findFiltered(array(
+            'profileId' => $this->getProfileId(),
+            'status' => \App\Db\Placement::STATUS_APPROVED
+        ), \Tk\Db\Tool::create('name'));
+        $this->table->addFilter(new Field\Select('companyId', $list))->prependOption('-- Company --', '');
+
         // Actions
         $this->table->addAction(\Tk\Table\Action\ColumnSelect::create()->setDisabled(array('id', 'title')));
         $this->table->addAction(\Tk\Table\Action\Csv::create());
