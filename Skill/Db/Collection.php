@@ -165,7 +165,7 @@ class Collection extends \Tk\Db\Map\Model
     public function save()
     {
         parent::save();
-        $calc = new \Skill\Util\GradeCalculator($this->getId());
+        $calc = new \Skill\Util\GradeCalculator($this);
         $calc->deleteSubjectGradeCache();
     }
 

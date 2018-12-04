@@ -36,7 +36,6 @@ class PlacementViewHandler implements Subscriber
             );
             foreach ($collectionList as $collection) {
                 if (!$placement->getPlacementType() || !$placement->getPlacementType()->enableReport) continue;
-
                 $entry = \Skill\Db\EntryMap::create()->findFiltered(array(
                     'collectionId' => $collection->getId(),
                     'placementId' => $placement->getId(),
@@ -50,8 +49,6 @@ class PlacementViewHandler implements Subscriber
                     $template->appendTemplate('placement-actions', $btn->show());
                 }
             }
-
-
         }
     }
 
