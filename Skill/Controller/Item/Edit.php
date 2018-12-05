@@ -67,7 +67,6 @@ class Edit extends AdminEditIface
         $layout->removeRow('domainId', 'col-md-6');
 
 
-        //$this->form->addField(new Field\Input('uid'))->setNotes('(optional) Use this to match up questions from other collections, for generating reports');
 
         $list = \Skill\Db\CategoryMap::create()->findFiltered(array('collectionId' => $this->item->getCollection()->getId()));
         $this->form->addField(new Field\Select('categoryId', \Tk\Form\Field\Option\ArrayObjectIterator::create($list)))
@@ -78,6 +77,9 @@ class Edit extends AdminEditIface
             $this->form->addField(new Field\Select('domainId', \Tk\Form\Field\Option\ArrayObjectIterator::create($list)))
                 ->prependOption('-- None --', '')->setNotes('');
         }
+
+        $this->form->addField(new Field\Input('uid'))->setNotes('(optional) Use this to match up questions from other collections, for generating reports');
+        
         $this->form->addField(new Field\Input('question'))->setRequired()->setNotes('The question text to display');
         $this->form->addField(new Field\Input('description'))->setNotes('Description or help text');
         $this->form->addField(new Field\Checkbox('publish'))->setLabel('')->setCheckboxLabel('Publish');
