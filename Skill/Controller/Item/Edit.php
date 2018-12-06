@@ -79,7 +79,7 @@ class Edit extends AdminEditIface
         }
 
         $this->form->addField(new Field\Input('uid'))->setNotes('(optional) Use this to match up questions from other collections, for generating reports');
-        
+
         $this->form->addField(new Field\Input('question'))->setRequired()->setNotes('The question text to display');
         $this->form->addField(new Field\Input('description'))->setNotes('Description or help text');
         $this->form->addField(new Field\Checkbox('publish'))->setLabel('')->setCheckboxLabel('Publish');
