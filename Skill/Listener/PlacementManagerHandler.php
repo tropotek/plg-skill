@@ -40,7 +40,7 @@ class PlacementManagerHandler implements Subscriber
     public function onControllerInit(\Tk\Event\ControllerEvent $event)
     {
         /** @var \App\Controller\Placement\Edit $controller */
-        $controller = $event->getController();
+        $controller = $event->getControllerObject();
         if ($controller instanceof \App\Controller\Placement\Manager) {
             $config = \Uni\Config::getInstance();
             $this->controller = $controller;

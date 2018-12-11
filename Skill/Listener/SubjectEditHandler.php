@@ -35,7 +35,7 @@ class SubjectEditHandler implements Subscriber
     public function onKernelController(\Tk\Event\ControllerEvent $event)
     {
         /** @var \App\Controller\Subject\Edit $controller */
-        $controller = $event->getController();
+        $controller = $event->getControllerObject();
         if ($controller instanceof \App\Controller\Subject\Edit) {
             $this->controller = $controller;
         }
