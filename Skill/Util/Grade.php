@@ -305,7 +305,7 @@ class Grade implements \Serializable
         $this->domainCount = $domainCount;
         return $this;
     }
-    
+
     /**
      * @return \Tk\Config|\Uni\Config
      */

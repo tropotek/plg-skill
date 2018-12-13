@@ -43,6 +43,7 @@ class GradeCalculator
     {
         $this->collection = $collection;
         if (!$cachePath) {
+
             $cachePath = $this->getConfig()->getDataPath() . '/skillResultsCache/' . $collection->getSubject()->getInstitutionId() . '/' . $collection->getVolatileId();
         }
         $this->cachePath = $cachePath;

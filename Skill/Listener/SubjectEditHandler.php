@@ -84,6 +84,7 @@ class SubjectEditHandler implements Subscriber
             $newC->publish = false;
             $newC->active = true;
             $newC->save();
+
             // Copy placement_type
             \Tk\Log::debug('Copying Skill Placement Types');
             $list = \Skill\Db\CollectionMap::create()->findPlacementTypes($collection->getId());
