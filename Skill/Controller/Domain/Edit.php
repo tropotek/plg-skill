@@ -53,8 +53,7 @@ class Edit extends AdminEditIface
     }
 
     /**
-     * @throws \Tk\Db\Exception
-     * @throws \Tk\Form\Exception
+     *
      */
     protected function buildForm() 
     {
@@ -62,23 +61,22 @@ class Edit extends AdminEditIface
         $this->form->setRenderer(\App\Config::getInstance()->createFormRenderer($this->form));
 
         // text, textblock, select, checkbox, date, file(????)
-        $this->form->addField(new Field\Input('name'))->setNotes('');
-        $this->form->addField(new Field\Input('label'))->setNotes('Create a short label for this domain');
-        $this->form->addField(new Field\Input('weight'))->setNotes('for weighted marks ad a multiplier value here from 0.0 to 1.0');
-        $this->form->addField(new Field\Input('description'))->setNotes('A short description of the domain');
+        $this->form->appendField(new Field\Input('name'))->setNotes('');
+        $this->form->appendField(new Field\Input('label'))->setNotes('Create a short label for this domain');
+        $this->form->appendField(new Field\Input('weight'))->setNotes('for weighted marks ad a multiplier value here from 0.0 to 1.0');
+        $this->form->appendField(new Field\Checkbox('active'));
+        $this->form->appendField(new Field\Input('description'))->setNotes('A short description of the domain');
 
-        $this->form->addField(new Event\Submit('update', array($this, 'doSubmit')));
-        $this->form->addField(new Event\Submit('save', array($this, 'doSubmit')));
-        $this->form->addField(new Event\Link('cancel', $this->getConfig()->getBackUrl()));
+        $this->form->appendField(new Event\Submit('update', array($this, 'doSubmit')));
+        $this->form->appendField(new Event\Submit('save', array($this, 'doSubmit')));
+        $this->form->appendField(new Event\Link('cancel', $this->getConfig()->getBackUrl()));
 
     }
 
     /**
      * @param \Tk\Form $form
      * @param \Tk\Form\Event\Iface $event
-     * @throws \ReflectionException
-     * @throws \Tk\Db\Exception
-     * @throws \Tk\Exception
+     * @throws \Exception
      */
     public function doSubmit($form, $event)
     {

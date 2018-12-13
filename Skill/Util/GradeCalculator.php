@@ -144,7 +144,7 @@ class GradeCalculator
                     $domainAvgList[$domain->getId()] = array(
                         'domainId' => $domain->getId(),
                         'maxGrade' => $this->collection->maxGrade,
-                        'domainCount' => $this->collection->getDomainCount(),
+                        'domainCount' => 0,
                         'scaleCount' => $this->collection->getScaleCount(),
                         'weight' => $domain->weight,
                         'name' => $domain->name,
@@ -155,24 +155,39 @@ class GradeCalculator
                         'itemAvgList' => array()
                     );
                 }
-                $avg = \Skill\Db\ItemMap::create()->findAverage($user->getId(), $item->getId(), 'approved', 'completed', $filter);
+
+                $placementStatus = '';
+                if ($this->collection->requirePlacement)
+                    $placementStatus = 'completed';
+
+                $avg = \Skill\Db\ItemMap::create()->findAverage($user->getId(), $item->getId(), 'approved', $placementStatus, $filter);
                 $domainAvgList[$domain->getId()]['itemAvgList'][$item->getId()] = $avg;
             }
 
-            $gradeTotal = 0;
+            //$domainCount = $this->collection->getDomainCount();
+            $domainCount = count($domainAvgList);
+
+            $avgTotal = 0;
+            $wightedAvgTotal = 0;
             foreach ($domainAvgList as $domainId => $domainAverage) {
+                $domainAvgList[$domainId]['domainCount'] = $domainCount;
                 $domainAvgList[$domainId]['avg'] = \Tk\Math::average($domainAverage['itemAvgList']);
-                $domainAvgList[$domainId]['grade'] = $domainAvgList[$domainId]['avg'] * ($domainAverage['maxGrade'] / $domainAverage['scaleCount']);
                 $domainAvgList[$domainId]['weighted_avg'] = $domainAvgList[$domainId]['avg'] * $domainAverage['weight'];
-                $gradeTotal += $domainAvgList[$domainId]['weighted_avg'];
-            }
-            if ($this->collection->getDomainCount()) {
-                $grade->setGrade(($gradeTotal / $this->collection->getDomainCount()) * $this->collection->maxGrade);
-            } else {
-                $grade->setGrade($gradeTotal * $this->collection->maxGrade);
+                $domainAvgList[$domainId]['grade'] = $domainAvgList[$domainId]['avg'] * ($domainAverage['maxGrade'] / $domainAverage['scaleCount']);
+                $avgTotal += $domainAvgList[$domainId]['avg'];
+                $wightedAvgTotal += $domainAvgList[$domainId]['weighted_avg'];
             }
 
+            $grade->setAvg($avgTotal);
+            $grade->setWeightedAvg($wightedAvgTotal);
+            $grade->setDomainCount($domainCount);
             $grade->setDomainAvgList($domainAvgList);
+
+            if ($domainCount) {
+                $grade->setGrade(($wightedAvgTotal / $domainCount) * $this->collection->maxGrade);
+            } else {
+                $grade->setGrade($wightedAvgTotal * $this->collection->maxGrade);
+            }
 
             // Storing the data in the cache
             $this->getCache()->store($cacheId, $grade, self::CACHE_TIMEOUT);

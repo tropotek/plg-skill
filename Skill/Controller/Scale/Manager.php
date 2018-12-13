@@ -54,11 +54,11 @@ class Manager extends AdminManagerIface
         $this->table = \App\Config::getInstance()->createTable(\App\Config::getInstance()->getUrlName());
         $this->table->setRenderer(\App\Config::getInstance()->createTableRenderer($this->table));
 
-        $this->table->addCell(new \Tk\Table\Cell\Checkbox('id'));
-        $this->table->addCell(new \Tk\Table\Cell\Text('name'))->addCss('key')->setUrl(clone $this->editUrl);
-        $this->table->addCell(new \Tk\Table\Cell\Text('value'));
-        //$this->table->addCell(new \Tk\Table\Cell\Date('modified'));
-        $this->table->addCell(new \Tk\Table\Cell\OrderBy('orderBy'))->setOnUpdate(function ($orderBy) {
+        $this->table->appendCell(new \Tk\Table\Cell\Checkbox('id'));
+        $this->table->appendCell(new \Tk\Table\Cell\Text('name'))->addCss('key')->setUrl(clone $this->editUrl);
+        $this->table->appendCell(new \Tk\Table\Cell\Text('value'));
+        //$this->table->appendCell(new \Tk\Table\Cell\Date('modified'));
+        $this->table->appendCell(new \Tk\Table\Cell\OrderBy('orderBy'))->setOnUpdate(function ($orderBy) {
             /** @var \Tk\Table\Cell\OrderBy $orderBy */
             \Skill\Db\Scale::recalculateValues($this->collection->getId());
         });

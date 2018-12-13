@@ -42,29 +42,29 @@ class Manager extends AdminManagerIface
         $this->table = \Uni\Config::getInstance()->createTable(\App\Config::getInstance()->getUrlName());
         $this->table->setRenderer(\Uni\Config::getInstance()->createTableRenderer($this->table));
 
-        $this->table->addCell(new \Tk\Table\Cell\Checkbox('id'));
+        $this->table->appendCell(new \Tk\Table\Cell\Checkbox('id'));
         $this->actionsCell = new \Tk\Table\Cell\Actions();
         $this->actionsCell->addButton(\Tk\Table\Cell\ActionButton::create('Edit Collection',
             \Uni\Uri::createSubjectUrl('/collectionEdit.html'), 'fa fa-edit'))->setAppendQuery();
         $this->actionsCell->addButton(\Tk\Table\Cell\ActionButton::create('View Entries',
             \Uni\Uri::createSubjectUrl('/entryManager.html'), 'fa fa-files-o'))->setAppendQuery();
 
-        $this->table->addCell($this->actionsCell);
+        $this->table->appendCell($this->actionsCell);
 
-        $this->table->addCell(new \Tk\Table\Cell\Text('name'))->addCss('key')->setUrl(clone $this->editUrl);
-        $this->table->addCell(new \Tk\Table\Cell\Text('role'));
-        $this->table->addCell(new \Tk\Table\Cell\ArrayObject('available'))->setLabel('Placement Enabled Status');
-        $this->table->addCell(new \Tk\Table\Cell\Boolean('gradable'));
-        $this->table->addCell(new \Tk\Table\Cell\Boolean('viewGrade'));
-        $this->table->addCell(new \Tk\Table\Cell\Boolean('requirePlacement'));
-        $this->table->addCell(new \Tk\Table\Cell\Boolean('publish'));
-        $this->table->addCell(new \Tk\Table\Cell\Boolean('active'));
-        $this->table->addCell(new \Tk\Table\Cell\Text('entries'))->setOnPropertyValue(function ($cell, $obj) {
+        $this->table->appendCell(new \Tk\Table\Cell\Text('name'))->addCss('key')->setUrl(clone $this->editUrl);
+        $this->table->appendCell(new \Tk\Table\Cell\Text('role'));
+        $this->table->appendCell(new \Tk\Table\Cell\ArrayObject('available'))->setLabel('Placement Enabled Status');
+        $this->table->appendCell(new \Tk\Table\Cell\Boolean('gradable'));
+        $this->table->appendCell(new \Tk\Table\Cell\Boolean('viewGrade'));
+        $this->table->appendCell(new \Tk\Table\Cell\Boolean('requirePlacement'));
+        $this->table->appendCell(new \Tk\Table\Cell\Boolean('publish'));
+        $this->table->appendCell(new \Tk\Table\Cell\Boolean('active'));
+        $this->table->appendCell(new \Tk\Table\Cell\Text('entries'))->setOnPropertyValue(function ($cell, $obj) {
             /** @var \Skill\Db\Collection $obj */
             $filter = array('collectionId' => $obj->getId());
             return \Skill\Db\EntryMap::create()->findFiltered($filter)->count();
         });
-        $this->table->addCell(new \Tk\Table\Cell\Date('modified'));
+        $this->table->appendCell(new \Tk\Table\Cell\Date('modified'));
 
         // Filters
         $this->table->addFilter(new Field\Input('keywords'))->setAttr('placeholder', 'Keywords');

@@ -61,32 +61,32 @@ class View extends AdminEditIface
         $this->form->setRenderer(\App\Config::getInstance()->createFormRenderer($this->form));
         $this->form->addCss('form-horizontal');
 
-        $this->form->addField(new Field\Html('title', htmlentities($this->entry->title)))->setFieldset('Entry Details');
+        $this->form->appendField(new Field\Html('title', htmlentities($this->entry->title)))->setFieldset('Entry Details');
         //if($this->entry->getCollection()->gradable && $this->getUser()->isStaff()) {
         if($this->entry->getCollection()->gradable) {
             $pct = round(($this->entry->calcAverage()/($this->entry->getCollection()->getScaleCount()))*100);
-            $this->form->addField(new Field\Html('average', sprintf('%.2f &nbsp; (%d%%)', $this->entry->calcAverage(), $pct)))
+            $this->form->appendField(new Field\Html('average', sprintf('%.2f &nbsp; (%d%%)', $this->entry->calcAverage(), $pct)))
                 ->setFieldset('Entry Details');
         }
 
-        $this->form->addField(new Field\Html('status'))->setFieldset('Entry Details');
-        $this->form->addField(new Field\Html('assessor', htmlentities($this->entry->assessor)))->setFieldset('Entry Details');
+        $this->form->appendField(new Field\Html('status'))->setFieldset('Entry Details');
+        $this->form->appendField(new Field\Html('assessor', htmlentities($this->entry->assessor)))->setFieldset('Entry Details');
         if ($this->entry->getCollection()->requirePlacement)
-            $this->form->addField(new Field\Html('absent'))->setLabel('Days Absent')->setFieldset('Entry Details');
+            $this->form->appendField(new Field\Html('absent'))->setLabel('Days Absent')->setFieldset('Entry Details');
 
         if ($this->entry->getCollection()->confirm && $this->getUser()->isStaff()) {
             $s = ($this->entry->confirm === null) ? '' : ($this->entry->confirm ? 'Yes' : 'No');
-            $this->form->addField(new Field\Html('confirm', $s))->setFieldset('Entry Details')->setNotes($this->entry->getCollection()->confirm);
+            $this->form->appendField(new Field\Html('confirm', $s))->setFieldset('Entry Details')->setNotes($this->entry->getCollection()->confirm);
         }
         if ($this->entry->notes)
-            $this->form->addField(new Field\Html('notes', htmlentities($this->entry->notes)))->setLabel('Comments')->setFieldset('Entry Details');
+            $this->form->appendField(new Field\Html('notes', htmlentities($this->entry->notes)))->setLabel('Comments')->setFieldset('Entry Details');
 
         $items = \Skill\Db\ItemMap::create()->findFiltered(array('collectionId' => $this->entry->getCollection()->getId()),
             \Tk\Db\Tool::create('category_id, order_by'));
 
         /** @var \Skill\Db\Item $item */
         foreach ($items as $item) {
-            $fld = $this->form->addField(new \Skill\Form\Field\Item($item))->setLabel(null)->setDisabled();
+            $fld = $this->form->appendField(new \Skill\Form\Field\Item($item))->setLabel(null)->setDisabled();
             $val = \Skill\Db\EntryMap::create()->findValue($this->entry->getId(), $item->getId());
             if ($val)
                 $fld->setValue($val->value);

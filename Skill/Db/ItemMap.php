@@ -64,16 +64,22 @@ class ItemMap extends \App\Db\Mapper
      * @param int $itemId
      * @param string $entryStatus
      * @param string $placementStatus
+     * @param array $filter
      * @return float
      * @throws \Tk\Db\Exception
      */
-    public function findAverage($userId, $itemId, $entryStatus = 'approved', $placementStatus = 'completed', $filter = array())
+    public function findAverage($userId, $itemId, $entryStatus = 'approved', $placementStatus = '', $filter = array())
     {
         $db = $this->getDb();
 
+        $placementSql = '';
+        if ($placementStatus) {
+            $placementSql = ' LEFT JOIN placement c ON (a.placement_id = c.id)';
+        }
+
         $sql = <<<SQL
 SELECT AVG(b.`value`) as 'avg'
-FROM  skill_entry a LEFT JOIN skill_value b ON (a.id = b.entry_id) LEFT JOIN placement c ON (a.placement_id = c.id)
+FROM  skill_entry a LEFT JOIN skill_value b ON (a.id = b.entry_id) $placementSql
 WHERE a.user_id = ? AND b.item_id = ? AND b.value > 0 AND a.`status` = ?
 SQL;
         if ($placementStatus)
@@ -86,12 +92,12 @@ SQL;
                 $sql .= ' AND ('. $w . ')';
             }
         }
-        //vd($sql);
         $stmt = $db->prepare($sql);
         if ($placementStatus)
             $stmt->execute(array((int)$userId, (int)$itemId, $entryStatus, $placementStatus));
         else
             $stmt->execute(array((int)$userId, (int)$itemId, $entryStatus));
+
 
         $avg = 0.0;
         while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {

@@ -55,12 +55,12 @@ class SystemSettings extends Iface
         $this->form = \App\Config::getInstance()->createForm('formEdit');
         $this->form->setRenderer(\App\Config::getInstance()->createFormRenderer($this->form));
 
-        $this->form->addField(new Field\Input('plugin.title'))->setLabel('Site Title')->setRequired(true);
-        $this->form->addField(new Field\Input('plugin.email'))->setLabel('Site Email')->setRequired(true);
+        $this->form->appendField(new Field\Input('plugin.title'))->setLabel('Site Title')->setRequired(true);
+        $this->form->appendField(new Field\Input('plugin.email'))->setLabel('Site Email')->setRequired(true);
         
-        $this->form->addField(new Event\Submit('update', array($this, 'doSubmit')));
-        $this->form->addField(new Event\Submit('save', array($this, 'doSubmit')));
-        $this->form->addField(new Event\LinkButton('cancel', $this->getConfig()->getBackUrl()));
+        $this->form->appendField(new Event\Submit('update', array($this, 'doSubmit')));
+        $this->form->appendField(new Event\Submit('save', array($this, 'doSubmit')));
+        $this->form->appendField(new Event\LinkButton('cancel', $this->getConfig()->getBackUrl()));
 
         $this->form->load($this->data->toArray());
         $this->form->execute();

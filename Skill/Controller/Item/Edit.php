@@ -69,24 +69,24 @@ class Edit extends AdminEditIface
 
 
         $list = \Skill\Db\CategoryMap::create()->findFiltered(array('collectionId' => $this->item->getCollection()->getId()));
-        $this->form->addField(new Field\Select('categoryId', \Tk\Form\Field\Option\ArrayObjectIterator::create($list)))
+        $this->form->appendField(new Field\Select('categoryId', \Tk\Form\Field\Option\ArrayObjectIterator::create($list)))
             ->prependOption('-- Select --', '')->setNotes('');
 
         $list = \Skill\Db\DomainMap::create()->findFiltered(array('collectionId' => $this->item->getCollection()->getId()));
         if (count($list)) {
-            $this->form->addField(new Field\Select('domainId', \Tk\Form\Field\Option\ArrayObjectIterator::create($list)))
+            $this->form->appendField(new Field\Select('domainId', \Tk\Form\Field\Option\ArrayObjectIterator::create($list)))
                 ->prependOption('-- None --', '')->setNotes('');
         }
 
-        $this->form->addField(new Field\Input('uid'))->setNotes('(optional) Use this to match up questions from other collections, for generating reports');
+        $this->form->appendField(new Field\Input('uid'))->setNotes('(optional) Use this to match up questions from other collections, for generating reports');
 
-        $this->form->addField(new Field\Input('question'))->setRequired()->setNotes('The question text to display');
-        $this->form->addField(new Field\Input('description'))->setNotes('Description or help text');
-        $this->form->addField(new Field\Checkbox('publish'))->setLabel('')->setCheckboxLabel('Publish');
+        $this->form->appendField(new Field\Input('question'))->setRequired()->setNotes('The question text to display');
+        $this->form->appendField(new Field\Input('description'))->setNotes('Description or help text');
+        $this->form->appendField(new Field\Checkbox('publish'))->setLabel('')->setCheckboxLabel('Publish');
 
-        $this->form->addField(new Event\Submit('update', array($this, 'doSubmit')));
-        $this->form->addField(new Event\Submit('save', array($this, 'doSubmit')));
-        $this->form->addField(new Event\Link('cancel', $this->getConfig()->getBackUrl()));
+        $this->form->appendField(new Event\Submit('update', array($this, 'doSubmit')));
+        $this->form->appendField(new Event\Submit('save', array($this, 'doSubmit')));
+        $this->form->appendField(new Event\Link('cancel', $this->getConfig()->getBackUrl()));
 
     }
 

@@ -23,6 +23,24 @@ class Grade implements \Serializable
     protected $userId = 0;
 
     /**
+     * This is the number of domains that contain items with values
+     * @var int
+     */
+    protected $domainCount = 0;
+
+    /**
+     * This is the calculated average for all the domains with items
+     * @var float
+     */
+    protected $avg = 0.0;
+
+    /**
+     * This is the calculated weighted average for all the domains with items
+     * @var float
+     */
+    protected $weightedAvg = 0.0;
+
+    /**
      * This is the calculated weighted average for all the domain averages
      * Includes the maxGrade calc...
      * @var float
@@ -164,9 +182,12 @@ class Grade implements \Serializable
         return $this;
     }
 
+
+
     /**
      * @param float $grade
      * @return Grade
+     * @deprecated
      */
     public function setGrade($grade)
     {
@@ -176,6 +197,7 @@ class Grade implements \Serializable
 
     /**
      * @return float
+     * @deprecated
      */
     public function getGrade()
     {
@@ -184,6 +206,7 @@ class Grade implements \Serializable
 
     /**
      * @return float
+     * @deprecated
      */
     public function getAverage()
     {
@@ -192,6 +215,7 @@ class Grade implements \Serializable
 
     /**
      * @return float
+     * @deprecated
      */
     public function getPercent()
     {
@@ -199,6 +223,89 @@ class Grade implements \Serializable
     }
 
 
+    /**
+     *
+     *
+     * @return float
+     * @todo
+     */
+    public function getGradeResult()
+    {
+        $grade = 0;
+        if ($this->getDomainCount()) {
+            $grade = ($this->weightedAvg / $this->getDomainCount()) * $this->getCollection()->maxGrade;
+        } else {
+            $grade = $this->weightedAvg * $this->getCollection()->maxGrade;
+        }
+        //return $grade;
+        return $this->weightedAvg;
+    }
+
+    /**
+     *
+     *
+     * @return float
+     * @todo
+     */
+    public function getGradePercent()
+    {
+        return $this->getGradeResult() * (100 / $this->getCollection()->maxGrade);
+    }
+
+    /**
+     * @return float
+     */
+    public function getAvg()
+    {
+        return $this->avg;
+    }
+
+    /**
+     * @param float $avg
+     * @return Grade
+     */
+    public function setAvg($avg)
+    {
+        $this->avg = $avg;
+        return $this;
+    }
+
+    /**
+     * @return float
+     */
+    public function getWeightedAvg()
+    {
+        return $this->weightedAvg;
+    }
+
+    /**
+     * @param float $weightedAvg
+     * @return Grade
+     */
+    public function setWeightedAvg($weightedAvg)
+    {
+        $this->weightedAvg = $weightedAvg;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getDomainCount()
+    {
+        return $this->domainCount;
+    }
+
+    /**
+     * @param int $domainCount
+     * @return Grade
+     */
+    public function setDomainCount($domainCount)
+    {
+        $this->domainCount = $domainCount;
+        return $this;
+    }
+    
     /**
      * @return \Tk\Config|\Uni\Config
      */

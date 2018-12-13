@@ -64,15 +64,15 @@ class Edit extends \App\Controller\AdminEditIface
         $layout->addRow('name', 'col-md-6');
         $layout->removeRow('label', 'col-md-6');
 
-        $this->form->addField(new Field\Input('name'))->setNotes('');
-        $this->form->addField(new Field\Input('label'))->setNotes('');
-        $this->form->addField(new Field\Checkbox('publish'))->setCheckboxLabel('Category is visible to students');
-        $this->form->addField(new Field\Textarea('description'))->addCss('tkTextareaTool')
+        $this->form->appendField(new Field\Input('name'))->setNotes('');
+        $this->form->appendField(new Field\Input('label'))->setNotes('');
+        $this->form->appendField(new Field\Checkbox('publish'))->setCheckboxLabel('Category is visible to students');
+        $this->form->appendField(new Field\Textarea('description'))->addCss('tkTextareaTool')
             ->setNotes('A short description of the category');
 
-        $this->form->addField(new Event\Submit('update', array($this, 'doSubmit')));
-        $this->form->addField(new Event\Submit('save', array($this, 'doSubmit')));
-        $this->form->addField(new Event\Link('cancel', $this->getConfig()->getBackUrl()));
+        $this->form->appendField(new Event\Submit('update', array($this, 'doSubmit')));
+        $this->form->appendField(new Event\Submit('save', array($this, 'doSubmit')));
+        $this->form->appendField(new Event\Link('cancel', $this->getConfig()->getBackUrl()));
     }
 
     /**

@@ -52,8 +52,8 @@ class CollectionReport extends \App\Controller\AdminManagerIface
         $this->table = \App\Config::getInstance()->createTable(\App\Config::getInstance()->getUrlName());
         $this->table->setRenderer(\App\Config::getInstance()->createTableRenderer($this->table));
 
-        $this->table->addCell(new \Tk\Table\Cell\Text('uid'))->setLabel('studentNumber');
-        $this->table->addCell(new \Tk\Table\Cell\Text('name'))->addCss('key')->setUrl(clone $this->editUrl)
+        $this->table->appendCell(new \Tk\Table\Cell\Text('uid'))->setLabel('studentNumber');
+        $this->table->appendCell(new \Tk\Table\Cell\Text('name'))->addCss('key')->setUrl(clone $this->editUrl)
             ->setOnPropertyValue(function ($cell, $obj, $value) {
                 /** @var \Tk\Table\Cell\Text $cell */
                 $cell->setUrl($cell->getUrl()->set('userId', $obj->getId()));
@@ -83,8 +83,9 @@ class CollectionReport extends \App\Controller\AdminManagerIface
 
         $gradeList = $results->gradeList;
         $domains = \Skill\Db\DomainMap::create()->findFiltered(array('collectionId'=>$this->collection->getId(), 'active' => true));
+        //$domains = \Skill\Db\DomainMap::create()->findFiltered(array('collectionId'=>$this->collection->getId()));
         foreach ($domains as $domain) {
-            $this->table->addCell(new \Tk\Table\Cell\Text($domain->label))->setLabel($domain->label)->setOnPropertyValue(function ($cell, $obj, $value) use ($domain, $gradeList) {
+            $this->table->appendCell(new \Tk\Table\Cell\Text($domain->label))->setLabel($domain->label)->setOnPropertyValue(function ($cell, $obj, $value) use ($domain, $gradeList) {
                 /** @var \Tk\Table\Cell\Text $cell */
                 /** @var \Uni\Db\User $obj */
 
@@ -101,7 +102,7 @@ class CollectionReport extends \App\Controller\AdminManagerIface
             });
         }
 
-        $this->table->addCell(new \Tk\Table\Cell\Text('total'))->setLabel('Total Avg.')->setOnPropertyValue(function ($cell, $obj, $value) use ($gradeList) {
+        $this->table->appendCell(new \Tk\Table\Cell\Text('total'))->setLabel('Total Avg.')->setOnPropertyValue(function ($cell, $obj, $value) use ($gradeList) {
             /** @var \Tk\Table\Cell\Text $cell */
             /** @var \Uni\Db\User $obj */
             $cell->addCss('total');
@@ -115,7 +116,7 @@ class CollectionReport extends \App\Controller\AdminManagerIface
         });
 
         foreach ($domains as $domain) {
-            $this->table->addCell(new \Tk\Table\Cell\Text($domain->label.'Grade'))->setLabel($domain->label.' Grade')->
+            $this->table->appendCell(new \Tk\Table\Cell\Text($domain->label.'Grade'))->setLabel($domain->label.' Grade')->
             setOnPropertyValue(function ($cell, $obj, $value) use ($domain, $gradeList) {
                 /** @var \Tk\Table\Cell\Text $cell */
                 /** @var \Uni\Db\User $obj */
@@ -130,7 +131,7 @@ class CollectionReport extends \App\Controller\AdminManagerIface
                 return '0.00';
             });
         };
-        $this->table->addCell(new \Tk\Table\Cell\Text('totalGrade'))->setOnPropertyValue(function ($cell, $obj, $value) use ($gradeList) {
+        $this->table->appendCell(new \Tk\Table\Cell\Text('totalGrade'))->setOnPropertyValue(function ($cell, $obj, $value) use ($gradeList) {
             /** @var \Tk\Table\Cell\Text $cell */
             /** @var \Uni\Db\User $obj */
             $cell->addCss('total');
@@ -142,7 +143,7 @@ class CollectionReport extends \App\Controller\AdminManagerIface
             }
             return '0.00';
         });
-        $this->table->addCell(new \Tk\Table\Cell\Text('totalPct'))->setOnPropertyValue(function ($cell, $obj, $value) use ($gradeList) {
+        $this->table->appendCell(new \Tk\Table\Cell\Text('totalPct'))->setOnPropertyValue(function ($cell, $obj, $value) use ($gradeList) {
             /** @var \Tk\Table\Cell\Text $cell */
             /** @var \Uni\Db\User $obj */
 

@@ -222,9 +222,9 @@ class Edit extends AdminEditIface
         $this->form->setRenderer(\App\Config::getInstance()->createFormRenderer($this->form));
 
         if ($this->isSelfAssessment($this->entry)) {
-            $this->form->addField(new Field\Html('title'))->setFieldset('Entry Details');
+            $this->form->appendField(new Field\Html('title'))->setFieldset('Entry Details');
         } else {
-            $f = $this->form->addField(new Field\Input('title'))->setFieldset('Entry Details');
+            $f = $this->form->appendField(new Field\Input('title'))->setFieldset('Entry Details');
             if ($this->entry->getPlacement() && $this->isPublic) {
                 $f->setReadonly();
             }
@@ -235,30 +235,30 @@ class Edit extends AdminEditIface
             $avg = \Skill\Db\EntryMap::create()->getEntryAverage($this->entry->getId());
             $ratio = \Skill\Db\EntryMap::create()->getEntryRatio($this->entry->getId()) * 100;
             //$pct = round(($avg / ($this->entry->getCollection()->getScaleCount() - 1)) * 100);
-            $this->form->addField(new Field\Html('average', sprintf('%.2f &nbsp; (%d%%)', $avg, $ratio)))->setFieldset('Entry Details');
+            $this->form->appendField(new Field\Html('average', sprintf('%.2f &nbsp; (%d%%)', $avg, $ratio)))->setFieldset('Entry Details');
         }
 
         $urlRole = \Bs\Uri::create()->getRoleType($this->getConfig()->getAvailableUserRoleTypes());
         if ($this->getUser() && $this->getUser()->isStaff() && $this->getUser()->getRoleType() == $urlRole) {
-            $this->form->addField(new \App\Form\Field\CheckSelect('status', \Skill\Db\Entry::getStatusList()))
+            $this->form->appendField(new \App\Form\Field\CheckSelect('status', \Skill\Db\Entry::getStatusList()))
                 ->setRequired()->prependOption('-- Status --', '')->setNotes('Set the status. Use the checkbox to disable notification emails.')->setFieldset('Entry Details');
         } else {
-            $this->form->addField(new \Tk\Form\Field\Html('status'))->setFieldset('Entry Details');
+            $this->form->appendField(new \Tk\Form\Field\Html('status'))->setFieldset('Entry Details');
         }
 
         if (!$this->isSelfAssessment($this->entry)) {
-            $this->form->addField(new Field\Input('assessor'))->setFieldset('Entry Details')->setRequired();
-            $this->form->addField(new Field\Input('absent'))->setFieldset('Entry Details');
+            $this->form->appendField(new Field\Input('assessor'))->setFieldset('Entry Details')->setRequired();
+            $this->form->appendField(new Field\Input('absent'))->setFieldset('Entry Details');
         }
 
-        $this->form->addField(new Field\Textarea('notes'))->addCss('')->setLabel('Comments')->setFieldset('Entry Details');
+        $this->form->appendField(new Field\Textarea('notes'))->addCss('')->setLabel('Comments')->setFieldset('Entry Details');
 
 
         $items = \Skill\Db\ItemMap::create()->findFiltered(array('collectionId' => $this->entry->getCollection()->getId()),
             \Tk\Db\Tool::create('category_id, order_by'));
         /** @var \Skill\Db\Item $item */
         foreach ($items as $item) {
-            $fld = $this->form->addField(new \Skill\Form\Field\Item($item))->setLabel(null);
+            $fld = $this->form->appendField(new \Skill\Form\Field\Item($item))->setLabel(null);
             $val = \Skill\Db\EntryMap::create()->findValue($this->entry->getId(), $item->getId());
             if ($val) {
                 $fld->setValue($val->value);
@@ -268,15 +268,15 @@ class Edit extends AdminEditIface
         if ($this->entry->getCollection()->confirm) {
             $radioBtn = new \Tk\Form\Field\RadioButton('confirm', $this->entry->getCollection()->confirm);
             $radioBtn->appendOption('Yes', '1', 'fa fa-check')->appendOption('No', '0', 'fa fa-ban');
-            $this->form->addField($radioBtn)->setLabel(null)->setFieldset('Confirmation')->setValue(true);
+            $this->form->appendField($radioBtn)->setLabel(null)->setFieldset('Confirmation')->setValue(true);
         }
 
         if ($this->isPublic) {
-            $this->form->addField(new Event\Submit('submit', array($this, 'doSubmit')))->setIconRight('fa fa-arrow-right')->addCss('pull-right')->setLabel('Submit ');
+            $this->form->appendField(new Event\Submit('submit', array($this, 'doSubmit')))->setIconRight('fa fa-arrow-right')->addCss('pull-right')->setLabel('Submit ');
         } else {
-            $this->form->addField(new Event\Submit('update', array($this, 'doSubmit')));
-            $this->form->addField(new Event\Submit('save', array($this, 'doSubmit')));
-            $this->form->addField(new Event\Link('cancel', $this->getConfig()->getBackUrl()));
+            $this->form->appendField(new Event\Submit('update', array($this, 'doSubmit')));
+            $this->form->appendField(new Event\Submit('save', array($this, 'doSubmit')));
+            $this->form->appendField(new Event\Link('cancel', $this->getConfig()->getBackUrl()));
         }
 
     }

@@ -110,7 +110,7 @@ class StudentResults extends AdminIface
             $row = $template->getRepeat('domain-row');
             $row->insertText('name', $domain->name . ' (' . $domain->label . ')');
             $row->insertText('weight', round($domain->weight * 100) . '%');
-            if ($domainAvg) {
+            if ($domainAvg && property_exists($domainAvg, 'avg')) {
                 $row->insertText('avg', sprintf('%.2f', round($domainAvg->avg, 2)));
                 $row->insertText('grade', sprintf('%.2f', round($domainAvg->grade, 2)));
             } else {

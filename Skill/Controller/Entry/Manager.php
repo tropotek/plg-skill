@@ -68,12 +68,12 @@ class Manager extends AdminManagerIface
         $this->table = \App\Config::getInstance()->createTable(\App\Config::getInstance()->getUrlName());
         $this->table->setRenderer(\App\Config::getInstance()->createTableRenderer($this->table));
 
-        $this->table->addCell(new \Tk\Table\Cell\Checkbox('id'));
-        $this->table->addCell($this->actionsCell);
-        $this->table->addCell(new \Tk\Table\Cell\Text('title'))->addCss('key')->setUrl(clone $this->editUrl);
-        $this->table->addCell(new \Tk\Table\Cell\Text('average'));
-        $this->table->addCell(new \Tk\Table\Cell\Text('status'));
-        $this->table->addCell(new \Tk\Table\Cell\Text('userId'))->setOnPropertyValue(function ($cell, $obj) {
+        $this->table->appendCell(new \Tk\Table\Cell\Checkbox('id'));
+        $this->table->appendCell($this->actionsCell);
+        $this->table->appendCell(new \Tk\Table\Cell\Text('title'))->addCss('key')->setUrl(clone $this->editUrl);
+        $this->table->appendCell(new \Tk\Table\Cell\Text('average'));
+        $this->table->appendCell(new \Tk\Table\Cell\Text('status'));
+        $this->table->appendCell(new \Tk\Table\Cell\Text('userId'))->setOnPropertyValue(function ($cell, $obj) {
             /** @var \Tk\Table\Cell\Text $cell */
             /** @var \Skill\Db\Entry $obj */
             if ($obj->getUser()) {
@@ -84,10 +84,10 @@ class Manager extends AdminManagerIface
             }
             return $value;
         });
-        $this->table->addCell(new \Tk\Table\Cell\Text('assessor'));
-        $this->table->addCell(new \Tk\Table\Cell\Text('absent'));
-        $this->table->addCell(new \Tk\Table\Cell\Boolean('confirm'));
-        $this->table->addCell(new \Tk\Table\Cell\Date('created'));
+        $this->table->appendCell(new \Tk\Table\Cell\Text('assessor'));
+        $this->table->appendCell(new \Tk\Table\Cell\Text('absent'));
+        $this->table->appendCell(new \Tk\Table\Cell\Boolean('confirm'));
+        $this->table->appendCell(new \Tk\Table\Cell\Date('created'));
 
         // Filters
         $this->table->addFilter(new Field\Input('keywords'))->setAttr('placeholder', 'Keywords');

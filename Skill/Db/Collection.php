@@ -202,6 +202,7 @@ class Collection extends \Tk\Db\Map\Model
      * Get the total number of domains for this collection
      *
      * @return int
+     * @deprecated the actual values should be used not this, as it does not reflect when it changes.
      */
     public function getDomainCount()
     {

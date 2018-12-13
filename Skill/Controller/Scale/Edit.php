@@ -60,13 +60,13 @@ class Edit extends AdminEditIface
         $this->form->setRenderer(\Uni\Config::getInstance()->createFormRenderer($this->form));
 
         // text, textblock, select, checkbox, date, file(????)
-        $this->form->addField(new Field\Input('name'))->setNotes('');
-        //$this->form->addField(new Field\Input('value'))->setNotes('');
-        $this->form->addField(new Field\Input('description'))->setNotes('A short description');
+        $this->form->appendField(new Field\Input('name'))->setNotes('');
+        //$this->form->appendField(new Field\Input('value'))->setNotes('');
+        $this->form->appendField(new Field\Input('description'))->setNotes('A short description');
 
-        $this->form->addField(new Event\Submit('update', array($this, 'doSubmit')));
-        $this->form->addField(new Event\Submit('save', array($this, 'doSubmit')));
-        $this->form->addField(new Event\Link('cancel', $this->getConfig()->getBackUrl()));
+        $this->form->appendField(new Event\Submit('update', array($this, 'doSubmit')));
+        $this->form->appendField(new Event\Submit('save', array($this, 'doSubmit')));
+        $this->form->appendField(new Event\Link('cancel', $this->getConfig()->getBackUrl()));
 
     }
 

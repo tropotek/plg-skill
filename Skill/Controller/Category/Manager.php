@@ -54,13 +54,13 @@ class Manager extends AdminManagerIface
         $this->table = \App\Config::getInstance()->createTable(\App\Config::getInstance()->getUrlName());
         $this->table->setRenderer(\App\Config::getInstance()->createTableRenderer($this->table));
 
-        $this->table->addCell(new \Tk\Table\Cell\Checkbox('id'));
-        $this->table->addCell(new \Tk\Table\Cell\Text('uid'))->setLabel('UID');
-        $this->table->addCell(new \Tk\Table\Cell\Text('name'))->addCss('key')->setUrl(clone $this->editUrl);
-        $this->table->addCell(new \Tk\Table\Cell\Text('label'));
-        $this->table->addCell(new \Tk\Table\Cell\Boolean('publish'));
-        $this->table->addCell(new \Tk\Table\Cell\Date('modified'));
-        $this->table->addCell(new \Tk\Table\Cell\OrderBy('orderBy'));
+        $this->table->appendCell(new \Tk\Table\Cell\Checkbox('id'));
+        $this->table->appendCell(new \Tk\Table\Cell\Text('uid'))->setLabel('UID');
+        $this->table->appendCell(new \Tk\Table\Cell\Text('name'))->addCss('key')->setUrl(clone $this->editUrl);
+        $this->table->appendCell(new \Tk\Table\Cell\Text('label'));
+        $this->table->appendCell(new \Tk\Table\Cell\Boolean('publish'));
+        $this->table->appendCell(new \Tk\Table\Cell\Date('modified'));
+        $this->table->appendCell(new \Tk\Table\Cell\OrderBy('orderBy'));
 
         // Filters
         $this->table->addFilter(new Field\Input('keywords'))->setAttr('placeholder', 'Keywords');
