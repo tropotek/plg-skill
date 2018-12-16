@@ -48,14 +48,19 @@ class Manager extends AdminManagerIface
         $this->editUrl = \Uni\Uri::createSubjectUrl('/itemEdit.html');
 
         $u = clone $this->editUrl;
-        $this->getActionPanel()->add(\Tk\Ui\Button::create('New Item',
+        $this->getActionPanel()->append(\Tk\Ui\LINK::createBtn('New Item',
             $u->set('collectionId', $this->collection->getId()), 'fa fa-question'));
 
         $this->table = \App\Config::getInstance()->createTable(\App\Config::getInstance()->getUrlName());
         $this->table->setRenderer(\App\Config::getInstance()->createTableRenderer($this->table));
 
         $this->table->appendCell(new \Tk\Table\Cell\Checkbox('id'));
-        $this->table->appendCell(new \Tk\Table\Cell\Text('uid'))->setLabel('UID');
+        $this->table->appendCell(new \Tk\Table\Cell\Text('num'))->setLabel('#')->setOnPropertyValue(function ($cell, $obj, $value) {
+            /** @var \Tk\Table\Cell\Text $cell */
+            /** @var \Skill\Db\Item $obj */
+            $value = $cell->getTable()->getRenderer()->getRowId()+1;
+            return $value;
+        });
         $this->table->appendCell(new \Tk\Table\Cell\Text('question'))->addCss('key')->setUrl(clone $this->editUrl);
         $this->table->appendCell(new \Tk\Table\Cell\Text('categoryId'))->setOnPropertyValue(function ($cell, $obj, $value) {
             /** @var \Skill\Db\Item $obj */
@@ -72,17 +77,35 @@ class Manager extends AdminManagerIface
         }
         $this->table->appendCell(new \Tk\Table\Cell\Boolean('publish'));
         $this->table->appendCell(new \Tk\Table\Cell\Date('modified'));
-        $this->table->appendCell(new \Tk\Table\Cell\OrderBy('orderBy'));
+        $this->table->appendCell(new \Tk\Table\Cell\Text('uid'))->setLabel('UID');
+
+        $this->table->appendCell(new \Tk\Table\Cell\Text('values'))->setLabel('Val #')->setOnPropertyValue(function ($cell, $obj, $value) {
+            /** @var \Tk\Table\Cell\Text $cell */
+            /** @var \Skill\Db\Item $obj */
+            $sql = sprintf('SELECT a.id, a.question, COUNT(b.item_id) as \'count\'
+FROM skill_item a, skill_value b
+WHERE a.id = %s AND a.id = b.item_id
+GROUP BY a.id', $obj->getId());
+            $res = \App\Config::getInstance()->getDb()->query($sql);
+            $value = (int)$res->fetchColumn(2);
+
+            return $value;
+        });
+
+        // TODO: this needs to be a nested sub level order system ???????
+        //$this->table->appendCell(new \Tk\Table\Cell\OrderBy('orderBy'));
+        $this->table->setStaticOrderBy('cat.order_by, order_by');
 
         // Filters
-        $this->table->addFilter(new Field\Input('keywords'))->setAttr('placeholder', 'Keywords');
+        $this->table->appendFilter(new Field\Input('keywords'))->setAttr('placeholder', 'Keywords');
 
         // Actions
-        $this->table->addAction(\Tk\Table\Action\ColumnSelect::create()->setDisabled(array('id', 'name'))->setUnselected(array('uid', 'publish', 'modified')));
-        $this->table->addAction(\Tk\Table\Action\Csv::create());
-        $this->table->addAction(\Tk\Table\Action\Delete::create());
+        $this->table->appendAction(\Tk\Table\Action\ColumnSelect::create()->setDisabled(array('id', 'name'))->setUnselected(array('publish', 'modified')));
+        $this->table->appendAction(\Tk\Table\Action\Csv::create());
+        $this->table->appendAction(\Tk\Table\Action\Delete::create());
 
         $this->table->setList($this->getList());
+        $this->table->resetSession();
 
     }
 
@@ -94,7 +117,7 @@ class Manager extends AdminManagerIface
     {
         $filter = $this->table->getFilterValues();
         $filter['collectionId'] = $this->collection->getId();
-        return \Skill\Db\ItemMap::create()->findFiltered($filter, $this->table->getTool('orderBy', 100));
+        return \Skill\Db\ItemMap::create()->findFiltered($filter, $this->table->getTool('cat.order_by', 100));
     }
 
     /**

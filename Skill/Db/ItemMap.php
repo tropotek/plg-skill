@@ -119,8 +119,9 @@ SQL;
     public function findFiltered($filter = array(), $tool = null)
     {
         if (!$tool) $tool = \Tk\Db\Tool::create('orderBy');
-        $from = sprintf('%s a ', $this->getDb()->quoteParameter($this->getTable()));
-        $where = '';
+        $select = 'a.*, cat.order_by as \'cat_order\'';
+        $from = sprintf('%s a, `skill_category` cat', $this->getDb()->quoteParameter($this->getTable()));
+        $where = 'a.category_id = cat.id AND ';
 
         if (!empty($filter['keywords'])) {
             $kw = '%' . $this->getDb()->escapeString($filter['keywords']) . '%';
@@ -200,7 +201,7 @@ SQL;
         }
         
         
-        $res = $this->selectFrom($from, $where, $tool);
+        $res = $this->selectFrom($from, $where, $tool, $select);
         //vd($this->getDb()->getLastQuery());
         return $res;
     }

@@ -136,12 +136,14 @@ class GradeCalculator
             \Tk\Log::notice('   - Student: ' . $user->getName());
             $grade = new Grade($this->collection->getId(), $user->getId());
             $domainAvgList = $grade->getDomainAvgList();        // Domain Average List
-
+//vd(array_keys($domainAvgList));
             $itemList = \Skill\Db\ItemMap::create()->findFiltered(array('collectionId' => $this->collection->getId()));
             foreach ($itemList as $item) {
                 $domain = $item->getDomain();
-                if (!$domain) continue;
+                if (!$domain) { continue; }
+
                 if (!isset($domainAvgList[$domain->getId()])) {
+//vd($domain->name);
                     $domainAvgList[$domain->getId()] = array(
                         'domainId' => $domain->getId(),
                         'maxGrade' => $this->collection->maxGrade,
@@ -164,7 +166,7 @@ class GradeCalculator
                 $avg = \Skill\Db\ItemMap::create()->findAverage($user->getId(), $item->getId(), 'approved', $placementStatus, $filter);
                 $domainAvgList[$domain->getId()]['itemAvgList'][$item->getId()] = $avg;
             }
-
+//vd(array_keys($domainAvgList));
             //$domainCount = $this->collection->getDomainCount();
             $domainCount = count($domainAvgList);
 
