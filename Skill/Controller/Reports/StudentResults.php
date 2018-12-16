@@ -160,7 +160,7 @@ class StudentResults extends AdminIface
         }
 
         if ($this->getConfig()->isDebug()) {
-            $template->setChoice('debug');
+            $template->show('debug');
         }
 
 

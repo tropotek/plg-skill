@@ -23,4 +23,3 @@ WHERE a.domain_id = a1.id AND a.category_id = b.id AND c.name IS NOT NULL AND a1
 
 
 
-
