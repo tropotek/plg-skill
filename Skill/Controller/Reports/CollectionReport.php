@@ -127,8 +127,8 @@ class CollectionReport extends \App\Controller\AdminManagerIface
                     $grade = $gradeList[$obj->getId()];
                     $list = $grade->getDomainAvgList();
                     if (!empty($list[$domain->getId()])) {
-                        //return sprintf('%.2f', round($list[$domain->getId()]['avg']*$grade->getGradeMultiplier(), 2));
-                        return sprintf('%.2f', round($list[$domain->getId()]['weightedAvg']*$grade->getGradeMultiplier(), 2));
+                        return sprintf('%.2f', round($list[$domain->getId()]['avg']*$grade->getGradeMultiplier(), 2));
+                        //return sprintf('%.2f', round($list[$domain->getId()]['weightedAvg']*$grade->getGradeMultiplier(), 2));
                     }
                 }
                 return '0.00';

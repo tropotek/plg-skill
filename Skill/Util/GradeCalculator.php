@@ -164,7 +164,9 @@ class GradeCalculator
             foreach ($domainAvgList as $domainId => $domainAverage) {
                 $domainAvgList[$domainId]['domainCount'] = $domainCount;
                 $domainAvgList[$domainId]['avg'] = \Tk\Math::average($domainAverage['itemAvgList']);
-                $domainAvgList[$domainId]['weightedAvg'] = $domainAvgList[$domainId]['avg'] - ($domainAvgList[$domainId]['avg']*$domainAvgList[$domainId]['weight']);
+                //$domainAvgList[$domainId]['weightedAvg'] = $domainAvgList[$domainId]['avg'] - ($domainAvgList[$domainId]['avg']*$domainAvgList[$domainId]['weight']);
+                $domainAvgList[$domainId]['weightedAvg'] = $domainAvgList[$domainId]['avg'] -
+                    ($domainAvgList[$domainId]['weight'] * $domainAvgList[$domainId]['avg']);
                 $domainAvgList[$domainId]['grade'] = $domainAvgList[$domainId]['avg'] * $grade->getGradeMultiplier();
             }
             $grade->setDomainCount($domainCount);

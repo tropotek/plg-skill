@@ -211,7 +211,11 @@ class Grade implements \Serializable
      */
     public function getWeightedGrade()
     {
-        return $this->getWeightedAverage() * $this->getGradeMultiplier();
+        //return $this->getWeightedAverage() * $this->getGradeMultiplier(); ?????
+        $max = $this->getCollection()->maxGrade;
+        if (!$max)
+            $max = 100;
+        return $this->getWeightedPercent()/(100/$max);
     }
 
     /**
@@ -226,14 +230,21 @@ class Grade implements \Serializable
     }
 
     /**
+     * NOTE: not sure what I am missing here? But if we use the weightedAverage we end up with off results?????????????????
+     *
      * @return float
      */
     public function getWeightedPercent()
     {
-        $max = $this->getCollection()->maxGrade;
-        if (!$max)
-            $max = 100;
-        return $this->getWeightedGrade() * (100/$max);
+        $cnt = 1;
+        if ($this->getDomainCount())
+            $cnt = $this->getDomainCount();
+
+        $avg = 0;
+        foreach($this->getDomainAvgList() as $list) {
+            $avg += $list['avg']*$list['weight']*100;
+        }
+        return $avg/$cnt;
     }
 
     /**
