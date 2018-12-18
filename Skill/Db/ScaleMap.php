@@ -59,7 +59,7 @@ class ScaleMap extends \App\Db\Mapper
      *
      * @param array $filter
      * @param Tool $tool
-     * @return ArrayObject
+     * @return ArrayObject|Scale[]
      * @throws \Exception
      */
     public function findFiltered($filter = array(), $tool = null)

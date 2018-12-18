@@ -48,7 +48,7 @@ class Manager extends AdminManagerIface
         $this->editUrl = \Uni\Uri::createSubjectUrl('/scaleEdit.html');
 
         $u = clone $this->editUrl;
-        $this->getActionPanel()->add(\Tk\Ui\Button::create('New Scale',
+        $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('New Scale',
             $u->set('collectionId', $this->collection->getId()), 'fa fa-balance-scale'));
 
         $this->table = \App\Config::getInstance()->createTable(\App\Config::getInstance()->getUrlName());
@@ -58,18 +58,18 @@ class Manager extends AdminManagerIface
         $this->table->appendCell(new \Tk\Table\Cell\Text('name'))->addCss('key')->setUrl(clone $this->editUrl);
         $this->table->appendCell(new \Tk\Table\Cell\Text('value'));
         //$this->table->appendCell(new \Tk\Table\Cell\Date('modified'));
-        $this->table->appendCell(new \Tk\Table\Cell\OrderBy('orderBy'))->setOnUpdate(function ($orderBy) {
-            /** @var \Tk\Table\Cell\OrderBy $orderBy */
-            \Skill\Db\Scale::recalculateValues($this->collection->getId());
-        });
+//        $this->table->appendCell(new \Tk\Table\Cell\OrderBy('orderBy'))->setOnUpdate(function ($orderBy) {
+//            /** @var \Tk\Table\Cell\OrderBy $orderBy */
+//            \Skill\Db\Scale::recalculateValues($this->collection->getId());
+//        });
 
         // Filters
-        $this->table->addFilter(new Field\Input('keywords'))->setAttr('placeholder', 'Keywords');
+        $this->table->appendFilter(new Field\Input('keywords'))->setAttr('placeholder', 'Keywords');
 
         // Actions
-        $this->table->addAction(\Tk\Table\Action\ColumnSelect::create()->setDisabled(array('id', 'name')));
-        $this->table->addAction(\Tk\Table\Action\Csv::create());
-        $this->table->addAction(\Tk\Table\Action\Delete::create());
+        $this->table->appendAction(\Tk\Table\Action\ColumnSelect::create()->setDisabled(array('id', 'name')));
+        $this->table->appendAction(\Tk\Table\Action\Csv::create());
+        $this->table->appendAction(\Tk\Table\Action\Delete::create());
 
         $this->table->setList($this->getList());
 
@@ -83,7 +83,7 @@ class Manager extends AdminManagerIface
     {
         $filter = $this->table->getFilterValues();
         $filter['collectionId'] = $this->collection->getId();
-        return \Skill\Db\ScaleMap::create()->findFiltered($filter, $this->table->getTool());
+        return \Skill\Db\ScaleMap::create()->findFiltered($filter, $this->table->getTool('value'));
     }
 
     /**

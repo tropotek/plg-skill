@@ -36,13 +36,13 @@ class Scale extends \Tk\Db\Map\Model
     public $description = '';
 
     /**
-     * @todo: may not be required, calculate on the fly, using order_by
      * @var float
      */
     public $value = 0;
 
     /**
      * @var int
+     * @deprecated Order by `value` instead
      */
     public $orderBy = 0;
 
@@ -78,26 +78,9 @@ class Scale extends \Tk\Db\Map\Model
     public function save()
     {
         parent::save();
-        self::recalculateValues($this->collectionId);
-    }
-
-    /**
-     * recalculate the values for a collection of scales
-     *
-     * @param $collectionId
-     * @throws \Tk\Db\Exception
-     */
-    public static function recalculateValues($collectionId) {
-        $list = ScaleMap::create()->findFiltered(array('collectionId' => $collectionId));
-        /** @var Scale $scale */
-        foreach ($list as $i => $scale) {
-            if ($i == 0) {
-                $scale->value = 0;
-            } else {
-                $scale->value = round((100/($list->count()-1))*$i, 2);
-            }
-            $scale->update();
-        }
+        try {
+            self::recalculateValues($this->collectionId);
+        } catch (\Exception $e) { \Tk\Log::error($e->getMessage()); }
     }
 
     /**
@@ -112,13 +95,34 @@ class Scale extends \Tk\Db\Map\Model
     }
 
     /**
+     * recalculate the values for a collection of scales
+     *
+     * @param $collectionId
+     * @throws \Exception
+     */
+    public static function recalculateValues($collectionId) {
+        $list = ScaleMap::create()->findFiltered(array('collectionId' => $collectionId));
+        /** @var Scale $scale */
+        foreach ($list as $i => $scale) {
+            $scale->value = $i;
+//            if ($i == 0) {
+//                $scale->value = 0;
+//            } else {
+//                $scale->value = round((100/($list->count()-1))*$i, 2);
+//            }
+            $scale->update();
+        }
+    }
+
+    /**
      * Get the number value of this scale item
      * Generally this is a percentage of the scale in the list 0% - 100%
      *
      * @return float|int
-     * @throws \Tk\Db\Exception
+     * @throws \Exception
+     * @deprecated Not really used
      */
-    public function getValue()
+    public function getRatioValue()
     {
         $list = ScaleMap::create()->findFiltered(array('collectionId' => $this->collectionId), \Tk\Db\Tool::create('order_by'));
         $cnt = count($list)-1;

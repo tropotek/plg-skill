@@ -58,53 +58,35 @@ class ItemMap extends \App\Db\Mapper
     }
 
     /**
-     * Get a basic un weighted average of an entry
+     * Get an Item average for a user, entries that have a 0 value are ignored in this
+     * calculation.
      *
      * @param int $userId
      * @param int $itemId
      * @param string $entryStatus
-     * @param string $placementStatus
      * @param array $filter
      * @return float
      * @throws \Tk\Db\Exception
      */
-    public function findAverage($userId, $itemId, $entryStatus = 'approved', $placementStatus = '', $filter = array())
+    public function findAverage($userId, $itemId, $entryStatus = 'approved', $filter = array())
     {
         $db = $this->getDb();
 
-        $placementSql = '';
-        if ($placementStatus) {
-            $placementSql = ' LEFT JOIN placement c ON (a.placement_id = c.id)';
-        }
-
         $sql = <<<SQL
 SELECT AVG(b.`value`) as 'avg'
-FROM  skill_entry a LEFT JOIN skill_value b ON (a.id = b.entry_id) $placementSql
+FROM  skill_entry a LEFT JOIN skill_value b ON (a.id = b.entry_id)
 WHERE a.user_id = ? AND b.item_id = ? AND b.value > 0 AND a.`status` = ?
 SQL;
-        if ($placementStatus)
-            $sql .= ' AND c.`status` = ?';
 
-
-        if (!empty($filter['companyId'])) {
-            $w = $this->makeMultiQuery($filter['companyId'], 'c.company_id', 'AND', '!=');
+        if (!empty($filter['notCompanyId'])) {
+            $w = $this->makeMultiQuery($filter['notCompanyId'], 'c.company_id', 'AND', '!=');
             if ($w) {
                 $sql .= ' AND ('. $w . ')';
             }
         }
         $stmt = $db->prepare($sql);
-        if ($placementStatus)
-            $stmt->execute(array((int)$userId, (int)$itemId, $entryStatus, $placementStatus));
-        else
-            $stmt->execute(array((int)$userId, (int)$itemId, $entryStatus));
-
-
-        $avg = 0.0;
-        while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-            if (isset($row['avg'])) {
-                $avg = (float)$row['avg'];
-            }
-        }
+        $stmt->execute(array((int)$userId, (int)$itemId, $entryStatus));
+        $avg = (float)round($stmt->fetchColumn(), 2);
         return $avg;
     }
 

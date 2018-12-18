@@ -11,6 +11,8 @@ namespace Skill\Util;
 class GradeCalculator
 {
 
+    const PRECISION = 2;
+
     const CACHE_TIMEOUT = 60*60*24*2;
 
     /**
@@ -136,61 +138,37 @@ class GradeCalculator
             \Tk\Log::notice('   - Student: ' . $user->getName());
             $grade = new Grade($this->collection->getId(), $user->getId());
             $domainAvgList = $grade->getDomainAvgList();        // Domain Average List
-//vd(array_keys($domainAvgList));
             $itemList = \Skill\Db\ItemMap::create()->findFiltered(array('collectionId' => $this->collection->getId()));
             foreach ($itemList as $item) {
                 $domain = $item->getDomain();
                 if (!$domain) { continue; }
-
                 if (!isset($domainAvgList[$domain->getId()])) {
-//vd($domain->name);
                     $domainAvgList[$domain->getId()] = array(
                         'domainId' => $domain->getId(),
                         'maxGrade' => $this->collection->maxGrade,
-                        'domainCount' => 0,
                         'scaleCount' => $this->collection->getScaleCount(),
+                        'domainCount' => 0,
                         'weight' => $domain->weight,
                         'name' => $domain->name,
                         'label' => $domain->label,
                         'avg' => 0,
-                        'weighted_avg' => 0,
-                        'grade' => 0,
+                        'weightedAvg' => 0,
                         'itemAvgList' => array()
                     );
                 }
-
-                $placementStatus = '';
-                if ($this->collection->requirePlacement)
-                    $placementStatus = 'completed';
-
-                $avg = \Skill\Db\ItemMap::create()->findAverage($user->getId(), $item->getId(), 'approved', $placementStatus, $filter);
+                $avg = \Skill\Db\ItemMap::create()->findAverage($user->getId(), $item->getId(), 'approved', $filter);
                 $domainAvgList[$domain->getId()]['itemAvgList'][$item->getId()] = $avg;
             }
-//vd(array_keys($domainAvgList));
-            //$domainCount = $this->collection->getDomainCount();
+            // Count the number of domains in these averages, do no get the active domains for this collection as that could be changed by a staff memeber.
             $domainCount = count($domainAvgList);
-
-            $avgTotal = 0;
-            $wightedAvgTotal = 0;
             foreach ($domainAvgList as $domainId => $domainAverage) {
                 $domainAvgList[$domainId]['domainCount'] = $domainCount;
                 $domainAvgList[$domainId]['avg'] = \Tk\Math::average($domainAverage['itemAvgList']);
-                $domainAvgList[$domainId]['weighted_avg'] = $domainAvgList[$domainId]['avg'] * $domainAverage['weight'];
-                $domainAvgList[$domainId]['grade'] = $domainAvgList[$domainId]['avg'] * ($domainAverage['maxGrade'] / $domainAverage['scaleCount']);
-                $avgTotal += $domainAvgList[$domainId]['avg'];
-                $wightedAvgTotal += $domainAvgList[$domainId]['weighted_avg'];
+                $domainAvgList[$domainId]['weightedAvg'] = $domainAvgList[$domainId]['avg'] - ($domainAvgList[$domainId]['avg']*$domainAvgList[$domainId]['weight']);
+                $domainAvgList[$domainId]['grade'] = $domainAvgList[$domainId]['avg'] * $grade->getGradeMultiplier();
             }
-
-            $grade->setAvg($avgTotal);
-            $grade->setWeightedAvg($wightedAvgTotal);
             $grade->setDomainCount($domainCount);
             $grade->setDomainAvgList($domainAvgList);
-
-            if ($domainCount) {
-                $grade->setGrade(($wightedAvgTotal / $domainCount) * $this->collection->maxGrade);
-            } else {
-                $grade->setGrade($wightedAvgTotal * $this->collection->maxGrade);
-            }
 
             // Storing the data in the cache
             $this->getCache()->store($cacheId, $grade, self::CACHE_TIMEOUT);
@@ -215,99 +193,39 @@ class GradeCalculator
 
         if (!$data) {
             \Tk\Log::notice('Refreshing Skills Collection Results Cache: ' . $this->collection->name);
-
             $gradeList = array();
             $gradeValueList = array();
             $studentList = \App\Db\UserMap::create()->findFiltered(array('subjectId' => $this->collection->subjectId));
             foreach ($studentList as $student) {
                 $result = $this->getStudentGrade($student, $filter);
                 $gradeList[$student->getId()] = $result;
-                if ($result->getGrade() > 0)
-                    $gradeValueList[$student->getId()] = $result->getGrade();
-
+                if ($result->getWeightedPercent() > 0)
+                    $gradeValueList[$student->getId()] = $result->getWeightedPercent();
             }
 
             $subjectEntries = \Skill\Db\EntryMap::create()->findFiltered(array(
                 'collectionId' => $this->collection->getId(),
                 'status' => 'approved'
             ));
+
             $data = (object)array(
                 'processingTime' => round(microtime(true) - $start, 4),
-                'min' => (count($gradeValueList) > 0) ? round(min($gradeValueList) * $this->collection->maxGrade, 2) : 0,
-                'median' => round(\Tk\Math::median($gradeValueList) * $this->collection->maxGrade, 2),
-                'max' => (count($gradeValueList) > 0) ? round(max($gradeValueList) * $this->collection->maxGrade, 2) : 0,
-                'avg' => round(\Tk\Math::average($gradeValueList), 2),
+
+                'min' => (count($gradeValueList) > 0) ? round(min($gradeValueList), self::PRECISION) : 0,
+                'median' => round(\Tk\Math::median($gradeValueList), self::PRECISION),
+                'max' => (count($gradeValueList) > 0) ? round(max($gradeValueList), self::PRECISION) : 0,
+
+                'avg' => round(\Tk\Math::average($gradeValueList), self::PRECISION),
                 'count' => count($gradeValueList),
+
                 'gradeValueList' => $gradeValueList,
                 'gradeList' => $gradeList,
                 'entryCount' => $subjectEntries->count()
             );
-//vd($data);
+
             // Storing the data in the cache
             $this->getCache()->store($cacheId, $data, self::CACHE_TIMEOUT);
         }
-        return $data;
-    }
-
-
-
-    /**
-     * This is faster for the StudentResults report page
-     *
-     * @return object|null
-     * @throws \Exception
-     * @deprecated
-     */
-    public function findSubjectAverageGrades()
-    {
-        // Check cache
-        $start = microtime(true);
-        $cacheId = $this->getSubjectGradesCacheId() . '_opt';
-        $data = $this->getCache()->fetch($cacheId);
-        //if ($data) \Tk\Log::info('Subject Grade Cache Exists: ' . $this->collection->getSubject()->getName());
-        if (!$data || !$this->isCacheEnabled()) {
-            //\Tk\Log::info(' - Subject Grade Calculating');
-
-            $students = $this->getConfig()->getUserMapper()->findFiltered(array('subjectId' => $this->collection->subjectId, 'type' => \Uni\Db\ROLE::TYPE_STUDENT));
-            $gradeValueList = array();
-            $subjectEntries = \Skill\Db\EntryMap::create()->findFiltered(array(
-                'collectionId' => $this->collection->getId(),
-                'status' => 'approved'
-            ));
-            if ($subjectEntries->count()) {
-                foreach ($students as $student) {
-                    $entries = \Skill\Db\EntryMap::create()->findFiltered(array(
-                        'collectionId' => $this->collection->getId(),
-                        'status' => 'approved',
-                        'userId' => $student->getId()
-                    ));
-                    if (!$entries->count()) {
-                        continue;
-                    }
-
-                    $studentResult = \Skill\Db\ReportingMap::create()->findStudentResult($this->collection->getId(), $this->collection->subjectId,
-                        $student->getId(), true);
-
-                    if ($studentResult > 0)
-                        $gradeValueList[$student->getId()] = $studentResult;
-                }
-            }
-
-            $data = (object)array(
-                'processingTime' => round(microtime(true) - $start, 4),
-                'min' => (count($gradeValueList) > 0) ? round(min($gradeValueList)*100, 2) : 0,
-                'median' => round(\Tk\Math::median($gradeValueList)*100, 2),
-                'max' => (count($gradeValueList) > 0) ? round(max($gradeValueList)*100, 2) : 0,
-                'avg' => round(\Tk\Math::average($gradeValueList)*100, 2),
-                'count' => count($gradeValueList),
-                'gradeValueList' => $gradeValueList,
-                'entryCount' => $subjectEntries->count()
-            );
-
-            // Storing the data in the cache for 10 minutes
-            $this->getCache()->store($cacheId, $data, self::CACHE_TIMEOUT);
-        }
-
         return $data;
     }
 

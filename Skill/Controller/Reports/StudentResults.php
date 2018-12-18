@@ -89,8 +89,8 @@ class StudentResults extends AdminIface
 //vd($studentGrade);
 
         $template->insertText('avg', sprintf('%.2f / %d', $studentGrade->getAverage(), $this->collection->getScaleCount()));
-        $template->insertText('grade', sprintf('%.2f / %d', $studentGrade->getGrade(), $this->collection->maxGrade));
-        $template->insertText('gradePcnt', sprintf('%.2f', $studentGrade->getPercent()) . '%');
+        $template->insertText('grade', sprintf('%.2f / %d', $studentGrade->getWeightedGrade(), $this->collection->maxGrade));
+        $template->insertText('gradePcnt', sprintf('%.2f%%', $studentGrade->getWeightedPercent()));
 
 
         $filter = array(
@@ -112,9 +112,10 @@ class StudentResults extends AdminIface
             $row = $template->getRepeat('domain-row');
             $row->insertText('name', $domain->name . ' (' . $domain->label . ')');
             $row->insertText('weight', round($domain->weight * 100) . '%');
+            vd($domainAvg);
             if ($domainAvg && property_exists($domainAvg, 'avg')) {
                 $row->insertText('avg', sprintf('%.2f', round($domainAvg->avg, 2)));
-                $row->insertText('grade', sprintf('%.2f', round($domainAvg->grade, 2)));
+                $row->insertText('grade', sprintf('%.2f', round($domainAvg->weightedAvg * $studentGrade->getGradeMultiplier(), 2)));
             } else {
                 $row->insertText('avg', sprintf('%.2f', 0));
                 $row->insertText('grade', sprintf('%.2f', 0));
@@ -263,8 +264,8 @@ class StudentResults extends AdminIface
           <tr>
             <th>Domain</th>
             <th>Weight</th>
-            <th>Avg.</th>
-            <th>Grade</th>
+            <th title="Standard Avg. (unweighted)">Avg.</th>
+            <th title="Weighted Grade">Grade</th>
           </tr>
           <tr repeat="domain-row" var="domain-row">
             <td var="name"></td>

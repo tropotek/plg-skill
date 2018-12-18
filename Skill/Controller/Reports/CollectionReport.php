@@ -74,7 +74,7 @@ class CollectionReport extends \App\Controller\AdminManagerIface
         //$calc->setCacheEnabled(false);
         $filter = array();
         if($this->table->getFilterSession()->has('exclude')) {
-            $filter['companyId'] = explode(',', str_replace(' ', '', $this->table->getFilterSession()->get('exclude')));
+            $filter['notCompanyId'] = explode(',', str_replace(' ', '', $this->table->getFilterSession()->get('exclude')));
         }
         $results = $calc->getSubjectGrades($filter);
 
@@ -95,6 +95,7 @@ class CollectionReport extends \App\Controller\AdminManagerIface
                     $list = $grade->getDomainAvgList();
                     if (!empty($list[$domain->getId()])) {
                         return sprintf('%.2f', round($list[$domain->getId()]['avg'], 2));
+                        //return sprintf('%.2f', round($list[$domain->getId()]['weightedAvg'], 2));
                     }
                 }
 
@@ -111,6 +112,7 @@ class CollectionReport extends \App\Controller\AdminManagerIface
                 /** @var \Skill\Util\Grade $grade */
                 $grade = $gradeList[$obj->getId()];
                 return sprintf('%.2f', round($grade->getAverage(), 2) );
+                //return sprintf('%.2f', round($grade->getWeightedAverage(), 2) );
             }
             return '0.00';
         });
@@ -125,7 +127,8 @@ class CollectionReport extends \App\Controller\AdminManagerIface
                     $grade = $gradeList[$obj->getId()];
                     $list = $grade->getDomainAvgList();
                     if (!empty($list[$domain->getId()])) {
-                        return sprintf('%.2f', round($list[$domain->getId()]['grade'], 2));
+                        //return sprintf('%.2f', round($list[$domain->getId()]['avg']*$grade->getGradeMultiplier(), 2));
+                        return sprintf('%.2f', round($list[$domain->getId()]['weightedAvg']*$grade->getGradeMultiplier(), 2));
                     }
                 }
                 return '0.00';
@@ -139,7 +142,8 @@ class CollectionReport extends \App\Controller\AdminManagerIface
             if ($gradeList[$obj->getId()]) {
                 /** @var \Skill\Util\Grade $grade */
                 $grade = $gradeList[$obj->getId()];
-                return sprintf('%.2f', round($grade->getGrade(), 2));
+                //return sprintf('%.2f', round($grade->getGrade(), 2));
+                return sprintf('%.2f', round($grade->getWeightedGrade(), 2));
             }
             return '0.00';
         });
@@ -150,23 +154,23 @@ class CollectionReport extends \App\Controller\AdminManagerIface
             if ($gradeList[$obj->getId()]) {
                 /** @var \Skill\Util\Grade $grade */
                 $grade = $gradeList[$obj->getId()];
-                //return sprintf('%.2f%%', round($grade->getGrade() * (100/$grade->getCollection()->maxGrade), 2) );
-                return sprintf('%.2f%%', round($grade->getPercent(), 2) );
+                //return sprintf('%.2f%%', round($grade->getPercent(), 2) );
+                return sprintf('%.2f%%', round($grade->getWeightedPercent(), 2) );
             }
             return '0.00';
         });
 
         // Filters
-        $this->table->addFilter(new \Tk\Form\Field\Input('uid'))->setAttr('placeholder', 'Student Number');
+        $this->table->appendFilter(new \Tk\Form\Field\Input('uid'))->setAttr('placeholder', 'Student Number');
         if ($this->getUser()->isCoordinator()) {
-            $this->table->addFilter(new \Tk\Form\Field\Input('exclude'))->setAttr('style', 'width: 250px;')
+            $this->table->appendFilter(new \Tk\Form\Field\Input('exclude'))->setAttr('style', 'width: 250px;')
                 ->setAttr('placeholder', 'Exclude companyId (EG: 123, 412, 231)');
         }
 
 
         // Actions
-        //$this->table->addAction(\Tk\Table\Action\ColumnSelect::create()->setDisabled(array('id', 'name')));
-        $this->table->addAction(\Tk\Table\Action\Csv::create());
+        //$this->table->appendAction(\Tk\Table\Action\ColumnSelect::create()->setDisabled(array('id', 'name')));
+        $this->table->appendAction(\Tk\Table\Action\Csv::create());
 
         $this->table->setList($this->getList());
 
