@@ -111,8 +111,8 @@ class Historic extends \Uni\TableIface
         ), \Tk\Db\Tool::create('id DESC'));
         $this->appendFilter(new Field\CheckboxSelect('scaleId', \Tk\Form\Field\Option\ArrayObjectIterator::create($list, 'name', 'value')));
 
-        $list = array('-- Exclude Zero Values --' => '', 'Yes' => '1', 'No' => '0');
-        $this->appendFilter(Field\Select::createSelect('excludeZero', $list));
+//        $list = array('-- Exclude Zero Values --' => '', 'Yes' => '1', 'No' => '0');
+//        $this->appendFilter(Field\Select::createSelect('excludeZero', $list));
 
 
         // Actions
