@@ -87,6 +87,10 @@ class Historic extends \Uni\TableIface
 
         $this->appendFilter(new Field\DateRange('date'));
 
+        $this->appendFilter(new Field\Input('studentNumber'))->setAttr('placeholder', 'Student Number');
+
+        $this->appendFilter(new Field\Input('placementId'))->setLabel('Placement ID')->setAttr('placeholder', 'Placement ID');
+
         $list = \Skill\Db\ItemMap::create()->findFiltered(array(    // TODO: we need to use the uid here
             'collectionId' => $this->getCollectionObject()->getId()
         ), \Tk\Db\Tool::create('id DESC'));

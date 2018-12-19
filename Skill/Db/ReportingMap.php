@@ -121,6 +121,14 @@ SQL;
             }
         }
 
+        if (!empty($filter['studentNumber'])) {
+            $where .= sprintf('u.uid = %s AND ', $this->getDb()->quote($filter['studentNumber']));
+        }
+
+        if (!empty($filter['placementId'])) {
+            $where .= sprintf('p.id = %s AND ', (int)$filter['placementId']);
+        }
+
 
 
 
