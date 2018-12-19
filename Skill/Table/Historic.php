@@ -49,17 +49,18 @@ class Historic extends \Uni\TableIface
         $this->appendCell(new \Tk\Table\Cell\Checkbox('id'));
         $this->appendCell(new \Tk\Table\Cell\Text('item_uid'));
         $this->appendCell(new \Tk\Table\Cell\Text('item_question'))->addCss('key');
-        $this->appendCell(new \Tk\Table\Cell\Text('category_name'));
-        $this->appendCell(new \Tk\Table\Cell\Text('domain_name'));
         $this->appendCell(new \Tk\Table\Cell\Text('item_value'));
-        $this->appendCell(new \Tk\Table\Cell\Text('subject_name'));
         $this->appendCell(new \Tk\Table\Cell\Text('placement_title'));
         $this->appendCell(\Tk\Table\Cell\Date::createDate('placement_dateStart'));
         $this->appendCell(\Tk\Table\Cell\Date::createDate('placement_dateEnd'));
-        $this->appendCell(new \Tk\Table\Cell\Text('user_uid'))->setLabel('Student Number');
+        $this->appendCell(new \Tk\Table\Cell\Text('subject_name'));
+        $this->appendCell(new \Tk\Table\Cell\Text('supervisor_name'));
         $this->appendCell(new \Tk\Table\Cell\Text('user_name'))->setLabel('Student Name');
         $this->appendCell(new \Tk\Table\Cell\Text('company_name'));
-        $this->appendCell(new \Tk\Table\Cell\Text('supervisor_name'));
+
+        $this->appendCell(new \Tk\Table\Cell\Text('category_name'));
+        $this->appendCell(new \Tk\Table\Cell\Text('domain_name'));
+        $this->appendCell(new \Tk\Table\Cell\Text('user_uid'))->setLabel('Student Number');
 
         $this->appendCell(new \Tk\Table\Cell\Text('item_id'));
         $this->appendCell(new \Tk\Table\Cell\Text('subject_id'));
@@ -112,7 +113,7 @@ class Historic extends \Uni\TableIface
 
         // Actions
         $this->appendAction(\Tk\Table\Action\ColumnSelect::create()->setUnselected(
-            array('item_id', 'subject_id', 'placement_id', 'student_id', 'company_id', 'supervisor_id')
+            array('item_uid', 'item_id', 'subject_id', 'placement_id', 'student_id', 'company_id', 'supervisor_id')
         ));
         $this->appendAction(\Tk\Table\Action\Csv::create());
         $this->appendAction(\Tk\Table\Action\Delete::create());

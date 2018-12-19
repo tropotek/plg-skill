@@ -179,7 +179,7 @@ SQL;
         }
 
         $res = $this->selectFrom($from, $where, $tool, $select);
-        vd($this->getDb()->getLastQuery());
+        //vd($this->getDb()->getLastQuery());
         return $res;
     }
 
