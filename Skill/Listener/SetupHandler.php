@@ -33,8 +33,8 @@ class SetupHandler implements Subscriber
         // TODO: figure a way out of this, this shows in the cmd list but fails to execute????
         //$app = $config->getConsoleApplication()->add(new \Skill\Console\Cache());
 
-
         $dispatcher->addSubscriber(new \Skill\Listener\CronHandler());
+        $dispatcher->addSubscriber(new \Skill\Listener\StatusMailHandler());
 
         $this->setup();
     }

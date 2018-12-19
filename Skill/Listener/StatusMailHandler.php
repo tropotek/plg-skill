@@ -47,7 +47,6 @@ class StatusMailHandler implements Subscriber
                         }
                         $skillLinkHtml .= sprintf('<a href="%s" title="%s">%s</a> | ', htmlentities($url->toString()),
                             htmlentities($collection->name).$avail, htmlentities($collection->name).$avail);
-
                         $skillLinkText .= sprintf('%s: %s | ', htmlentities($collection->name).$avail, htmlentities($url->toString()));
                     }
                 }
@@ -58,7 +57,6 @@ class StatusMailHandler implements Subscriber
 
             }
         }
-
     }
 
     /**

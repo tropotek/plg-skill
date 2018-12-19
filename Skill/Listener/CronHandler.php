@@ -27,30 +27,48 @@ class CronHandler implements Subscriber
     {
         /** @var \App\Console\Cron $cronConsole */
         $cronConsole = $event->get('console');
-        $cronConsole->write(' - Checking and repairing old Entry collection_id and item_id values. (Remove After: Jan 2019)');
+
+        // TODO: Remove after Jan 2019
+        $this->fixCollectionIds($cronConsole);
+
+        $this->refreshGradeCache($cronConsole);
+
+    }
+
+
+    /**
+     * @param \App\Console\Cron $console
+     */
+    protected function fixCollectionIds($console)
+    {
+        $console->write(' - Checking and repairing old Entry collection_id and item_id values. (Remove After: Jan 2019)');
         \Skill\Db\CollectionMap::create()->fixChangeoverEntries();
+    }
 
-
-
+    /**
+     * @param \App\Console\Cron $console
+     */
+    protected function refreshGradeCache($console)
+    {
         $subjects = \App\Db\SubjectMap::create()->findFiltered(array(
             'active' => true
         ), \Tk\Db\Tool::create('id DESC'));
 
         if ($subjects->count()) {
-            $cronConsole->write(' - Updating gradable skill results cache:');
+            $console->write(' - Updating gradable skill results cache:');
         }
         foreach ($subjects as $subject) {
             $collections = \Skill\Db\CollectionMap::create()->findFiltered(array(
-                'gradable' => true,
-                'requirePlacement' => true,
-                'subjectId' => $subject->getId())
+                    'gradable' => true,
+                    'requirePlacement' => true,
+                    'subjectId' => $subject->getId())
             );
             foreach ($collections as $collection) {
                 $students = \App\Db\UserMap::create()->findFiltered(array('subjectId' => $subject->getId(), 'type' => \Uni\Db\Role::TYPE_STUDENT));
-                $cronConsole->writeComment($subject->name . ' - ' . $collection->name, Output::VERBOSITY_VERY_VERBOSE);
-                $cronConsole->writeComment('  - Collection ID: ' . $collection->getId(), Output::VERBOSITY_VERY_VERBOSE);
-                $cronConsole->writeComment('  - Subject ID:    ' . $subject->getId(), Output::VERBOSITY_VERY_VERBOSE);
-                $cronConsole->writeComment('  - Students:      ' . $students->count(), Output::VERBOSITY_VERY_VERBOSE);
+                $console->writeComment($subject->name . ' - ' . $collection->name, Output::VERBOSITY_VERY_VERBOSE);
+                $console->writeComment('  - Collection ID: ' . $collection->getId(), Output::VERBOSITY_VERY_VERBOSE);
+                $console->writeComment('  - Subject ID:    ' . $subject->getId(), Output::VERBOSITY_VERY_VERBOSE);
+                $console->writeComment('  - Students:      ' . $students->count(), Output::VERBOSITY_VERY_VERBOSE);
 
                 $calc = new \Skill\Util\GradeCalculator($collection);
                 $calc->flushCache();
@@ -58,20 +76,19 @@ class CronHandler implements Subscriber
                 $res = $calc->getSubjectGrades();
 
                 if (!$res || !$res->count){
-                    $cronConsole->writeComment('  - Entry Count:   0', Output::VERBOSITY_VERY_VERBOSE);
-                    $cronConsole->writeComment('', Output::VERBOSITY_VERY_VERBOSE);
+                    $console->writeComment('  - Entry Count:   0', Output::VERBOSITY_VERY_VERBOSE);
+                    $console->writeComment('', Output::VERBOSITY_VERY_VERBOSE);
                     continue;
                 }
-                $cronConsole->writeComment('  - Entry Count:   ' . $res->entryCount, Output::VERBOSITY_VERY_VERBOSE);
-                $cronConsole->writeComment('  - Min:           ' . $res->min, Output::VERBOSITY_VERY_VERBOSE);
-                $cronConsole->writeComment('  - Median:        ' . $res->median, Output::VERBOSITY_VERY_VERBOSE);
-                $cronConsole->writeComment('  - Max:           ' . $res->max, Output::VERBOSITY_VERY_VERBOSE);
-                $cronConsole->writeComment('  - Avg:           ' . $res->avg, Output::VERBOSITY_VERY_VERBOSE);
-                $cronConsole->writeComment('', Output::VERBOSITY_VERY_VERBOSE);
+                $console->writeComment('  - Entry Count:   ' . $res->entryCount, Output::VERBOSITY_VERY_VERBOSE);
+                $console->writeComment('  - Min:           ' . $res->min, Output::VERBOSITY_VERY_VERBOSE);
+                $console->writeComment('  - Median:        ' . $res->median, Output::VERBOSITY_VERY_VERBOSE);
+                $console->writeComment('  - Max:           ' . $res->max, Output::VERBOSITY_VERY_VERBOSE);
+                $console->writeComment('  - Avg:           ' . $res->avg, Output::VERBOSITY_VERY_VERBOSE);
+                $console->writeComment('', Output::VERBOSITY_VERY_VERBOSE);
             }
         }
     }
-
 
 
     /**
