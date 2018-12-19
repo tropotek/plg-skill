@@ -28,8 +28,9 @@ class Collection extends \Tk\Db\Map\Model
 
     /**
      * @var int
+     * @deprecated Flagged for removal avoid using it!
      */
-    //public $profileId = 0;
+    public $profileId = 0;
 
     /**
      * @var int

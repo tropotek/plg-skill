@@ -172,6 +172,12 @@ class Edit extends AdminEditIface
     {
         $template = parent::show();
         if ($this->collection->getId()) {
+
+            // TODO: Remove this when ready for release
+            if ($this->getConfig()->isDebug())
+                $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('Historic Report', \Uni\Uri::createSubjectUrl('/historicReport.html')->set('collectionId', $this->collection->getId()), 'fa fa-bar-chart'));
+
+
             $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('View Entries', \Uni\Uri::createSubjectUrl('/entryManager.html')->set('collectionId', $this->collection->getId()), 'fa fa-files-o'));
             $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('Domains', \Uni\Uri::createSubjectUrl('/domainManager.html')->set('collectionId', $this->collection->getId()), 'fa fa-black-tie'));
             $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('Categories', \Uni\Uri::createSubjectUrl('/categoryManager.html')->set('collectionId', $this->collection->getId()), 'fa fa-folder-o'));

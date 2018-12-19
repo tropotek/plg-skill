@@ -21,15 +21,6 @@ class SubjectEditHandler implements Subscriber
 
 
     /**
-     * @param $subject
-     */
-    public function __construct()
-    {
-
-    }
-
-
-    /**
      * @param \Tk\Event\ControllerEvent $event
      */
     public function onKernelController(\Tk\Event\ControllerEvent $event)
@@ -54,7 +45,7 @@ class SubjectEditHandler implements Subscriber
             if (!$this->controller->getUser()->isStaff() || !$this->controller->getSubject()->getId()) return;
             /** @var \Tk\Ui\Admin\ActionPanel $actionPanel */
             $actionPanel = $this->controller->getActionPanel();
-            $actionPanel->add(\Tk\Ui\Button::create('Skill Collections',
+            $actionPanel->append(\Tk\Ui\Link::createBtn('Skill Collections',
                 \Uni\Uri::createSubjectUrl('/collectionManager.html'), 'fa fa-graduation-cap'));
         }
     }

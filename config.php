@@ -43,6 +43,7 @@ $routes->add('skill-entry-view', new \Tk\Routing\Route('/staff/{subjectCode}/ent
 
 $routes->add('skill-entry-results-staff', new \Tk\Routing\Route('/staff/{subjectCode}/entryResults.html', 'Skill\Controller\Reports\StudentResults::doDefault', $params));
 $routes->add('skill-entry-report', new \Tk\Routing\Route('/staff/{subjectCode}/collectionReport.html', 'Skill\Controller\Reports\CollectionReport::doDefault', $params));
+$routes->add('skill-entry-report', new \Tk\Routing\Route('/staff/{subjectCode}/historicReport.html', 'Skill\Controller\Reports\HistoricReport::doDefault', $params));
 
 //$routes->add('staff-collection-manager', new \Tk\Routing\Route('/staff/skill/collectionManager.html', 'Skill\Controller\Collection\Manager::doDefault', $params));
 //$routes->add('staff-collection-edit', new \Tk\Routing\Route('/staff/skill/collectionEdit.html', 'Skill\Controller\Collection\Edit::doDefault', $params));

@@ -26,7 +26,7 @@ class CollectionMap extends \App\Db\Mapper
             $this->dbMap = new \Tk\DataMap\DataMap();
             $this->dbMap->addPropertyMap(new Db\Integer('id'), 'key');
             $this->dbMap->addPropertyMap(new Db\Integer('uid'));
-            //$this->dbMap->addPropertyMap(new Db\Integer('profileId', 'profile_id'));
+            $this->dbMap->addPropertyMap(new Db\Integer('profileId', 'profile_id'));
             $this->dbMap->addPropertyMap(new Db\Integer('subjectId', 'subject_id'));
             $this->dbMap->addPropertyMap(new Db\Text('name'));
             $this->dbMap->addPropertyMap(new Db\Text('role'));
@@ -145,6 +145,10 @@ WHERE c.collection_id = b.collection_id AND a.item_id = b.org_id AND a.entry_id 
 
         if (!empty($filter['subjectId'])) {
             $where .= sprintf('a.subject_id = %s AND ', (int)$filter['subjectId']);
+        }
+
+        if (!empty($filter['profileId'])) {
+            $where .= sprintf('a.profile_id = %s AND ', (int)$filter['profileId']);
         }
 
         if (!empty($filter['name'])) {
