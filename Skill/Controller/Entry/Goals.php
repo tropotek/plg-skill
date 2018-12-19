@@ -7,6 +7,7 @@ use Tk\Request;
 /**
  * @deprecated This is a temporary object to bridge from the old EMSII and ensure the links work.
  * @todo: we can delete this safely after 2018
+ * @deprecated Remove when your able
  */
 class Goals extends \App\Controller\Iface
 {
