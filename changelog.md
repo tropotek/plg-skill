@@ -1,5 +1,10 @@
 #CHANGELOG#
 
+Ver 2.1.68 [2018-12-19]:
+-------------------------------
+  - Added search to form Checkbox select
+
+
 Ver 2.1.66 [2018-12-19]:
 -------------------------------
   - Removed old Reporting queries
