@@ -85,12 +85,6 @@ class Historic extends \Uni\TableIface
         ), \Tk\Db\Tool::create('id DESC'));
         $this->appendFilter(new Field\CheckboxSelect('supervisorId', $list));
 
-        $this->appendFilter(new Field\DateRange('date'));
-
-        $this->appendFilter(new Field\Input('studentNumber'))->setAttr('placeholder', 'Student Number');
-
-        $this->appendFilter(new Field\Input('placementId'))->setLabel('Placement ID')->setAttr('placeholder', 'Placement ID');
-
         $list = \Skill\Db\ItemMap::create()->findFiltered(array(    // TODO: we need to use the uid here
             'collectionId' => $this->getCollectionObject()->getId()
         ), \Tk\Db\Tool::create('id DESC'));
@@ -110,6 +104,12 @@ class Historic extends \Uni\TableIface
             'collectionId' => $this->getCollectionObject()->getId()
         ), \Tk\Db\Tool::create('id DESC'));
         $this->appendFilter(new Field\CheckboxSelect('scaleId', \Tk\Form\Field\Option\ArrayObjectIterator::create($list, 'name', 'value')));
+
+        $this->appendFilter(new Field\DateRange('date'));
+
+        $this->appendFilter(new Field\Input('studentNumber'))->setAttr('placeholder', 'Student Number');
+
+        $this->appendFilter(new Field\Input('placementId'))->setLabel('Placement ID')->setAttr('placeholder', 'Placement ID');
 
 //        $list = array('-- Exclude Zero Values --' => '', 'Yes' => '1', 'No' => '0');
 //        $this->appendFilter(Field\Select::createSelect('excludeZero', $list));
