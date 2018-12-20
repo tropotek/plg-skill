@@ -1,5 +1,10 @@
 #CHANGELOG#
 
+Ver 2.1.70 [2018-12-20]:
+-------------------------------
+  - adding changes
+
+
 Ver 2.1.68 [2018-12-19]:
 -------------------------------
   - Added search to form Checkbox select
