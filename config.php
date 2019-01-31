@@ -32,6 +32,7 @@ $routes->add('skill-entry-view', new \Tk\Routing\Route('/staff/{subjectCode}/ent
 $routes->add('skill-entry-results-staff', new \Tk\Routing\Route('/staff/{subjectCode}/entryResults.html', 'Skill\Controller\Reports\StudentResults::doDefault', $params));
 $routes->add('skill-entry-report', new \Tk\Routing\Route('/staff/{subjectCode}/collectionReport.html', 'Skill\Controller\Reports\CollectionReport::doDefault', $params));
 $routes->add('skill-historic-report', new \Tk\Routing\Route('/staff/{subjectCode}/historicReport.html', 'Skill\Controller\Reports\HistoricReport::doDefault', $params));
+$routes->add('skill-historic-graph-report', new \Tk\Routing\Route('/staff/{subjectCode}/historicGraphReport.html', 'Skill\Controller\Reports\HistoricGraphReport::doDefault', $params));
 
 // Student Only
 $params = array('role' => array('student'));

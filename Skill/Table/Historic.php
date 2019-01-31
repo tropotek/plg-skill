@@ -109,7 +109,7 @@ class Historic extends \Uni\TableIface
 
         $this->appendFilter(new Field\Input('studentNumber'))->setAttr('placeholder', 'Student Number');
 
-        $this->appendFilter(new Field\Input('placementId'))->setLabel('Placement ID')->setAttr('placeholder', 'Placement ID');
+        //$this->appendFilter(new Field\Input('placementId'))->setLabel('Placement ID')->setAttr('placeholder', 'Placement ID');
 
 //        $list = array('-- Exclude Zero Values --' => '', 'Yes' => '1', 'No' => '0');
 //        $this->appendFilter(Field\Select::createSelect('excludeZero', $list));

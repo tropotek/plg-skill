@@ -9,7 +9,7 @@ use Tk\Request;
  * @see http://www.tropotek.com/
  * @license Copyright 2015 Michael Mifsud
  */
-class HistoricReport extends \App\Controller\AdminManagerIface
+class HistoricGraphReport extends \App\Controller\AdminManagerIface
 {
 
     /**
@@ -24,7 +24,7 @@ class HistoricReport extends \App\Controller\AdminManagerIface
     public function __construct()
     {
         parent::__construct();
-        $this->setPageTitle('Historic Report');
+        $this->setPageTitle('Historic Average Report');
     }
 
     /**
@@ -39,15 +39,13 @@ class HistoricReport extends \App\Controller\AdminManagerIface
         }
 
 
-        $this->table = \Skill\Table\Historic::create();
-        $this->table->setCollectionObject($this->collection);
-        $this->table->init();
-
-
-        $filter = array(
-            'collectionId' => $this->collection->uid
-        );
-        $this->table->setList($this->table->findList($filter));
+//        $this->table = \Skill\Table\Historic::create();
+//        $this->table->setCollectionObject($this->collection);
+//        $this->table->init();
+//        $filter = array(
+//            'collectionId' => $this->collection->uid
+//        );
+//        $this->table->setList($this->table->findList($filter));
 
 
     }
@@ -62,11 +60,13 @@ class HistoricReport extends \App\Controller\AdminManagerIface
     {
         $template = parent::show();
 
-        $panelTitle = sprintf('%s Historic Report', $this->collection->name);
+        $panelTitle = sprintf('%s Historic Average Report', $this->collection->name);
         $template->setAttr('panel', 'data-panel-title', $panelTitle);
-        //$template->setAttr('panel', 'data-panel-icon', $this->collection->icon);
 
-        $template->appendTemplate('panel', $this->table->show());
+        // include Flot
+        \App\Ui\Js::includeFlot($template);
+
+        //$template->appendTemplate('panel', $this->table->show());
 
         return $template;
     }
@@ -80,7 +80,7 @@ class HistoricReport extends \App\Controller\AdminManagerIface
     {
         $xhtml = <<<HTML
 <div class="historic-report">
-  <div class="tk-panel" data-panel-icon="fa fa-table" var="panel"></div>
+  <div class="tk-panel" data-panel-icon="fa fa-line-chart" var="panel"></div>
 </div>
 HTML;
 
