@@ -54,7 +54,7 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
             return null;
         }
         $message = \Tk\Mail\CurlyMessage::create($mailTemplate->template);
-        $message->setSubject($model->getCollection()->name . ' Entry ' . ucfirst($status->name) . ' for ' . $placement->getTitle(true) . ' ');
+        $message->setSubject('[#'.$model->getId().'] ' . $model->getCollection()->name . ' Entry ' . ucfirst($status->name) . ' for ' . $placement->getTitle(true) . ' ');
         $message->setFrom(\Tk\Mail\Message::joinEmail($status->getProfile()->email, $status->getSubjectName()));
 
         // Setup the message vars

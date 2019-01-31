@@ -44,7 +44,7 @@ class Scale extends \Tk\Db\Map\Model
      * @var int
      * @deprecated Order by `value` instead
      */
-    public $orderBy = 0;
+    //public $orderBy = 0;
 
     /**
      * @var \DateTime

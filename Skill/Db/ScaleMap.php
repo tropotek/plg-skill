@@ -24,12 +24,12 @@ class ScaleMap extends \App\Db\Mapper
             $this->setTable('skill_scale');
             $this->dbMap = new \Tk\DataMap\DataMap();
             $this->dbMap->addPropertyMap(new Db\Integer('id'), 'key');
-            $this->dbMap->addPropertyMap(new Db\Integer('uid'));
+            //$this->dbMap->addPropertyMap(new Db\Integer('uid'));
             $this->dbMap->addPropertyMap(new Db\Integer('collectionId', 'collection_id'));
             $this->dbMap->addPropertyMap(new Db\Text('name'));
             $this->dbMap->addPropertyMap(new Db\Text('description'));
             $this->dbMap->addPropertyMap(new Db\Decimal('value'));
-            $this->dbMap->addPropertyMap(new Db\Integer('orderBy', 'order_by'));
+            //$this->dbMap->addPropertyMap(new Db\Integer('orderBy', 'order_by'));
             $this->dbMap->addPropertyMap(new Db\Date('modified'));
             $this->dbMap->addPropertyMap(new Db\Date('created'));
         }
@@ -45,7 +45,7 @@ class ScaleMap extends \App\Db\Mapper
         if (!$this->formMap) {
             $this->formMap = new \Tk\DataMap\DataMap();
             $this->formMap->addPropertyMap(new Form\Integer('id'), 'key');
-            $this->formMap->addPropertyMap(new Form\Integer('uid'));
+            //$this->formMap->addPropertyMap(new Form\Integer('uid'));
             $this->formMap->addPropertyMap(new Form\Integer('collectionId'));
             $this->formMap->addPropertyMap(new Form\Text('name'));
             $this->formMap->addPropertyMap(new Form\Text('description'));
@@ -64,7 +64,7 @@ class ScaleMap extends \App\Db\Mapper
      */
     public function findFiltered($filter = array(), $tool = null)
     {
-        if (!$tool) $tool = \Tk\Db\Tool::create('orderBy');
+        if (!$tool) $tool = \Tk\Db\Tool::create();
         $from = sprintf('%s a ', $this->getDb()->quoteParameter($this->getTable()));
         $where = '';
 
@@ -82,9 +82,9 @@ class ScaleMap extends \App\Db\Mapper
             }
         }
 
-        if (!empty($filter['uid'])) {
-            $where .= sprintf('a.uid = %s AND ', $this->quote($filter['uid']));
-        }
+//        if (!empty($filter['uid'])) {
+//            $where .= sprintf('a.uid = %s AND ', $this->quote($filter['uid']));
+//        }
 
         if (!empty($filter['collectionId'])) {
             $where .= sprintf('a.collection_id = %s AND ', (int)$filter['collectionId']);
