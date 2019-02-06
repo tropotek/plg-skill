@@ -20,7 +20,7 @@ use Tk\Table\Cell;
  * @link http://tropotek.com.au/
  * @license Copyright 2018 Tropotek
  */
-class Historic extends \Uni\TableIface
+class HistoricAll extends \Uni\TableIface
 {
 
     /**
@@ -70,13 +70,8 @@ class Historic extends \Uni\TableIface
         $this->appendCell(new \Tk\Table\Cell\Text('supervisor_id'));
 
         // Filters
-//        $list = \App\Db\SubjectMap::create()->findFiltered(array('profileId' => $this->getConfig()->getProfileId()), \Tk\Db\Tool::create('id DESC'));
-//        $this->appendFilter(new Field\CheckboxSelect('subjectId', $list));
-
-        $list = \Skill\Db\ItemMap::create()->findFiltered(array(    // TODO: we need to use the uid here
-            'collectionId' => $this->getCollectionObject()->getId()
-        ), \Tk\Db\Tool::create('uid'));
-        $this->appendFilter(Field\CheckboxSelect::createSelect('itemId', \Tk\Form\Field\Option\ArrayObjectIterator::create($list, 'question', 'uid')))->setLabel('Question');
+        $list = \App\Db\SubjectMap::create()->findFiltered(array('profileId' => $this->getConfig()->getProfileId()), \Tk\Db\Tool::create('id DESC'));
+        $this->appendFilter(new Field\CheckboxSelect('subjectId', $list));
 
         $list = \App\Db\CompanyMap::create()->findFiltered(array(
             'profileId' => $this->getConfig()->getProfileId(),
@@ -89,6 +84,11 @@ class Historic extends \Uni\TableIface
             'status' => array('approved')
         ), \Tk\Db\Tool::create('id DESC'));
         $this->appendFilter(new Field\CheckboxSelect('supervisorId', $list));
+
+        $list = \Skill\Db\ItemMap::create()->findFiltered(array(    // TODO: we need to use the uid here
+            'collectionId' => $this->getCollectionObject()->getId()
+        ), \Tk\Db\Tool::create('uid'));
+        $this->appendFilter(Field\CheckboxSelect::createSelect('itemId', \Tk\Form\Field\Option\ArrayObjectIterator::create($list, 'question', 'uid')))->setLabel('Question');
 
         $list = \Skill\Db\CategoryMap::create()->findFiltered(array(    // TODO: we need to use the uid here
             'collectionId' => $this->getCollectionObject()->getId()
@@ -105,11 +105,14 @@ class Historic extends \Uni\TableIface
         ), \Tk\Db\Tool::create('id DESC'));
         $this->appendFilter(new Field\CheckboxSelect('scaleId', \Tk\Form\Field\Option\ArrayObjectIterator::create($list, 'name', 'value')));
 
-        //$this->appendFilter(new Field\DateRange('date'));
+        $this->appendFilter(new Field\DateRange('date'));
 
         $this->appendFilter(new Field\Input('studentNumber'))->setAttr('placeholder', 'Student Number');
 
+        //$this->appendFilter(new Field\Input('placementId'))->setLabel('Placement ID')->setAttr('placeholder', 'Placement ID');
 
+//        $list = array('-- Exclude Zero Values --' => '', 'Yes' => '1', 'No' => '0');
+//        $this->appendFilter(Field\Select::createSelect('excludeZero', $list));
 
 
         // Actions

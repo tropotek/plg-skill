@@ -9,7 +9,7 @@ use Tk\Request;
  * @see http://www.tropotek.com/
  * @license Copyright 2015 Michael Mifsud
  */
-class HistoricGraphReport extends \App\Controller\AdminManagerIface
+class ItemAverageReport extends \App\Controller\AdminManagerIface
 {
 
     /**
@@ -24,7 +24,7 @@ class HistoricGraphReport extends \App\Controller\AdminManagerIface
     public function __construct()
     {
         parent::__construct();
-        $this->setPageTitle('Historic Average Report');
+        $this->setPageTitle('Item Average Report');
     }
 
     /**
@@ -39,13 +39,14 @@ class HistoricGraphReport extends \App\Controller\AdminManagerIface
         }
 
 
-//        $this->table = \Skill\Table\Historic::create();
-//        $this->table->setCollectionObject($this->collection);
-//        $this->table->init();
-//        $filter = array(
-//            'collectionId' => $this->collection->uid
-//        );
-//        $this->table->setList($this->table->findList($filter));
+        $this->table = \Skill\Table\ItemAverage::create();
+        $this->table->setCollectionObject($this->collection);
+        $this->table->init();
+        $filter = array(
+            'collectionId' => $this->collection->id,
+            //'subjectId' => $this->getConfig()->getSubjectId()
+        );
+        $this->table->setList($this->table->findList($filter, $this->table->getTool('', 0)));
 
 
     }
@@ -60,13 +61,17 @@ class HistoricGraphReport extends \App\Controller\AdminManagerIface
     {
         $template = parent::show();
 
-        $panelTitle = sprintf('%s Historic Average Report', $this->collection->name);
+        $panelTitle = sprintf('%s Item Average Report', $this->collection->name);
         $template->setAttr('panel', 'data-panel-title', $panelTitle);
 
-        // include Flot
-        \App\Ui\Js::includeFlot($template);
 
-        //$template->appendTemplate('panel', $this->table->show());
+        $template->appendTemplate('panel', $this->table->show());
+
+        //$template->setAttr('stats-graph', 'data-src', \Tk\Uri::create('/ajax/stats.html'));
+        //$template->setAttr('stats-graph', 'data-collection-id', $this->collection->getId());
+
+
+        $template->insertText('subject', $this->getConfig()->getSubject()->getName());
 
         return $template;
     }
@@ -80,7 +85,9 @@ class HistoricGraphReport extends \App\Controller\AdminManagerIface
     {
         $xhtml = <<<HTML
 <div class="historic-report">
-  <div class="tk-panel" data-panel-icon="fa fa-line-chart" var="panel"></div>
+  <div class="tk-panel" data-panel-icon="fa fa-line-chart" var="panel">
+    <p>This table queries all Skill Entries submitted to the subject: <span var="subject"></span></p>
+  </div>
 </div>
 HTML;
 

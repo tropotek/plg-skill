@@ -9,7 +9,7 @@ use Tk\Request;
  * @see http://www.tropotek.com/
  * @license Copyright 2015 Michael Mifsud
  */
-class HistoricReport extends \App\Controller\AdminManagerIface
+class HistoricReportAll extends \App\Controller\AdminManagerIface
 {
 
     /**
@@ -24,7 +24,7 @@ class HistoricReport extends \App\Controller\AdminManagerIface
     public function __construct()
     {
         parent::__construct();
-        $this->setPageTitle('Historic Report');
+        $this->setPageTitle('All Historic Report');
     }
 
     /**
@@ -39,13 +39,13 @@ class HistoricReport extends \App\Controller\AdminManagerIface
         }
 
 
-        $this->table = \Skill\Table\Historic::create();
+        $this->table = \Skill\Table\HistoricAll::create();
         $this->table->setCollectionObject($this->collection);
         $this->table->init();
 
 
         $filter = array(
-            'collectionId' => $this->collection->getId()
+            'collectionUid' => $this->collection->uid
         );
         $this->table->setList($this->table->findList($filter));
 
@@ -62,13 +62,11 @@ class HistoricReport extends \App\Controller\AdminManagerIface
     {
         $template = parent::show();
 
-        $panelTitle = sprintf('%s Historic Report', $this->collection->name);
+        $panelTitle = sprintf('%s All Historic Report', $this->collection->name);
         $template->setAttr('panel', 'data-panel-title', $panelTitle);
         //$template->setAttr('panel', 'data-panel-icon', $this->collection->icon);
 
         $template->appendTemplate('panel', $this->table->show());
-
-        $template->insertText('subject', $this->getConfig()->getSubject()->getName());
 
         return $template;
     }
@@ -83,7 +81,7 @@ class HistoricReport extends \App\Controller\AdminManagerIface
         $xhtml = <<<HTML
 <div class="historic-report">
   <div class="tk-panel" data-panel-icon="fa fa-table" var="panel">
-    <p>This table queries all Skill Entries submitted to the subject: <span var="subject"></span></p>
+    <p><em>Notice: trying to query a large number of subjects can cause out of memory errors.</em></p>
   </div>
 </div>
 HTML;
