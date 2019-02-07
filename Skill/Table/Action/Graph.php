@@ -120,7 +120,6 @@ jQuery(function ($) {
       var average = tr.find('td.mAverage').text();
       var item = tr.find('td.mNum').text() + '. ' + tr.find('td.mItem_question').text();
       if (average === '') continue;
-      //console.log([idx, average, item]);
       d1.push([idx, average, item]);
     }
 
