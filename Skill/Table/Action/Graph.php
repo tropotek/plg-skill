@@ -115,12 +115,12 @@ jQuery(function ($) {
     var rowCount = table.find('tbody tr').length - 1;
 
     for (var i = 0; i <= rowCount; i++) {
-      var tr = table.find('tbody tr').eq(i + 1);
+      var tr = table.find('tbody tr').eq(i);
       var idx = tr.find('td.mNum').text();
       var average = tr.find('td.mAverage').text();
       var item = tr.find('td.mNum').text() + '. ' + tr.find('td.mItem_question').text();
-      if (idx === '' || average === '') continue;
-      console.log([idx, average, item]);
+      if (average === '') continue;
+      //console.log([idx, average, item]);
       d1.push([idx, average, item]);
     }
 
@@ -143,12 +143,13 @@ jQuery(function ($) {
         show: false
       },
       xaxis: {
-        show: false,
+        show: true,
         mode: 'categories',
-        tickLength: 5,
+        //tickLength: 5,
         showTicks: true,
         gridLines: false,
-        //rotateTicks: 120
+        axisLabel: 'Skill Items',
+        rotateTicks: 120
       },
       yaxis: {
         min: 0,
@@ -169,7 +170,7 @@ jQuery(function ($) {
           var x = item.datapoint[0];
           var y = item.datapoint[1];
           var color = item.series.color;
-          var tipText = item.series.data[item.dataIndex][2];
+          var tipText = item.series.data[item.dataIndex][2] + ' [Avg: '+item.series.data[item.dataIndex][1]+']';
 
           showTooltip(item.pageX, item.pageY, color, tipText);
         }
@@ -184,8 +185,6 @@ jQuery(function ($) {
         position: 'absolute',
         display: 'none',
         top: y - 40,
-        //top: y,
-        //bottom: 70,
         left: x - 120,
         border: '2px solid ' + color,
         padding: '3px',
