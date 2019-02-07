@@ -69,13 +69,9 @@ class ItemAverage extends \Uni\TableIface
         $values = array('dateStart' => \Tk\Date::getYearStart($lastYear)->format(\Tk\Date::$formFormat), 'dateEnd' => \Tk\Date::getYearEnd($lastYear)->format(\Tk\Date::$formFormat));
         $this->appendFilter(new Field\DateRange('date')); //->setValue($values);
 
-//        $list = \Skill\Db\ItemMap::create()->findFiltered(array(
-//            'collectionId' => $this->getCollectionObject()->getId()
-//        ), \Tk\Db\Tool::create('uid'));
-//        $this->appendFilter(Field\CheckboxSelect::createSelect('itemId', \Tk\Form\Field\Option\ArrayObjectIterator::create($list, 'question', 'uid')))->setLabel('Question');
-
         $list = \App\Db\CompanyMap::create()->findFiltered(array(
             'profileId' => $this->getConfig()->getProfileId(),
+            'hasPlacement' => $this->getConfig()->getSubjectId(),
             'status' => array('approved')
         ), \Tk\Db\Tool::create('name'));
         $this->appendFilter(new Field\CheckboxSelect('companyId', $list));
@@ -103,7 +99,7 @@ class ItemAverage extends \Uni\TableIface
 
         // Actions
         $this->appendAction(\Tk\Table\Action\Csv::create());
-        // $this->appendAction(\Skill\Table\Action\Graph::createGraph('graph'));
+        $this->appendAction(\Skill\Table\Action\Graph::createGraph('graph'));
 
         return $this;
     }

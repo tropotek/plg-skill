@@ -223,7 +223,7 @@ cat.id as 'category_id', cat.name as 'category_name',
 sd.id as 'domain_id', sd.name as 'domain_name',
 c.id as 'company_id', c.name as 'company_name',
 sup.id as 'supervisor_id', sup.name as 'supervisor_name',
-AVG(sv.value) as 'average', COUNT(sv.value) as 'count'
+ROUND(AVG(sv.value), 3) as 'average', COUNT(sv.value) as 'count'
 SQL;
 
         $from = <<<SQL
@@ -375,7 +375,7 @@ SQL;
         $select = <<<SQL
 sc.id as 'collection_id',
 si.uid as 'item_uid', si.question as 'item_question',
-AVG(sv.value) as 'average', COUNT(sv.value) as 'count', $interval as 'date'
+ROUND(AVG(sv.value), 3) as 'average', COUNT(sv.value) as 'count', $interval as 'date'
 SQL;
 
         $from = <<<SQL

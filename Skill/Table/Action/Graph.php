@@ -65,6 +65,7 @@ class Graph extends \Tk\Table\Action\Link
     public function show()
     {
         $template = parent::show();
+        $this->dialog->setAttr('data-table-target', '#'.$this->getTable()->getId());
 
         if ($this->dialog) {
             $this->dialog->setOnShow(function ($dialog) {
@@ -73,6 +74,7 @@ class Graph extends \Tk\Table\Action\Link
 
                 $css = <<<CSS
 .flot-graph-container {
+    position: relative;
     padding: 20px 45px 15px 15px;
     /* margin: 15px auto 30px auto;*/ 
     border: 1px solid #ddd;
@@ -99,88 +101,107 @@ CSS;
                 $js = <<<JS
 jQuery(function ($) {
   var dialog = $('#{$this->dialog->getId()}');
-  
-  
+
+
   dialog.on('shown.bs.modal', function (e) {
-    
+
     dialog.find('.modal-body').empty().append('<div class="flot-graph-container"><div class="flot-graph"></div></div>');
     var graph = dialog.find('.flot-graph');
-    
-    
-    
+
+
+    // TODO: Get this data from the rendered table.
     var d1 = [];
-    for (var i = 0; i <= 80; i += 1) {
-        d1.push([i, parseInt(Math.random() * 5)]);
+    var table = $(dialog.data('tableTarget'));
+    var rowCount = table.find('tbody tr').length - 1;
+
+    for (var i = 0; i <= rowCount; i++) {
+      var tr = table.find('tbody tr').eq(i + 1);
+      var idx = tr.find('td.mNum').text();
+      var average = tr.find('td.mAverage').text();
+      var item = tr.find('td.mNum').text() + '. ' + tr.find('td.mItem_question').text();
+      if (idx === '' || average === '') continue;
+      console.log([idx, average, item]);
+      d1.push([idx, average, item]);
     }
-    var data = [ {data: d1, label: 'Questions' } ];
-     
+
+    var data = [{data: d1, label: 'Skill Items'}];
+
     //flot options
     var options = {
       series: {
         bars: {
           show: true,
           align: 'center',
-          barWidth: 0.6
+          barWidth: 0.5
         }
       },
       grid: {
         hoverable: true,
-        clickable:true
+        clickable: true
       },
-  	  legend: {
-  	    show: false
+      legend: {
+        show: false
       },
       xaxis: {
+        show: false,
         mode: 'categories',
-        tickLength: 0,
+        tickLength: 5,
         showTicks: true,
-        gridLines: false
+        gridLines: false,
+        //rotateTicks: 120
+      },
+      yaxis: {
+        min: 0,
+        max: 5
       }
     };
-    
-    
-    // var data = [{ data: [ ["January", 10], ["February", 8], ["March", 4], ["April", 13], ["May", 17], ["June", 9]], label: 'Categories' }];
-    // var options = {
-    //   series: {
-    //     bars: {
-    //       show: true,
-    //       barWidth: 0.6,
-    //       align: 'center'
-    //     }
-    //   },
-    //   grid: {
-    //     hoverable: true,
-    //     clickable: true
-    //   },
-    //   xaxis: {
-    //     mode: 'categories',
-		// tickLength: 0,
-    //     showTicks: false,
-    //     gridLines: false
-    //   }
-    // };
-    
     $.plot(graph, data, options);
-    
-    
-    // graph.on("plothover", function (event, pos, item) {
-    //   if (item) {
-    //     alert("You clicked an Item!");
-    //   }
-    // });
-    
-    // graph.bind("plotclick", function (event, pos, item) {
-    //   if (item) {
-    //     alert("You clicked a point!");
-    //   }
-    // });
-    
-    
-    
+
+
+    var previousPoint = null, previousLabel = null;
+    $(this).bind("plothover", function (event, pos, item) {
+      if (item) {
+        if ((previousLabel != item.series.label) || (previousPoint != item.dataIndex)) {
+          previousPoint = item.dataIndex;
+          previousLabel = item.series.label;
+          $("#tooltip").remove();
+         
+          var x = item.datapoint[0];
+          var y = item.datapoint[1];
+          var color = item.series.color;
+          var tipText = item.series.data[item.dataIndex][2];
+
+          showTooltip(item.pageX, item.pageY, color, tipText);
+        }
+      } else {
+        $("#tooltip").remove();
+        previousPoint = null;
+      }
+    });
+
+    function showTooltip(x, y, color, contents) {
+      $('<div id="tooltip">' + contents + '</div>').css({
+        position: 'absolute',
+        display: 'none',
+        top: y - 40,
+        //top: y,
+        //bottom: 70,
+        left: x - 120,
+        border: '2px solid ' + color,
+        padding: '3px',
+        'font-size': '9px',
+        'border-radius': '5px',
+        'background-color': '#fff',
+        'font-family': 'Verdana, Arial, Helvetica, Tahoma, sans-serif',
+        opacity: 0.9,
+        zIndex: 9999999
+      }).appendTo("body").fadeIn(200);
+    }
+
+
   });
-  
-  
-  
+
+
 });
 JS;
                 $template->appendJs($js);
