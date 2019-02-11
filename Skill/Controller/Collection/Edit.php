@@ -177,8 +177,8 @@ class Edit extends AdminEditIface
                 $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('Historic Report All', \Uni\Uri::createSubjectUrl('/historicReportAll.html')->set('collectionId', $this->collection->getId()), 'fa fa-list-alt'));
 
             $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('Historic Report', \Uni\Uri::createSubjectUrl('/historicReport.html')->set('collectionId', $this->collection->getId()), 'fa fa-table'));
-            $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('Date Average Report', \Uni\Uri::createSubjectUrl('/dateAverageReport.html')->set('collectionId', $this->collection->getId()), 'fa fa-calendar'));
             $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('Item Average Report', \Uni\Uri::createSubjectUrl('/itemAverageReport.html')->set('collectionId', $this->collection->getId()), 'fa fa-line-chart'));
+            $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('Date Average Report', \Uni\Uri::createSubjectUrl('/dateAverageReport.html')->set('collectionId', $this->collection->getId()), 'fa fa-calendar'));
 
             $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('View Entries', \Uni\Uri::createSubjectUrl('/entryManager.html')->set('collectionId', $this->collection->getId()), 'fa fa-files-o'));
             $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('Domains', \Uni\Uri::createSubjectUrl('/domainManager.html')->set('collectionId', $this->collection->getId()), 'fa fa-black-tie'));
