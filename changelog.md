@@ -1,5 +1,10 @@
 #CHANGELOG#
 
+Ver 2.1.80 [2019-02-11]:
+-------------------------------
+  - Added new company list to search results page
+
+
 Ver 2.1.78 [2019-02-07]:
 -------------------------------
   - Added placement count to company and supervoisor tables
