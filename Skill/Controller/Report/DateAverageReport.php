@@ -1,5 +1,5 @@
 <?php
-namespace Skill\Controller\Reports;
+namespace Skill\Controller\Report;
 
 use Dom\Template;
 use Tk\Request;
@@ -9,7 +9,7 @@ use Tk\Request;
  * @see http://www.tropotek.com/
  * @license Copyright 2015 Michael Mifsud
  */
-class ItemAverageReport extends \App\Controller\AdminManagerIface
+class DateAverageReport extends \App\Controller\AdminManagerIface
 {
 
     /**
@@ -24,7 +24,7 @@ class ItemAverageReport extends \App\Controller\AdminManagerIface
     public function __construct()
     {
         parent::__construct();
-        $this->setPageTitle('Item Average Report');
+        $this->setPageTitle('Date Average Report');
     }
 
     /**
@@ -38,16 +38,13 @@ class ItemAverageReport extends \App\Controller\AdminManagerIface
             throw new \Tk\Exception('A report is not available for this collection.');
         }
 
-
-        $this->table = \Skill\Table\ItemAverage::create();
+        $this->table = \Skill\Table\DateAverage::create();
         $this->table->setCollectionObject($this->collection);
         $this->table->init();
         $filter = array(
-            'collectionId' => $this->collection->id,
-            //'subjectId' => $this->getConfig()->getSubjectId()
+            'collectionId' => $this->collection->getId()
         );
         $this->table->setList($this->table->findList($filter, $this->table->getTool('', 0)));
-
 
     }
 
@@ -61,15 +58,13 @@ class ItemAverageReport extends \App\Controller\AdminManagerIface
     {
         $template = parent::show();
 
-        $panelTitle = sprintf('%s Item Average Report', $this->collection->name);
+        $panelTitle = sprintf('%s Date Average Report', $this->collection->name);
         $template->setAttr('panel', 'data-panel-title', $panelTitle);
-
 
         $template->appendTemplate('panel', $this->table->show());
 
         //$template->setAttr('stats-graph', 'data-src', \Tk\Uri::create('/ajax/stats.html'));
         //$template->setAttr('stats-graph', 'data-collection-id', $this->collection->getId());
-
 
         $template->insertText('subject', $this->getConfig()->getSubject()->getName());
 
@@ -85,7 +80,7 @@ class ItemAverageReport extends \App\Controller\AdminManagerIface
     {
         $xhtml = <<<HTML
 <div class="historic-report">
-  <div class="tk-panel" data-panel-icon="fa fa-line-chart" var="panel">
+  <div class="tk-panel" data-panel-icon="fa fa-calendar" var="panel">
     <p>This table queries all Skill Entries submitted to the subject: <span var="subject"></span></p>
   </div>
 </div>

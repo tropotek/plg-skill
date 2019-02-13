@@ -1,5 +1,5 @@
 <?php
-namespace Skill\Controller\Reports;
+namespace Skill\Controller\Report;
 
 use Dom\Template;
 use Tk\Request;
@@ -9,7 +9,7 @@ use Tk\Request;
  * @see http://www.tropotek.com/
  * @license Copyright 2015 Michael Mifsud
  */
-class HistoricReportAll extends \App\Controller\AdminManagerIface
+class ItemAverageReport extends \App\Controller\AdminManagerIface
 {
 
     /**
@@ -24,7 +24,7 @@ class HistoricReportAll extends \App\Controller\AdminManagerIface
     public function __construct()
     {
         parent::__construct();
-        $this->setPageTitle('All Historic Report');
+        $this->setPageTitle('Item Average Report');
     }
 
     /**
@@ -39,15 +39,14 @@ class HistoricReportAll extends \App\Controller\AdminManagerIface
         }
 
 
-        $this->table = \Skill\Table\HistoricAll::create();
+        $this->table = \Skill\Table\ItemAverage::create();
         $this->table->setCollectionObject($this->collection);
         $this->table->init();
-
-
         $filter = array(
-            'collectionUid' => $this->collection->uid
+            'collectionId' => $this->collection->id,
+            //'subjectId' => $this->getConfig()->getSubjectId()
         );
-        $this->table->setList($this->table->findList($filter));
+        $this->table->setList($this->table->findList($filter, $this->table->getTool('', 0)));
 
 
     }
@@ -62,11 +61,17 @@ class HistoricReportAll extends \App\Controller\AdminManagerIface
     {
         $template = parent::show();
 
-        $panelTitle = sprintf('%s All Historic Report', $this->collection->name);
+        $panelTitle = sprintf('%s Item Average Report', $this->collection->name);
         $template->setAttr('panel', 'data-panel-title', $panelTitle);
-        //$template->setAttr('panel', 'data-panel-icon', $this->collection->icon);
+
 
         $template->appendTemplate('panel', $this->table->show());
+
+        //$template->setAttr('stats-graph', 'data-src', \Tk\Uri::create('/ajax/stats.html'));
+        //$template->setAttr('stats-graph', 'data-collection-id', $this->collection->getId());
+
+
+        $template->insertText('subject', $this->getConfig()->getSubject()->getName());
 
         return $template;
     }
@@ -80,8 +85,8 @@ class HistoricReportAll extends \App\Controller\AdminManagerIface
     {
         $xhtml = <<<HTML
 <div class="historic-report">
-  <div class="tk-panel" data-panel-icon="fa fa-table" var="panel">
-    <p><em>Notice: trying to query a large number of subjects can cause out of memory errors.</em></p>
+  <div class="tk-panel" data-panel-icon="fa fa-line-chart" var="panel">
+    <p>This table queries all Skill Entries submitted to the subject: <span var="subject"></span></p>
   </div>
 </div>
 HTML;

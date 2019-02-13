@@ -1,5 +1,5 @@
 <?php
-namespace Skill\Controller\Reports;
+namespace Skill\Controller\Report;
 
 use App\Controller\AdminIface;
 use Dom\Template;
