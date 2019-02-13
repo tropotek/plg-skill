@@ -114,17 +114,19 @@ class EntryMap extends \App\Db\Mapper
 
         if (!empty($filter['placementId'])) {
             $where .= sprintf('a.placement_id = %s AND ', (int)$filter['placementId']);
-
         }
 
+        $from .= sprintf(', placement c');
+        $where .= sprintf('a.placement_id = c.id AND ');
         if (!empty($filter['placementStatus'])) {
-            $from .= sprintf(', placement c');
-            $where .= sprintf('a.placement_id = c.id AND ');
             $w = $this->makeMultiQuery($filter['placementStatus'], 'c.status');
             if ($w) {
                 $where .= '('. $w . ') AND ';
             }
+        }
 
+        if (!empty($filter['companyId'])) {
+            $where .= sprintf('c.company_id = %s AND ', (int)$filter['companyId']);
         }
 
         if (!empty($filter['title'])) {

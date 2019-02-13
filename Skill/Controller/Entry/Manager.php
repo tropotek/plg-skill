@@ -124,7 +124,7 @@ class Manager extends AdminManagerIface
      */
     public function show()
     {
-        $this->getActionPanel()->add(\Tk\Ui\Button::create('Edit', \Uni\Uri::createSubjectUrl('/collectionEdit.html')->set('collectionId', $this->collection->getId()), 'fa fa-edit'));
+        //$this->getActionPanel()->add(\Tk\Ui\Button::create('Edit', \Uni\Uri::createSubjectUrl('/collectionEdit.html')->set('collectionId', $this->collection->getId()), 'fa fa-edit'));
         if ($this->collection->gradable) {
             $this->getActionPanel()->add(\Tk\Ui\Button::create('Grade Report',
                 \Uni\Uri::createSubjectUrl('/collectionReport.html')->set('collectionId', $this->collection->getId()), 'fa fa-pie-chart'));
