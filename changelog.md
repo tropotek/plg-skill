@@ -1,5 +1,10 @@
 #CHANGELOG#
 
+Ver 2.1.82 [2019-02-13]:
+-------------------------------
+  - Added a new Company Placement Report
+
+
 Ver 2.1.80 [2019-02-11]:
 -------------------------------
   - Added new company list to search results page
