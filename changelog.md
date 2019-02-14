@@ -1,5 +1,10 @@
 #CHANGELOG#
 
+Ver 2.1.84 [2019-02-14]:
+-------------------------------
+  - Fixed Public/private comment report
+
+
 Ver 2.1.82 [2019-02-13]:
 -------------------------------
   - Added a new Company Placement Report
