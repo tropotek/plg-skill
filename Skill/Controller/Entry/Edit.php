@@ -353,10 +353,15 @@ class Edit extends AdminEditIface
     {
         $template = parent::show();
 
-        $template->insertText('panel-title', $this->entry->getCollection()->name);
-        if ($this->entry->getPlacement())
-            $template->insertText('panel-title', $this->entry->getCollection()->name . ': ' . $this->entry->getPlacement()->getTitle(true));
+        $title = $this->entry->getCollection()->name;
+        if ($this->entry->getPlacement()) {
+            $title .= ': ' . $this->entry->getPlacement()->getTitle(true);
+        }
+        if ($this->entry->getId()) {
+            $title = sprintf('[ID: %s] ', $this->entry->getId()) . $title;
+        }
 
+        $template->insertText('panel-title', $title);
 
         if ($this->entry->getCollection()->icon) {
             $template->setAttr('icon', 'class', $this->entry->getCollection()->icon);

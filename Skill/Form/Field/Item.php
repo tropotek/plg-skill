@@ -47,6 +47,8 @@ class Item extends \Tk\Form\Field\Input
         $template->appendCssUrl(\Tk\Uri::create('/plugin/plg-skill/assets/bootstrap-slider/src/less/bootstrap-slider.less'));
         $template->appendJsUrl(\Tk\Uri::create('/plugin/plg-skill/assets/bootstrap-slider/dist/bootstrap-slider.js'));
 
+        $template->setAttr('uid', 'data-uid', $this->item->uid);
+        $template->setAttr('uid', 'data-id', $this->item->getid());
         $template->insertText('uid', self::$incr.'.');
         $template->insertText('question', $this->item->question);
         $list = \Skill\Db\ScaleMap::create()->findFiltered(array('collectionId' => $this->item->collectionId))->toArray('name');

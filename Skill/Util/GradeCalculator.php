@@ -156,7 +156,7 @@ class GradeCalculator
                         'itemAvgList' => array()
                     );
                 }
-                $avg = \Skill\Db\ItemMap::create()->findAverage($user->getId(), $item->getId(), 'approved', $filter);
+                $avg = \Skill\Db\ItemMap::create()->findAverageForUser($user->getId(), $item->getId(), 'approved', $filter);
                 $domainAvgList[$domain->getId()]['itemAvgList'][$item->getId()] = $avg;
             }
             // Count the number of domains in these averages, do no get the active domains for this collection as that could be changed by a staff memeber.

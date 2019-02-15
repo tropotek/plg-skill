@@ -68,7 +68,7 @@ class ItemMap extends \App\Db\Mapper
      * @return float
      * @throws \Tk\Db\Exception
      */
-    public function findAverage($userId, $itemId, $entryStatus = 'approved', $filter = array())
+    public function findAverageForUser($userId, $itemId, $entryStatus = 'approved', $filter = array())
     {
         $db = $this->getDb();
 
@@ -86,6 +86,49 @@ SQL;
         }
         $stmt = $db->prepare($sql);
         $stmt->execute(array((int)$userId, (int)$itemId, $entryStatus));
+        $avg = (float)round($stmt->fetchColumn(), 2);
+        return $avg;
+    }
+
+
+    /**
+     * Get an Item average for a user, entries that have a 0 value are ignored in this
+     * calculation.
+     *
+     * @param int $companyId
+     * @param int $itemId
+     * @param string $entryStatus
+     * @param array $filter
+     * @return float
+     * @throws \Tk\Db\Exception
+     */
+    public function findAverageForCompany($companyId, $itemId, $entryStatus = 'approved', $filter = array())
+    {
+        $db = $this->getDb();
+
+        $sql = <<<SQL
+SELECT a.entry_id
+    ,SUM(a.value) as 'value_total'
+    ,COUNT(a.item_id) as 'item_count'
+    ,AVG(NULLIF(a.value, 0)) as 'avg'
+    ,AVG(NULLIF(a.value, 0))/d.scale_count as 'avg_ratio'
+FROM skill_value a, skill_entry b, skill_collection c,
+     (
+     SELECT a.collection_id, COUNT(a.id) - 1 AS 'scale_count'
+     FROM skill_scale a
+     GROUP BY a.collection_id
+     ) d
+WHERE a.entry_id=? AND a.entry_id = b.id AND b.collection_id = c.id AND b.collection_id = d.collection_id
+SQL;
+
+        if (!empty($filter['notCompanyId'])) {
+            $w = $this->makeMultiQuery($filter['notCompanyId'], 'c.company_id', 'AND', '!=');
+            if ($w) {
+                $sql .= ' AND ('. $w . ')';
+            }
+        }
+        $stmt = $db->prepare($sql);
+        $stmt->execute(array((int)$companyId, (int)$itemId, $entryStatus));
         $avg = (float)round($stmt->fetchColumn(), 2);
         return $avg;
     }
