@@ -86,7 +86,7 @@ class StudentResults extends AdminIface
         /** @var \Skill\Util\Grade $studentGrade */
         //$studentGrade = $results->gradeList[$this->user->getId()];
         $studentGrade = $calc->getStudentGrade($this->user, $filter);
-//vd($studentGrade);
+
 
         $template->insertText('avg', sprintf('%.2f / %d', $studentGrade->getAverage(), $this->collection->getScaleCount()));
         $template->insertText('grade', sprintf('%.2f / %d', $studentGrade->getWeightedGrade(), $this->collection->maxGrade));
