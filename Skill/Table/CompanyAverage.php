@@ -129,7 +129,6 @@ class CompanyAverage extends \Uni\TableIface
 
         $js = <<<JS
 jQuery(function ($) {
-  
   $('.mName').each(function () {
     var trigger = $(this).find('> a');
     var table = $(this).find('.table-sub');
@@ -137,8 +136,6 @@ jQuery(function ($) {
     var dnIcon = 'fa-caret-down';
     
     trigger.append(' <i class="fa fa-caret-up"></i>');
-    
-    console.log(table);
     table.hide();
     
     trigger.on('click', function () {
@@ -150,10 +147,7 @@ jQuery(function ($) {
          table.show();
       }
     });
-    
   });
-  
-  
 });
 JS;
         $this->getRenderer()->getTemplate()->appendJs($js);
