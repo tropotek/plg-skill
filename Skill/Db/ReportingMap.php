@@ -510,7 +510,7 @@ SQL;
      * @return \Tk\Db\Map\ArrayObject|Item[]
      * @throws \Exception
      */
-    public function findCompanyAverage($filter = array(), $tool = null)
+    public function findCompanyTotalAverage($filter = array(), $tool = null)
     {
         if (!$tool) $tool = \Tk\Db\Tool::create();
         $tool->setDistinct(false);
@@ -568,6 +568,72 @@ SQL;
 
         if (!empty($filter['minEntries'])) {
             $tool->setHaving(sprintf('COUNT(a.entry_id) >= %s ', (int)$filter['minEntries']));
+        }
+
+
+        if ($where) {
+            $where = substr($where, 0, -4);
+        }
+
+        $res = $this->selectFrom($from, $where, $tool, $select);
+        //vd($this->getDb()->getLastQuery());
+        return $res;
+    }
+
+
+
+    /**
+     * Find filtered records for graphing calculating the average values
+     *
+     * @param array $filter
+     * @param \Tk\Db\Tool $tool
+     * @return \Tk\Db\Map\ArrayObject|Item[]
+     * @throws \Exception
+     */
+    public function findCompanyAverage($filter = array(), $tool = null)
+    {
+        if (!$tool) $tool = \Tk\Db\Tool::create();
+        $tool->setDistinct(false);
+        $tool->setGroupBy('a.id');
+
+
+        $select = <<<SQL
+b.id as 'placement_id', a.collection_id, a1.uid as 'collection_uid', b.supervisor_id, b.company_id, a.id as 'entry_id', s.scale, 
+              ROUND(AVG(c.`value`), 3) as 'avg', ROUND((AVG(c.`value`) / s.scale) * 100, 3) as 'pct', a.created
+SQL;
+
+        $from = <<<SQL
+skill_entry a,
+    skill_collection a1,
+    placement b,
+    skill_value c,
+    (
+      SELECT a.collection_id, COUNT(a.id) - 1 As 'scale'
+      FROM skill_scale a
+      GROUP BY a.collection_id
+    ) s
+SQL;
+
+        $where = <<<SQL
+!a.del AND !b.del AND a.collection_id = a1.id AND a.placement_id = b.id AND c.value > 0 AND a.id = c.entry_id AND 
+SQL;
+
+        if (!empty($filter['collectionId'])) {
+            $w = $this->makeMultiQuery($filter['collectionId'], 'a.collection_id', 'OR');
+            if ($w) {
+                $where .= '('. $w . ') AND ';
+            }
+        }
+
+        if (!empty($filter['collectionUid'])) {
+            $where .= sprintf('a1.uid = %s AND ', (int)$filter['collectionUid']);
+        }
+
+        if (!empty($filter['companyId'])) {
+            $w = $this->makeMultiQuery($filter['companyId'], 'b.company_id', 'OR');
+            if ($w) {
+                $where .= '('. $w . ') AND ';
+            }
         }
 
 

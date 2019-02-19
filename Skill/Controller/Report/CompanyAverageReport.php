@@ -79,6 +79,7 @@ class CompanyAverageReport extends \App\Controller\AdminManagerIface
 <div class="historic-report">
   <div class="tk-panel" data-panel-icon="fa fa-building-o" var="panel">
     <p>This table queries all Skill Entries submitted to the subject: <span var="subject"></span></p>
+    <p><em>Note: These averages do not include any grade weighting.</em></p>
   </div>
 </div>
 HTML;

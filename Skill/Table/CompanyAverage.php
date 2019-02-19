@@ -44,25 +44,74 @@ class CompanyAverage extends \Uni\TableIface
      */
     public function init()
     {
+        $cid = $this->collectionObject->getId();
+
         //$this->resetSession();
 
         //$this->setStaticOrderBy('');
 
         //$this->appendCell(new \Tk\Table\Cell\Checkbox('id'));
 
-        $this->appendCell(new \Tk\Table\Cell\Text('name'))->addCss('key')->setUrl(\Tk\Uri::create('#'));
-        //$this->appendCell(new \Tk\Table\Cell\Text('company_id'));
-        $this->appendCell(new \Tk\Table\Cell\Text('avg'));
-        $this->appendCell(new \Tk\Table\Cell\Text('pct'));
-        $this->appendCell(new \Tk\Table\Cell\Text('entry_count'));
+        $this->appendCell(new \Tk\Table\Cell\Text('company_id'));
+        $this->appendCell(new \Tk\Table\Cell\Text('name'))->addCss('key')->setUrl(\App\Uri::create('#'))
+            ->setOnCellHtml(function ($cell, $obj, $html) use ($cid) {
+                /** @var $cell \Tk\Table\Cell\Text */
+                /** @var $obj \stdClass */
+                //vd($obj);
+                $config = \App\Config::getInstance();
+                $list = \Skill\Db\ReportingMap::create()->findCompanyAverage(array('collectionId' => $cid, 'companyId' => $obj->company_id));
+                $tbl = '';
+                if ($list->count()) {
+
+                    $ttable = $config->createTable('ptable-'.$obj->company_id);
+                    $ttable->setRenderer($config->createTableRenderer($ttable));
+                    $ttable->setStaticOrderBy('');
+                    $ttable->addCss('table-sm table-sub');
+                    $ttable->removeCss('table-striped table-hover');
+
+                    $ttable->appendCell(\Tk\Table\Cell\Text::create('placement_id'))->addCss('key')
+                        ->setOnPropertyValue(function ($cell, $obj, $value) {
+                            /** @var $cell \Tk\Table\Cell\Text */
+                            /** @var $obj \stdClass */
+                            //vd($obj);
+                            /** @var \App\Db\Placement $placement */
+                            $placement = \App\Db\PlacementMap::create()->find($value);
+                            if ($placement)
+                                return $placement->getTitle();
+                            return $value;
+                        });
+                    $ttable->appendCell(\Tk\Table\Cell\Text::create('supervisor_id'))
+                        ->setOnPropertyValue(function ($cell, $obj, $value) {
+                            /** @var $cell \Tk\Table\Cell\Text */
+                            /** @var $obj \stdClass */
+                            /** @var \App\Db\Supervisor $supervisor */
+                            $supervisor = \App\Db\SupervisorMap::create()->find($value);
+                            if ($supervisor) {
+                                $value = $supervisor->name;
+                                if ($supervisor->academic) {
+                                    $value .= ' [aa]';
+                                }
+                            }
+                            //vd($obj);
+                            return $value;
+                        });
+                    $ttable->appendCell(\Tk\Table\Cell\Text::create('avg'));
+                    $ttable->appendCell(\Tk\Table\Cell\Text::create('pct'));
+                    $ttable->appendCell(new \Tk\Table\Cell\Date('created'));
+                    $ttable->setList($list);
+
+                    $ttable->getRenderer()->enableFooter(false);
+                    $tbl = $ttable->getRenderer()->show()->toString();
+                }
+
+                return $html . $tbl;
+            });
         $this->appendCell(new \Tk\Table\Cell\Text('min'));
         $this->appendCell(new \Tk\Table\Cell\Text('max'));
-        $this->appendCell(new \Tk\Table\Cell\Date('created'))->setOnPropertyValue(function ($cell, $obj, $value) {
-            /** @var $cell \Tk\Table\Cell\Text */
-            /** @var $obj \stdClass */
-            //vd($obj);
-            return $value;
-        });
+        $this->appendCell(new \Tk\Table\Cell\Text('pct'));
+        $this->appendCell(new \Tk\Table\Cell\Text('avg'));
+        $this->appendCell(new \Tk\Table\Cell\Text('entry_count'));
+        $this->appendCell(new \Tk\Table\Cell\Date('created'));
 
 
         // Filters
@@ -101,6 +150,7 @@ class CompanyAverage extends \Uni\TableIface
         // Actions
         $this->appendAction(\Tk\Table\Action\Csv::create());
 
+
         return $this;
     }
 
@@ -114,7 +164,9 @@ class CompanyAverage extends \Uni\TableIface
     {
         if (!$tool) $tool = $this->getTool();
         $filter = array_merge($this->getFilterValues(), $filter);
-        $list = \Skill\Db\ReportingMap::create()->findCompanyAverage($filter, $tool);
+
+
+        $list = \Skill\Db\ReportingMap::create()->findCompanyTotalAverage($filter, $tool);
         return $list;
     }
 
