@@ -64,6 +64,7 @@ class CompanyAverage extends \Uni\TableIface
                     $ttable->setStaticOrderBy('');
                     $ttable->addCss('table-sm table-sub');
                     $ttable->removeCss('table-striped table-hover');
+                    //$ttable->getRenderer()->setAttr('style', 'display:none;');
 
                     $ttable->appendCell(\Tk\Table\Cell\Text::create('placement_id'))->addCss('key')
                         ->setOnPropertyValue(function ($cell, $obj, $value) {
@@ -93,7 +94,7 @@ class CompanyAverage extends \Uni\TableIface
                     $ttable->appendCell(\Tk\Table\Cell\Text::create('pct'));
                     $ttable->appendCell(new \Tk\Table\Cell\Date('created'));
                     $ttable->setList($list);
-
+                    $ttable->getRenderer()->getTemplate()->setAttr('tk-table', 'style', 'display: none;');
                     $ttable->getRenderer()->enableFooter(false);
                     $tbl = $ttable->getRenderer()->show()->toString();
                 }
@@ -131,7 +132,7 @@ class CompanyAverage extends \Uni\TableIface
 jQuery(function ($) {
   $('.mName').each(function () {
     var trigger = $(this).find('> a');
-    var table = $(this).find('.table-sub');
+    var table = $(this).find('> .tk-table');
     var upIcon = 'fa-caret-up';
     var dnIcon = 'fa-caret-down';
     
@@ -141,10 +142,12 @@ jQuery(function ($) {
     trigger.on('click', function () {
       if (table.isVisible()) {
          $(this).find('.fa').removeClass(dnIcon).addClass(upIcon);
-         table.hide();
+         //table.hide();
+         table.slideUp();
       } else {
          $(this).find('.fa').removeClass(upIcon).addClass(dnIcon);
-         table.show();
+         //table.show();
+         table.slideDown();
       }
     });
   });
