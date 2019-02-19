@@ -47,9 +47,7 @@ class CompanyAverage extends \Uni\TableIface
         $cid = $this->collectionObject->getId();
 
         //$this->resetSession();
-
         //$this->setStaticOrderBy('');
-
         //$this->appendCell(new \Tk\Table\Cell\Checkbox('id'));
 
         $this->appendCell(new \Tk\Table\Cell\Text('company_id'));
@@ -57,12 +55,10 @@ class CompanyAverage extends \Uni\TableIface
             ->setOnCellHtml(function ($cell, $obj, $html) use ($cid) {
                 /** @var $cell \Tk\Table\Cell\Text */
                 /** @var $obj \stdClass */
-                //vd($obj);
                 $config = \App\Config::getInstance();
                 $list = \Skill\Db\ReportingMap::create()->findCompanyAverage(array('collectionId' => $cid, 'companyId' => $obj->company_id));
                 $tbl = '';
                 if ($list->count()) {
-
                     $ttable = $config->createTable('ptable-'.$obj->company_id);
                     $ttable->setRenderer($config->createTableRenderer($ttable));
                     $ttable->setStaticOrderBy('');
@@ -73,7 +69,6 @@ class CompanyAverage extends \Uni\TableIface
                         ->setOnPropertyValue(function ($cell, $obj, $value) {
                             /** @var $cell \Tk\Table\Cell\Text */
                             /** @var $obj \stdClass */
-                            //vd($obj);
                             /** @var \App\Db\Placement $placement */
                             $placement = \App\Db\PlacementMap::create()->find($value);
                             if ($placement)
@@ -92,7 +87,6 @@ class CompanyAverage extends \Uni\TableIface
                                     $value .= ' [aa]';
                                 }
                             }
-                            //vd($obj);
                             return $value;
                         });
                     $ttable->appendCell(\Tk\Table\Cell\Text::create('avg'));
@@ -117,8 +111,6 @@ class CompanyAverage extends \Uni\TableIface
         // Filters
         $values = array();
 
-//        $this->appendFilter(new Field\DateRange('date')); //->setValue($values);
-//
         $list = \App\Db\CompanyMap::create()->findFiltered(array(
             'profileId' => $this->getConfig()->getProfileId(),
             'placementSubjectId' => $this->getConfig()->getSubjectId(),
@@ -126,22 +118,6 @@ class CompanyAverage extends \Uni\TableIface
             'placementsOnly' => true
         ), \Tk\Db\Tool::create('name'));
         $this->appendFilter(new Field\CheckboxSelect('companyId', $list));
-//
-//        $list = \App\Db\SupervisorMap::create()->findFiltered(array(
-//            'profileId' => $this->getConfig()->getProfileId(),
-//            'status' => array('approved')
-//        ), \Tk\Db\Tool::create('id DESC'));
-//        $this->appendFilter(new Field\CheckboxSelect('supervisorId', $list));
-//
-//        $list = \Skill\Db\CategoryMap::create()->findFiltered(array(
-//            'collectionId' => $this->getCollectionObject()->getId()
-//        ), \Tk\Db\Tool::create('id DESC'));
-//        $this->appendFilter(new Field\CheckboxSelect('categoryId', \Tk\Form\Field\Option\ArrayObjectIterator::create($list, 'name', 'uid')));
-//
-//        $list = \Skill\Db\DomainMap::create()->findFiltered(array(
-//            'collectionId' => $this->getCollectionObject()->getId()
-//        ), \Tk\Db\Tool::create('id DESC'));
-//        $this->appendFilter(new Field\CheckboxSelect('domainId', \Tk\Form\Field\Option\ArrayObjectIterator::create($list, 'name', 'uid')));
 
         $this->appendFilter(new Field\Input('minEntries'))->setAttr('placeholder', 'Minimum Entries/Placements');
 
@@ -149,6 +125,42 @@ class CompanyAverage extends \Uni\TableIface
         $this->getFilterForm()->load($values);
         // Actions
         $this->appendAction(\Tk\Table\Action\Csv::create());
+
+
+        $js = <<<JS
+jQuery(function ($) {
+  
+  $('.mName').each(function () {
+    var trigger = $(this).find('> a');
+    var table = $(this).find('.table-sub');
+    var upIcon = 'fa-caret-up';
+    var dnIcon = 'fa-caret-down';
+    
+    trigger.append(' <i class="fa fa-caret-up"></i>');
+    
+    console.log(table);
+    table.hide();
+    
+    trigger.on('click', function () {
+      if (table.isVisible()) {
+         $(this).find('.fa').removeClass(dnIcon).addClass(upIcon);
+         table.hide();
+      } else {
+         $(this).find('.fa').removeClass(upIcon).addClass(dnIcon);
+         table.show();
+      }
+    });
+    
+  });
+  
+  
+});
+JS;
+        $this->getRenderer()->getTemplate()->appendJs($js);
+
+
+
+
 
 
         return $this;
@@ -164,8 +176,6 @@ class CompanyAverage extends \Uni\TableIface
     {
         if (!$tool) $tool = $this->getTool();
         $filter = array_merge($this->getFilterValues(), $filter);
-
-
         $list = \Skill\Db\ReportingMap::create()->findCompanyTotalAverage($filter, $tool);
         return $list;
     }
