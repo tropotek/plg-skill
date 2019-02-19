@@ -80,13 +80,17 @@ class Historic extends \Uni\TableIface
 
         $list = \App\Db\CompanyMap::create()->findFiltered(array(
             'profileId' => $this->getConfig()->getProfileId(),
-            'status' => array('approved')
+            'placementSubjectId' => $this->getConfig()->getSubjectId(),
+            'status' => array('approved'),
+            'placementsOnly' => true
         ), \Tk\Db\Tool::create('name'));
         $this->appendFilter(new Field\CheckboxSelect('companyId', $list));
 
         $list = \App\Db\SupervisorMap::create()->findFiltered(array(
             'profileId' => $this->getConfig()->getProfileId(),
-            'status' => array('approved')
+            'placementSubjectId' => $this->getConfig()->getSubjectId(),
+            'status' => array('approved'),
+            'placementsOnly' => true
         ), \Tk\Db\Tool::create('id DESC'));
         $this->appendFilter(new Field\CheckboxSelect('supervisorId', $list));
 

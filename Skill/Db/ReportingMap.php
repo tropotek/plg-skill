@@ -501,4 +501,92 @@ SQL;
     }
 
 
+
+    /**
+     * Find filtered records for graphing calculating the average values
+     *
+     * @param array $filter
+     * @param \Tk\Db\Tool $tool
+     * @return \Tk\Db\Map\ArrayObject|Item[]
+     * @throws \Exception
+     */
+    public function findCompanyAverage($filter = array(), $tool = null)
+    {
+        if (!$tool) $tool = \Tk\Db\Tool::create();
+        $tool->setDistinct(false);
+        $tool->setGroupBy('a.company_id');
+
+
+        $select = <<<SQL
+a.company_id, b.name ,AVG(a.avg) as 'avg', ROUND((AVG(a.avg) / a.scale) * 100, 3) as 'pct',
+       COUNT(a.entry_id) as 'entry_count', MIN(a.pct) as 'min', MAX(a.pct) as 'max', b.created
+SQL;
+
+        $from = <<<SQL
+(
+       SELECT b.id as 'placement_id', a.collection_id, a1.uid as 'collection_uid', b.supervisor_id, b.company_id, a.id as 'entry_id', s.scale, 
+              ROUND(AVG(c.`value`), 3) as 'avg', ROUND((AVG(c.`value`) / s.scale) * 100, 3) as 'pct'
+       FROM skill_entry a,
+            skill_collection a1,
+            placement b,
+            skill_value c,
+            (
+              SELECT a.collection_id, COUNT(a.id) - 1 As 'scale'
+              FROM skill_scale a
+              GROUP BY a.collection_id
+            ) s
+       WHERE !a.del AND !b.del AND a.collection_id = a1.id
+--       AND a.collection_id = 27
+             AND a.placement_id = b.id AND c.value > 0 AND a.id = c.entry_id
+       GROUP BY a.id
+     ) a,
+     company b
+SQL;
+
+        $where = <<<SQL
+!b.del AND a.company_id = b.id AND 
+SQL;
+
+
+        if (!empty($filter['collectionId'])) {
+            $w = $this->makeMultiQuery($filter['collectionId'], 'a.collection_id', 'OR');
+            if ($w) {
+                $where .= '('. $w . ') AND ';
+            }
+        }
+
+        if (!empty($filter['collectionUid'])) {
+            $where .= sprintf('a.collection_uid = %s AND ', (int)$filter['collectionUid']);
+        }
+
+        if (!empty($filter['companyId'])) {
+            $w = $this->makeMultiQuery($filter['companyId'], 'b.id', 'OR');
+            if ($w) {
+                $where .= '('. $w . ') AND ';
+            }
+        }
+
+        if (!empty($filter['minEntries'])) {
+            $tool->setHaving(sprintf('COUNT(a.entry_id) >= %s ', (int)$filter['minEntries']));
+        }
+
+
+        if ($where) {
+            $where = substr($where, 0, -4);
+        }
+
+        $res = $this->selectFrom($from, $where, $tool, $select);
+        //vd($this->getDb()->getLastQuery());
+        return $res;
+    }
+
+
+
+
+
+
+
+
+
+
 }

@@ -35,6 +35,7 @@ $routes->add('skill-historic-report-all', new \Tk\Routing\Route('/staff/{subject
 $routes->add('skill-historic-report', new \Tk\Routing\Route('/staff/{subjectCode}/historicReport.html', 'Skill\Controller\Report\HistoricReport::doDefault', $params));
 $routes->add('skill-date-average-report', new \Tk\Routing\Route('/staff/{subjectCode}/dateAverageReport.html', 'Skill\Controller\Report\DateAverageReport::doDefault', $params));
 $routes->add('skill-item-average-report', new \Tk\Routing\Route('/staff/{subjectCode}/itemAverageReport.html', 'Skill\Controller\Report\ItemAverageReport::doDefault', $params));
+$routes->add('skill-company-average-report', new \Tk\Routing\Route('/staff/{subjectCode}/companyAverageReport.html', 'Skill\Controller\Report\CompanyAverageReport::doDefault', $params));
 
 // Student Only
 $params = array('role' => array('student'));
@@ -48,7 +49,5 @@ $routes->add('skill-ajax-graph-stats', new \Tk\Routing\Route('/ajax/stats.html',
 
 // Guest Pages
 $routes->add('guest-skill-entry-submit', new \Tk\Routing\Route('/inst/{institutionHash}/skillEdit.html', 'Skill\Controller\Entry\Edit::doPublicSubmission'));
-
-
 
 
