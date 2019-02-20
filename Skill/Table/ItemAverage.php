@@ -66,7 +66,9 @@ class ItemAverage extends \Uni\TableIface
         // Filters
 
         $lastYear = \Tk\Date::create()->sub(new \DateInterval('P1Y'));
-        $values = array('dateStart' => \Tk\Date::getYearStart($lastYear)->format(\Tk\Date::$formFormat), 'dateEnd' => \Tk\Date::getYearEnd($lastYear)->format(\Tk\Date::$formFormat));
+        //$values = array('dateStart' => \Tk\Date::getYearStart($lastYear)->format(\Tk\Date::$formFormat), 'dateEnd' => \Tk\Date::getYearEnd($lastYear)->format(\Tk\Date::$formFormat));
+        $values = array('dateStart' => $this->getConfig()->getSubject()->dateStart->format(\Tk\Date::$formFormat), 'dateEnd' => $this->getConfig()->getSubject()->dateEnd->format(\Tk\Date::$formFormat));
+
         $this->appendFilter(new Field\DateRange('date')); //->setValue($values);
 
         $list = \App\Db\CompanyMap::create()->findFiltered(array(

@@ -213,9 +213,6 @@ SQL;
         $tool->setGroupBy('si.uid');
         //$tool->setOrderBy('si.uid');
 
-
-
-
         $select = <<<SQL
 sc.id as 'collection_id',
 si.uid as 'item_uid', si.question as 'item_question',
@@ -346,7 +343,7 @@ SQL;
         }
 
         $res = $this->selectFrom($from, $where, $tool, $select);
-        //vd($this->getDb()->getLastQuery());
+        vd($this->getDb()->getLastQuery());
         return $res;
     }
 
