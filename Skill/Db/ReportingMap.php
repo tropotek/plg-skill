@@ -596,7 +596,7 @@ SQL;
 
         $select = <<<SQL
 b.id as 'placement_id', a.collection_id, a1.uid as 'collection_uid', b.supervisor_id, b.company_id, a.id as 'entry_id', s.scale, 
-              ROUND(AVG(c.`value`), 3) as 'avg', ROUND((AVG(c.`value`) / s.scale) * 100, 3) as 'pct', a.created
+              ROUND(AVG(c.`value`), 3) as 'avg', ROUND((AVG(c.`value`) / s.scale) * 100, 3) as 'pct', a.created, b.date_start, b.date_end
 SQL;
 
         $from = <<<SQL

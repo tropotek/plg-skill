@@ -73,7 +73,7 @@ class CompanyAverage extends \Uni\TableIface
                             /** @var \App\Db\Placement $placement */
                             $placement = \App\Db\PlacementMap::create()->find($value);
                             if ($placement)
-                                return $placement->getTitle();
+                                return $placement->getTitle(true);
                             return $value;
                         });
                     $ttable->appendCell(\Tk\Table\Cell\Text::create('supervisor_id'))
@@ -92,7 +92,7 @@ class CompanyAverage extends \Uni\TableIface
                         });
                     $ttable->appendCell(\Tk\Table\Cell\Text::create('avg'));
                     $ttable->appendCell(\Tk\Table\Cell\Text::create('pct'));
-                    $ttable->appendCell(new \Tk\Table\Cell\Date('created'));
+                    //$ttable->appendCell(\Tk\Table\Cell\Date::createDate('date_start', \Tk\Date::FORMAT_SHORT_DATE));
                     $ttable->setList($list);
                     $ttable->getRenderer()->getTemplate()->setAttr('tk-table', 'style', 'display: none;');
                     $ttable->getRenderer()->enableFooter(false);
@@ -106,7 +106,7 @@ class CompanyAverage extends \Uni\TableIface
         $this->appendCell(new \Tk\Table\Cell\Text('pct'));
         $this->appendCell(new \Tk\Table\Cell\Text('avg'));
         $this->appendCell(new \Tk\Table\Cell\Text('entry_count'));
-        $this->appendCell(new \Tk\Table\Cell\Date('created'));
+        $this->appendCell(\Tk\Table\Cell\Date::createDate('created', \Tk\Date::FORMAT_SHORT_DATE));
 
 
         // Filters
