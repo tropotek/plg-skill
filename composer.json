@@ -11,7 +11,7 @@
     ],
     "homepage": "http://www.tropotek.com/",
     "time": "2017-09-27",
-    "access": "admin, profile",
+    "access": "admin, subject",
     "license": "MIT",
     "version": "1.0.0",
     "authors":  [
@@ -27,7 +27,7 @@
     },
     "extra":  {
         "branch-alias":  {
-            "dev-master": "2.1.x-dev"
+            "dev-master": "2.2.x-dev"
         }
     },
     "require":  {
