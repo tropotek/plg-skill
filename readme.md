@@ -1,11 +1,10 @@
-# EMS III Skill Plugin
+# EMS Skill Plugin
 
-__Project:__ [ttek-plg/plg-skill](http://packagist.org/packages/ttek-plg/plg-skill)  
-__Published:__ 01 Sep 2016
+__Project:__ [ttek-plg/plg-skill](http://packagist.org/packages/ttek-plg/plg-skill)
 __Web:__ <http://www.tropotek.com/>  
 __Authors:__ Michael Mifsud <http://www.tropotek.com/>  
   
-An plg-skill Plugin for the new EMS III System. 
+An plg-skill Plugin for the new EMS System. 
 
 ## Contents
 
@@ -27,7 +26,7 @@ Or add the following to your composer.json file:
 
 ```json
 {
-  "ttek-plg/plg-skill": "~1.0"
+  "ttek-plg/plg-skill": "~3.0"
 }
 ```
 
