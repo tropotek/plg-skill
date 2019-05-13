@@ -3,6 +3,7 @@ namespace Skill\Listener;
 
 use Tk\Event\Subscriber;
 use Skill\Plugin;
+use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
  * @author Michael Mifsud <info@tropotek.com>
@@ -13,10 +14,10 @@ class SetupHandler implements Subscriber
 {
 
     /**
-     * @param \Tk\Event\GetResponseEvent $event
+     * @param \Symfony\Component\HttpKernel\Event\RequestEvent $event
      * @throws \Exception
      */
-    public function onRequest(\Tk\Event\GetResponseEvent $event)
+    public function onRequest(\Symfony\Component\HttpKernel\Event\RequestEvent $event)
     {
         $this->setup();
     }
@@ -108,7 +109,7 @@ class SetupHandler implements Subscriber
     public static function getSubscribedEvents()
     {
         return array(
-            \Tk\Kernel\KernelEvents::REQUEST => array('onRequest', -10),
+            KernelEvents::REQUEST => array('onRequest', -10),
             \Symfony\Component\Console\ConsoleEvents::COMMAND  => array('onCommand', -10)
         );
     }

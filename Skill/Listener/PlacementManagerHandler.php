@@ -3,6 +3,7 @@ namespace Skill\Listener;
 
 use Tk\Event\Subscriber;
 use Tk\Event\Event;
+use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
  * @author Michael Mifsud <info@tropotek.com>
@@ -35,12 +36,12 @@ class PlacementManagerHandler implements Subscriber
 
 
     /**
-     * @param \Tk\Event\ControllerEvent $event
+     * @param \Symfony\Component\HttpKernel\Event\ControllerEvent $event
      */
-    public function onControllerInit(\Tk\Event\ControllerEvent $event)
+    public function onControllerInit(\Symfony\Component\HttpKernel\Event\ControllerEvent $event)
     {
         /** @var \App\Controller\Placement\Edit $controller */
-        $controller = $event->getControllerObject();
+        $controller = \Tk\Event\Event::findControllerObject($event);
         if ($controller instanceof \App\Controller\Placement\Manager) {
             $config = \Uni\Config::getInstance();
             $this->controller = $controller;
@@ -167,7 +168,7 @@ class PlacementManagerHandler implements Subscriber
     public static function getSubscribedEvents()
     {
         return array(
-            \Tk\Kernel\KernelEvents::CONTROLLER => array('onControllerInit', 0),
+            KernelEvents::CONTROLLER => array('onControllerInit', 0),
             //\Tk\PageEvents::CONTROLLER_INIT => array('addActions', 0),
             //\Tk\PageEvents::CONTROLLER_INIT => array(array('onControllerInit', 0), array('addEntryCell', 0)),
             \Tk\Table\TableEvents::TABLE_INIT => array(array('addActions', 0), array('addEntryCell', 0))
