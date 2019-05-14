@@ -24,7 +24,7 @@ class SubjectEditHandler implements Subscriber
     /**
      * @param \Symfony\Component\HttpKernel\Event\ControllerEvent $event
      */
-    public function onKernelController(\Symfony\Component\HttpKernel\Event\ControllerEvent $event)
+    public function onKernelController($event)
     {
         /** @var \App\Controller\Subject\Edit $controller */
         $controller = \Tk\Event\Event::findControllerObject($event);

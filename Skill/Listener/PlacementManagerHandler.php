@@ -38,7 +38,7 @@ class PlacementManagerHandler implements Subscriber
     /**
      * @param \Symfony\Component\HttpKernel\Event\ControllerEvent $event
      */
-    public function onControllerInit(\Symfony\Component\HttpKernel\Event\ControllerEvent $event)
+    public function onControllerInit($event)
     {
         /** @var \App\Controller\Placement\Edit $controller */
         $controller = \Tk\Event\Event::findControllerObject($event);
