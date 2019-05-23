@@ -103,12 +103,12 @@ class SubjectDashboardHandler implements Subscriber
         // STUDENT Subject Dashboard
         if ($this->controller instanceof \App\Controller\Student\SubjectDashboard) {
             $placementList = $this->controller->getPlacementList();
-            $actionsCell = $placementList->getActionsCell();
+            $actionCell = $placementList->getActionCell();
 
             $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('subjectId' => $subject->getId(), 'requirePlacement' => true));
             foreach ($collectionList as $collection) {
                 if (!$collection->isAvailable() || !$collection->publish) continue;
-                $actionsCell->addButton(\Tk\Table\Cell\ActionButton::create($collection->name,
+                $actionCell->addButton(\Tk\Table\Cell\ActionButton::create($collection->name,
                     \Uni\Uri::createSubjectUrl('/entryView.html'), $collection->icon))
                     ->setShowLabel()
                     ->setOnShow(function ($cell, $obj, $btn) use ($collection) {
