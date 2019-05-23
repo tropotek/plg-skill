@@ -27,7 +27,7 @@ class Edit extends AdminEditIface
     protected $placement = null;
 
     /**
-     * @var \App\Ui\Table\Status
+     * @var \App\Table\Status
      */
     protected $statusTable = null;
 
@@ -196,15 +196,14 @@ class Edit extends AdminEditIface
         $this->form->load(\Skill\Db\EntryMap::create()->unmapForm($this->entry));
         $this->form->execute($request);
 
-        if ($this->getUser() && $this->getUser()->isStaff()) {
-            $this->statusTable = new \App\Ui\Table\Status(\App\Uri::createSubjectUrl('/mailLogManager.html'));
-            if ($this->entry->getId()) {
-                $filter = $this->statusTable->getTable()->getFilterValues();
-                $filter['model'] = $this->entry;
-                $filter['subjectId'] = $this->entry->subjectId;
-                $list = \App\Db\StatusMap::create()->findFiltered($filter, $this->statusTable->getTable()->getTool('created DESC'));
-                $this->statusTable->setList($list);
-            }
+        if ($this->getUser() && $this->getUser()->isStaff() && $this->entry->getId()) {
+
+            $this->statusTable = \App\Table\Status::create(\App\Config::getInstance()->getUrlName().'-status')->init();
+            $filter = array(
+                'model' => $this->entry,
+                'subjectId' => $this->entry->subjectId
+            );
+            $this->statusTable->setList($this->statusTable->findList($filter, $this->statusTable->getTool('created DESC')));
         }
 
         if ($this->getUser() && !$this->getUser()->isStudent()) {
@@ -387,7 +386,7 @@ class Edit extends AdminEditIface
             if ($this->getUser()->isStaff()) {
                 if ($this->entry->getId()) {
                     if ($this->statusTable) {
-                        $template->replaceTemplate('statusTable', $this->statusTable->getTable()->getRenderer()->show());
+                        $template->replaceTemplate('statusTable', $this->statusTable->show());
                         $template->setChoice('statusLog');
                     }
                 }
