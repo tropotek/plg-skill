@@ -1,5 +1,12 @@
 #CHANGELOG#
 
+Ver 3.0.10 [2019-05-29]:
+-------------------------------
+  - Added new Note system replcing old note system
+  - Updated a lot of Table objects
+  - Get DB ready for new message system
+
+
 Ver 3.0.8 [2019-05-15]:
 -------------------------------
 
