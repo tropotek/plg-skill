@@ -80,8 +80,8 @@ class PlacementEditHandler implements Subscriber
                         ->setTabGroup('Details')->setReadonly()->setLabel($collection->name)
                         ->setFieldset('Company Skill Urls')->setValue($url->toString())
                         ->setNotes('Copy this URL to send to the ' .
-                            \App\Db\Phrase::findValue('company', $placement->getSubject()->profileId) .
-                            ' to access this ' . \App\Db\Phrase::findValue('placement', $placement->getSubject()->profileId, true) .
+                            \App\Db\Phrase::findValue('company', $placement->getSubject()->getProfileId()) .
+                            ' to access this ' . \App\Db\Phrase::findValue('placement', $placement->getSubject()->getProfileId(), true) .
                             ' ' . $collection->name . ' submission form.');
                 }
             }
