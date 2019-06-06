@@ -374,27 +374,27 @@ class Edit extends AdminEditIface
         }
         if ($this->entry->getCollection()->instructions) {
             $template->insertHtml('instructions', $this->entry->getCollection()->instructions);
-            $template->show('instructions');
+            $template->setVisible('instructions');
         }
         if ($this->isPublic) {
             if (count($this->errors)) {
                 foreach ($this->errors as $error) {
                     \Tk\Alert::addWarning($error);
                 }
-                $template->setChoice('not-available');
+                $template->setVisible('not-available');
                 $template->setAttr('contact', 'href', \Tk\Uri::create('/contact.html')
                     ->set('subjectId', $this->entry->subjectId));
                 return $template;
             } else {
-                $template->setChoice('available');
+                $template->setVisible('available');
             }
         } else {
-            $template->setChoice('edit');
+            $template->setVisible('edit');
             if ($this->getUser()->isStaff()) {
                 if ($this->entry->getId()) {
                     if ($this->statusTable) {
                         $template->replaceTemplate('statusTable', $this->statusTable->show());
-                        $template->setChoice('statusLog');
+                        $template->setVisible('statusLog');
                     }
                 }
             } else {        // For students here

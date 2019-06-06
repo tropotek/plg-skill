@@ -34,7 +34,6 @@ class View extends AdminEditIface
     }
 
     /**
-     *
      * @param Request $request
      * @return \Dom\Renderer\Renderer|Template|null
      * @throws \Exception
@@ -58,23 +57,18 @@ class View extends AdminEditIface
     }
 
     /**
-     *
      * @param Request $request
      * @return \Dom\Renderer\Renderer|Template|null
      * @throws \Exception
      */
     public function doPdf(Request $request)
     {
-
         $watermark = '';
         $ren = \Skill\Ui\Pdf\Entry::create($this->entry, $watermark);
-
-        $ren->download();
-        //$ren->output();     // comment this to see html version
+        //$ren->download();
+        $ren->output();     // comment this to see html version
         //return $ren->show();
     }
-
-
 
     /**
      * @throws \Exception
