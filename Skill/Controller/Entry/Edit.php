@@ -171,10 +171,6 @@ class Edit extends AdminEditIface
             }
         }
 
-//        if ($this->entry->getId()) {
-//            $this->getActionPanel()->add(\Tk\Ui\Button::create('View', \App\Uri::createSubjectUrl('/entryView.html')->set('entryId', $this->entry->getId()), 'fa fa-eye'));
-//        }
-
         if (!$this->entry->getId() && $this->entry->getPlacement()) {
             $this->entry->title = $this->entry->getPlacement()->getTitle(true);
             if ($this->entry->getPlacement()->getCompany()) {
@@ -189,7 +185,7 @@ class Edit extends AdminEditIface
             $this->entry->assessor = $this->entry->getUser()->getName();
         }
 
-        $this->setPageTitle('Skill Edit');
+        $this->setPageTitle($this->entry->getCollection()->name);
 
         $this->buildForm();
 
@@ -344,12 +340,23 @@ class Edit extends AdminEditIface
         $event->setRedirect($url);
     }
 
+    public function initActionPanel()
+    {
+        if ($this->entry->getId() && $this->getUser()->isStaff()) {
+            $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('View',
+                \App\Uri::createSubjectUrl('/entryView.html')->set('entryId', $this->entry->getId()), 'fa fa-eye'));
+            $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('PDF',
+                \App\Uri::createSubjectUrl('/entryView.html')->set('entryId', $this->entry->getId())->set('p', 'p'), 'fa fa-file-pdf-o')->setAttr('target', '_blank'));
+        }
+    }
+
     /**
      * @return Template
      * @throws \Exception
      */
     public function show()
     {
+        $this->initActionPanel();
         $template = parent::show();
 
         $title = $this->entry->getCollection()->name;

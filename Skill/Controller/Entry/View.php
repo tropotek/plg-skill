@@ -22,7 +22,7 @@ class View extends AdminEditIface
 
 
     /**
-     * @throws \Tk\Db\Exception
+     * View constructor.
      */
     public function __construct()
     {
@@ -36,6 +36,7 @@ class View extends AdminEditIface
     /**
      *
      * @param Request $request
+     * @return \Dom\Renderer\Renderer|Template|null
      * @throws \Exception
      */
     public function doDefault(Request $request)
@@ -45,12 +46,35 @@ class View extends AdminEditIface
         if (!$this->entry)
             throw new \Tk\Exception('Invalid entry record.');
 
+        if ($request->has('p')) {
+            return $this->doPdf($request);
+        }
+
         $this->buildForm();
 
         $this->form->load(\Skill\Db\EntryMap::create()->unmapForm($this->entry));
         $this->form->execute($request);
 
     }
+
+    /**
+     *
+     * @param Request $request
+     * @return \Dom\Renderer\Renderer|Template|null
+     * @throws \Exception
+     */
+    public function doPdf(Request $request)
+    {
+
+        $watermark = '';
+        $ren = \Skill\Ui\Pdf\Entry::create($this->entry, $watermark);
+
+        $ren->download();
+        //$ren->output();     // comment this to see html version
+        //return $ren->show();
+    }
+
+
 
     /**
      * @throws \Exception
@@ -94,13 +118,23 @@ class View extends AdminEditIface
 
     }
 
+    public function initActionPanel()
+    {
+        if ($this->entry->getId() && $this->getUser()->isStaff()) {
+            $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('PDF',
+                \App\Uri::create()->set('p', 'p'), 'fa fa-file-pdf-o')->setAttr('target', '_blank'));
+        }
+    }
+
     /**
      * @return \Dom\Template
      * @throws \Exception
      */
     public function show()
     {
+        $this->initActionPanel();
         $template = parent::show();
+
         $template->insertText('panel-title', $this->entry->getCollection()->name . ' View');
         if ($this->entry->getCollection()->icon) {
             $template->setAttr('icon', 'class', $this->entry->getCollection()->icon);
