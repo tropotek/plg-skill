@@ -161,6 +161,7 @@ class Collection extends \App\FormIface
      */
     public function setCollection($collection)
     {
+        // TODO: WTF????? Why does this return the Db\Collection not the Form\Collection
         return $this->setModel($collection);
     }
     
