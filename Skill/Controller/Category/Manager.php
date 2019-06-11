@@ -3,10 +3,7 @@ namespace Skill\Controller\Category;
 
 use App\Controller\AdminManagerIface;
 use Dom\Template;
-use Tk\Form\Field;
 use Tk\Request;
-
-
 
 /**
  * @author Michael Mifsud <info@tropotek.com>
@@ -21,19 +18,12 @@ class Manager extends AdminManagerIface
      */
     private $collection = null;
 
-    /**
-     * @var null|\Tk\Uri
-     */
-    private $editUrl = null;
-
-
 
     /**
      * Manager constructor.
      */
     public function __construct()
     {
-        parent::__construct();
         $this->setPageTitle('Skill Category Manager');
     }
 
@@ -45,54 +35,37 @@ class Manager extends AdminManagerIface
     {
         $this->collection = \Skill\Db\CollectionMap::create()->find($request->get('collectionId'));
 
-        $this->editUrl = \Uni\Uri::createSubjectUrl('/categoryEdit.html');
+        $this->setTable(\Skill\Table\Category::create());
+        $this->getTable()->setEditUrl(\Uni\Uri::createSubjectUrl('/categoryEdit.html'));
+        $this->getTable()->init();
 
-        $u = clone $this->editUrl;
-        $this->getActionPanel()->add(\Tk\Ui\Button::create('New Category',
-            $u->set('collectionId', $this->collection->getId()), 'fa fa-folder-o'));
-
-        $this->table = \App\Config::getInstance()->createTable(\App\Config::getInstance()->getUrlName());
-        $this->table->setRenderer(\App\Config::getInstance()->createTableRenderer($this->table));
-
-        $this->table->appendCell(new \Tk\Table\Cell\Checkbox('id'));
-        $this->table->appendCell(new \Tk\Table\Cell\Text('uid'))->setLabel('UID');
-        $this->table->appendCell(new \Tk\Table\Cell\Text('name'))->addCss('key')->setUrl(clone $this->editUrl);
-        $this->table->appendCell(new \Tk\Table\Cell\Text('label'));
-        $this->table->appendCell(new \Tk\Table\Cell\Boolean('publish'));
-        $this->table->appendCell(new \Tk\Table\Cell\Date('modified'));
-        $this->table->appendCell(new \Tk\Table\Cell\OrderBy('orderBy'));
-
-        // Filters
-        $this->table->addFilter(new Field\Input('keywords'))->setAttr('placeholder', 'Keywords');
-
-        // Actions
-        $this->table->addAction(\Tk\Table\Action\ColumnSelect::create()->setDisabled(array('id', 'name')));
-        $this->table->addAction(\Tk\Table\Action\Csv::create());
-        $this->table->addAction(\Tk\Table\Action\Delete::create());
-
-        $this->table->setList($this->getList());
+        $filter = array(
+            'collectionId' => $this->collection->getId()
+        );
+        $this->getTable()->setList($this->getTable()->findList($filter));
 
     }
 
     /**
-     * @return \Skill\Db\Category[]|\Tk\Db\Map\ArrayObject
-     * @throws \Exception
+     *
      */
-    protected function getList()
+    public function initActionPanel()
     {
-        $filter = $this->table->getFilterValues();
-        $filter['collectionId'] = $this->collection->getId();
-        return \Skill\Db\CategoryMap::create()->findFiltered($filter, $this->table->getTool());
+        $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('New Category',
+            $this->getTable()->getEditUrl()->set('collectionId', $this->collection->getId()), 'fa fa-folder-o'));
+
     }
 
     /**
      * @return \Dom\Template
+     * @throws \Exception
      */
     public function show()
     {
+        $this->initActionPanel();
         $template = parent::show();
 
-        $template->replaceTemplate('table', $this->table->getRenderer()->show());
+        $template->appendTemplate('panel', $this->getTable()->show());
 
         return $template;
     }
@@ -105,18 +78,7 @@ class Manager extends AdminManagerIface
     public function __makeTemplate()
     {
         $xhtml = <<<HTML
-<div>
-
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h4 class="panel-title"><i class="fa fa-folder-o"></i> Categories</h4>
-    </div>
-    <div class="panel-body">
-      <div var="table"></div>
-    </div>
-  </div>
-
-</div>
+<div class="tk-panel" data-panel-title="Categories" data-panel-icon="fa fa-folder-o" var="panel"></div>
 HTML;
 
         return \Dom\Loader::load($xhtml);
