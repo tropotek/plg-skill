@@ -35,7 +35,6 @@ class Cache extends \Tk\Console\Console
 
         // required vars
         $config = \App\Config::getInstance();
-
         if (\App\Config::getInstance()->getEventDispatcher()) {
             $e = new \Tk\Event\Event();
             $e->set('console', $this);

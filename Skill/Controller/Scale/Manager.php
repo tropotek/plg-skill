@@ -21,19 +21,12 @@ class Manager extends AdminManagerIface
      */
     private $collection = null;
 
-    /**
-     * @var null|\Tk\Uri
-     */
-    private $editUrl = null;
-
-
 
     /**
      * Manager constructor.
      */
     public function __construct()
     {
-        parent::__construct();
         $this->setPageTitle('Skill Scale Manager');
     }
 
@@ -45,45 +38,25 @@ class Manager extends AdminManagerIface
     {
         $this->collection = \Skill\Db\CollectionMap::create()->find($request->get('collectionId'));
 
-        $this->editUrl = \Uni\Uri::createSubjectUrl('/scaleEdit.html');
+        $this->setTable(\Skill\Table\Scale::create());
+        $this->getTable()->setEditUrl(\Uni\Uri::createSubjectUrl('/scaleEdit.html'));
+        $this->getTable()->init();
 
-        $u = clone $this->editUrl;
-        $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('New Scale',
-            $u->set('collectionId', $this->collection->getId()), 'fa fa-balance-scale'));
-
-        $this->table = \App\Config::getInstance()->createTable(\App\Config::getInstance()->getUrlName());
-        $this->table->setRenderer(\App\Config::getInstance()->createTableRenderer($this->table));
-
-        $this->table->appendCell(new \Tk\Table\Cell\Checkbox('id'));
-        $this->table->appendCell(new \Tk\Table\Cell\Text('name'))->addCss('key')->setUrl(clone $this->editUrl);
-        $this->table->appendCell(new \Tk\Table\Cell\Text('value'));
-        //$this->table->appendCell(new \Tk\Table\Cell\Date('modified'));
-//        $this->table->appendCell(new \Tk\Table\Cell\OrderBy('orderBy'))->setOnUpdate(function ($orderBy) {
-//            /** @var \Tk\Table\Cell\OrderBy $orderBy */
-//            \Skill\Db\Scale::recalculateValues($this->collection->getId());
-//        });
-
-        // Filters
-        $this->table->appendFilter(new Field\Input('keywords'))->setAttr('placeholder', 'Keywords');
-
-        // Actions
-        $this->table->appendAction(\Tk\Table\Action\ColumnSelect::create()->setDisabled(array('id', 'name')));
-        $this->table->appendAction(\Tk\Table\Action\Csv::create());
-        $this->table->appendAction(\Tk\Table\Action\Delete::create());
-
-        $this->table->setList($this->getList());
+        $filter = array(
+            'collectionId' => $this->collection->getId()
+        );
+        $this->getTable()->setList($this->getTable()->findList($filter));
 
     }
 
     /**
-     * @return \Tk\Db\Map\ArrayObject
-     * @throws \Exception
+     *
      */
-    protected function getList()
+    public function initActionPanel()
     {
-        $filter = $this->table->getFilterValues();
-        $filter['collectionId'] = $this->collection->getId();
-        return \Skill\Db\ScaleMap::create()->findFiltered($filter, $this->table->getTool('value'));
+
+        $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('New Scale',
+            $this->getTable()->getEditUrl()->set('collectionId', $this->collection->getId()), 'fa fa-balance-scale'));
     }
 
     /**
@@ -91,9 +64,10 @@ class Manager extends AdminManagerIface
      */
     public function show()
     {
+        $this->initActionPanel();
         $template = parent::show();
 
-        $template->replaceTemplate('table', $this->table->getRenderer()->show());
+        $template->appendTemplate('panel', $this->getTable()->show());
 
         return $template;
     }
@@ -106,18 +80,7 @@ class Manager extends AdminManagerIface
     public function __makeTemplate()
     {
         $xhtml = <<<HTML
-<div>
-
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h4 class="panel-title"><i class="fa fa-balance-scale"></i> Scale Manager</h4>
-    </div>
-    <div class="panel-body">
-      <div var="table"></div>
-    </div>
-  </div>
-
-</div>
+<div class="tk-panel" data-panel-title="Scale Manager" data-panel-icon="fa fa-balance-scale" var="panel"></div>
 HTML;
 
         return \Dom\Loader::load($xhtml);

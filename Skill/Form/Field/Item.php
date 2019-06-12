@@ -30,7 +30,7 @@ class Item extends \Tk\Form\Field\Input
     {
         parent::__construct('item-'.$item->getId());
         $this->item = $item;
-        $this->setFieldset($this->item->getCategory()->getLabel());
+        $this->setFieldset($this->item->getCategory()->getLabel(), 'skill-group');
     }
 
     /**

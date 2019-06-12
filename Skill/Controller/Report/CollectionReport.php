@@ -30,7 +30,6 @@ class CollectionReport extends \App\Controller\AdminManagerIface
      */
     public function __construct()
     {
-        parent::__construct();
         $this->setPageTitle('Collection Report');
     }
 
@@ -44,153 +43,23 @@ class CollectionReport extends \App\Controller\AdminManagerIface
         $this->setPageTitle( $this->collection->name . ' Report');
 
         if (!$this->collection->gradable) {
-            throw new \Tk\Exception('A report is not available for this collection.');
-        }
-        if ($this->editUrl === null)
-            $this->editUrl = \Uni\Uri::createSubjectUrl('/entryResults.html')->set('collectionId', $this->collection->getId());
-
-        $this->table = \App\Config::getInstance()->createTable(\App\Config::getInstance()->getUrlName());
-        $this->table->setRenderer(\App\Config::getInstance()->createTableRenderer($this->table));
-
-        $this->table->appendCell(new \Tk\Table\Cell\Text('uid'))->setLabel('studentNumber');
-        $this->table->appendCell(new \Tk\Table\Cell\Text('name'))->addCss('key')->setUrl(clone $this->editUrl)
-            ->setOnPropertyValue(function ($cell, $obj, $value) {
-                /** @var \Tk\Table\Cell\Text $cell */
-                $cell->setUrl($cell->getUrl()->set('userId', $obj->getId()));
-                return $value;
-            });
-
-        // Student Results
-        $filter = array();
-        $filter['collectionId'] = $this->collection->getId();
-        $filter['subjectId'] = $this->getSubject()->getId();
-        $filter['userId'] = 0;
-
-        //
-        \Tk\Log::alert('\Skill\Db\ReportingMap::create()->findStudentResult(..START..)');
-
-        //$results = \Skill\Db\ReportingMap::create()->findStudentResults($filter, \Tk\Db\Tool::create('', 0));
-        $calc = new \Skill\Util\GradeCalculator($this->collection);
-        //$calc->setCacheEnabled(false);
-        $filter = array();
-        if($this->table->getFilterSession()->has('exclude')) {
-            $filter['notCompanyId'] = explode(',', str_replace(' ', '', $this->table->getFilterSession()->get('exclude')));
-        }
-        $results = $calc->getSubjectGrades($filter);
-
-        \Tk\Log::alert('\Skill\Db\ReportingMap::create()->findStudentResult(..END..)');
-
-        //$this->table->resetSession();
-
-        $gradeList = $results->gradeList;
-        $domains = \Skill\Db\DomainMap::create()->findFiltered(array('collectionId'=>$this->collection->getId(), 'active' => true));
-        //$domains = \Skill\Db\DomainMap::create()->findFiltered(array('collectionId'=>$this->collection->getId()));
-        foreach ($domains as $domain) {
-            $this->table->appendCell(new \Tk\Table\Cell\Text($domain->label))->setLabel($domain->label)->setOrderProperty('')->setOnPropertyValue(function ($cell, $obj, $value) use ($domain, $gradeList) {
-                /** @var \Tk\Table\Cell\Text $cell */
-                /** @var \Uni\Db\User $obj */
-
-                if ($gradeList[$obj->getId()]) {
-                    /** @var \Skill\Util\Grade $grade */
-                    $grade = $gradeList[$obj->getId()];
-                    $list = $grade->getDomainAvgList();
-                    if (!empty($list[$domain->getId()])) {
-                        return sprintf('%.2f', round($list[$domain->getId()]['avg'], 2));
-                        //return sprintf('%.2f', round($list[$domain->getId()]['weightedAvg'], 2));
-                    }
-                }
-
-                return '0.00';
-            });
+            \Tk\Alert::addError('A report is not available for this collection.');
+            $this->getBackUrl()->redirect();
         }
 
-        $this->table->appendCell(new \Tk\Table\Cell\Text('total'))->setOrderProperty('')->setLabel('Total Avg.')->setOnPropertyValue(function ($cell, $obj, $value) use ($gradeList) {
-            /** @var \Tk\Table\Cell\Text $cell */
-            /** @var \Uni\Db\User $obj */
-            $cell->addCss('total');
+        $this->setTable(\Skill\Table\CollectionReport::create());
+        $this->getTable()->setCollectionObj($this->collection);
+        $this->getTable()->setEditUrl(\Uni\Uri::createSubjectUrl('/entryResults.html')->set('collectionId', $this->collection->getId()));
+        $this->getTable()->init();
 
-            if ($gradeList[$obj->getId()]) {
-                /** @var \Skill\Util\Grade $grade */
-                $grade = $gradeList[$obj->getId()];
-                return sprintf('%.2f', round($grade->getAverage(), 2) );
-                //return sprintf('%.2f', round($grade->getWeightedAverage(), 2) );
-            }
-            return '0.00';
-        });
-
-        foreach ($domains as $domain) {
-            $this->table->appendCell(new \Tk\Table\Cell\Text($domain->label.'Grade'))->setOrderProperty('')->setLabel($domain->label.' Grade')->
-            setOnPropertyValue(function ($cell, $obj, $value) use ($domain, $gradeList) {
-                /** @var \Tk\Table\Cell\Text $cell */
-                /** @var \Uni\Db\User $obj */
-                if ($gradeList[$obj->getId()]) {
-                    /** @var \Skill\Util\Grade $grade */
-                    $grade = $gradeList[$obj->getId()];
-                    $list = $grade->getDomainAvgList();
-                    if (!empty($list[$domain->getId()])) {
-                        return sprintf('%.2f', round($list[$domain->getId()]['avg']*$grade->getGradeMultiplier(), 2));
-                        //return sprintf('%.2f', round($list[$domain->getId()]['weightedAvg']*$grade->getGradeMultiplier(), 2));
-                    }
-                }
-                return '0.00';
-            });
-        };
-        $this->table->appendCell(new \Tk\Table\Cell\Text('totalGrade'))->setOrderProperty('')->setOnPropertyValue(function ($cell, $obj, $value) use ($gradeList) {
-            /** @var \Tk\Table\Cell\Text $cell */
-            /** @var \Uni\Db\User $obj */
-            $cell->addCss('total');
-
-            if ($gradeList[$obj->getId()]) {
-                /** @var \Skill\Util\Grade $grade */
-                $grade = $gradeList[$obj->getId()];
-                //return sprintf('%.2f', round($grade->getGrade(), 2));
-                return sprintf('%.2f', round($grade->getWeightedGrade(), 2));
-            }
-            return '0.00';
-        });
-        $this->table->appendCell(new \Tk\Table\Cell\Text('totalPct'))->setOrderProperty('')->setOnPropertyValue(function ($cell, $obj, $value) use ($gradeList) {
-            /** @var \Tk\Table\Cell\Text $cell */
-            /** @var \Uni\Db\User $obj */
-
-            if ($gradeList[$obj->getId()]) {
-                /** @var \Skill\Util\Grade $grade */
-                $grade = $gradeList[$obj->getId()];
-                //return sprintf('%.2f%%', round($grade->getPercent(), 2) );
-                return sprintf('%.2f%%', round($grade->getWeightedPercent(), 2) );
-            }
-            return '0.00';
-        });
-
-        // Filters
-        $this->table->appendFilter(new \Tk\Form\Field\Input('uid'))->setAttr('placeholder', 'Student Number');
-        if ($this->getUser()->isCoordinator()) {
-            $this->table->appendFilter(new \Tk\Form\Field\Input('exclude'))->setAttr('style', 'width: 250px;')
-                ->setAttr('placeholder', 'Exclude companyId (EG: 123, 412, 231)');
-        }
-
-
-        // Actions
-        //$this->table->appendAction(\Tk\Table\Action\ColumnSelect::create()->setDisabled(array('id', 'name')));
-        $this->table->appendAction(\Tk\Table\Action\Csv::create());
-
-        $this->table->setList($this->getList());
+        $filter = array(
+            'collectionId' => $this->collection->getId(),
+            'subjectId' => $this->getConfig()->getSubjectId(),
+            'type' => \Uni\Db\Role::TYPE_STUDENT
+        );
+        $this->getTable()->setList($this->getTable()->findList($filter));
 
     }
-
-
-    /**
-     * @return \Skill\Db\Collection[]|\Tk\Db\Map\ArrayObject
-     * @throws \Exception
-     */
-    protected function getList()
-    {
-        $filter = $this->table->getFilterValues();
-        $filter['subjectId'] = $this->getSubject()->getId();
-        $filter['type'] = \Uni\Db\Role::TYPE_STUDENT;
-        return \App\Db\UserMap::create()->findFiltered($filter, $this->table->getTool('a.name', 0));
-    }
-
-
 
     /**
      * @return \Dom\Template
@@ -199,16 +68,14 @@ class CollectionReport extends \App\Controller\AdminManagerIface
     {
         $template = parent::show();
 
-        $template->replaceTemplate('table', $this->table->getRenderer()->show());
-
+        $template->appendTemplate('panel', $this->getTable()->show());
         if ($this->collection->icon) {
-            $template->addCss('icon', $this->collection->icon);
+            $template->setAttr('panel', 'data-panel-icon', $this->collection->icon);
         }
         $panelTitle = sprintf('%s Report', $this->collection->name);
-        $template->insertText('panel-title', $panelTitle);
+        $template->setAttr('panel', 'data-panel-title', $panelTitle);
 
         $template->appendCss('.tk-table td.total {border-right: double 3px #CCC; border-left: double 3px #CCC; background-color: #EEE;} ');
-
 
         return $template;
     }
@@ -221,21 +88,7 @@ class CollectionReport extends \App\Controller\AdminManagerIface
     public function __makeTemplate()
     {
         $xhtml = <<<HTML
-<div class="skill-report">
-
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h4 class="panel-title">
-        <i class="fa fa-eye" var="icon"></i>
-        <span var="panel-title">Skill Report</span>
-      </h4>
-    </div>
-    <div class="panel-body">
-      <div var="table"></div>
-    </div>
-  </div>
-
-</div>
+<div class="tk-panel" data-panel-title="Skill Report" data-panel-icon="fa fa-eye" var="panel"></div>
 HTML;
 
         return \Dom\Loader::load($xhtml);

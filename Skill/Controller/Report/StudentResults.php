@@ -30,7 +30,6 @@ class StudentResults extends AdminIface
      */
     public function __construct()
     {
-        parent::__construct();
         $this->setPageTitle('Results');
         if ($this->getUser()->isStudent()) {
             $this->getActionPanel()->setEnabled(false);

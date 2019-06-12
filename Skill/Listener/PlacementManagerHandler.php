@@ -2,7 +2,6 @@
 namespace Skill\Listener;
 
 use Tk\Event\Subscriber;
-use Tk\Event\Event;
 use Symfony\Component\HttpKernel\KernelEvents;
 
 /**
@@ -34,7 +33,6 @@ class PlacementManagerHandler implements Subscriber
         $this->subject = $subject;
     }
 
-
     /**
      * @param \Symfony\Component\HttpKernel\Event\ControllerEvent $event
      */
@@ -50,7 +48,6 @@ class PlacementManagerHandler implements Subscriber
                 \Skill\Db\CollectionMap::create()->fixChangeoverEntries();
             }
         }
-
     }
 
     /**
@@ -105,7 +102,6 @@ class PlacementManagerHandler implements Subscriber
     public function addEntryCell(\Tk\Event\TableEvent $event)
     {
         if ($this->controller) {
-
             $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('subjectId' => $this->subject->getId(),
                 'active' => true, 'requirePlacement' => true));
 

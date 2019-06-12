@@ -3,7 +3,6 @@ namespace Skill\Controller\Entry;
 
 use App\Controller\AdminEditIface;
 use Dom\Template;
-use Tk\Form\Field;
 use Tk\Request;
 
 
@@ -26,7 +25,6 @@ class View extends AdminEditIface
      */
     public function __construct()
     {
-        parent::__construct();
         $this->setPageTitle('Skill Entry View');
         if ($this->getUser()->isStudent()) {
             $this->getActionPanel()->setEnabled(false);
@@ -49,16 +47,15 @@ class View extends AdminEditIface
             return $this->doPdf($request);
         }
 
-        $this->buildForm();
-
-        $this->form->load(\Skill\Db\EntryMap::create()->unmapForm($this->entry));
-        $this->form->execute($request);
+        $this->setForm(\Skill\Form\EntryView::create()->setModel($this->entry));
+        $this->initForm($request);
+        $this->getForm()->execute();
 
     }
 
     /**
      * @param Request $request
-     * @return \Dom\Renderer\Renderer|Template|null
+     * @return \Dom\Renderer\Renderer|Template|null|void
      * @throws \Exception
      */
     public function doPdf(Request $request)
@@ -71,47 +68,8 @@ class View extends AdminEditIface
     }
 
     /**
-     * @throws \Exception
+     *
      */
-    protected function buildForm() 
-    {
-        $this->form = \App\Config::getInstance()->createForm('entryEdit');
-        $this->form->setRenderer(\App\Config::getInstance()->createFormRenderer($this->form));
-        $this->form->addCss('form-horizontal');
-
-        $this->form->appendField(new Field\Html('title', htmlentities($this->entry->title)))->setFieldset('Entry Details');
-        //if($this->entry->getCollection()->gradable && $this->getUser()->isStaff()) {
-        if($this->entry->getCollection()->gradable) {
-            $pct = round(($this->entry->calcAverage()/($this->entry->getCollection()->getScaleCount()))*100);
-            $this->form->appendField(new Field\Html('average', sprintf('%.2f &nbsp; (%d%%)', $this->entry->calcAverage(), $pct)))
-                ->setFieldset('Entry Details');
-        }
-
-        $this->form->appendField(new Field\Html('status'))->setFieldset('Entry Details');
-        $this->form->appendField(new Field\Html('assessor', htmlentities($this->entry->assessor)))->setFieldset('Entry Details');
-        if ($this->entry->getCollection()->requirePlacement)
-            $this->form->appendField(new Field\Html('absent'))->setLabel('Days Absent')->setFieldset('Entry Details');
-
-        if ($this->entry->getCollection()->confirm && $this->getUser()->isStaff()) {
-            $s = ($this->entry->confirm === null) ? '' : ($this->entry->confirm ? 'Yes' : 'No');
-            $this->form->appendField(new Field\Html('confirm', $s))->setFieldset('Entry Details')->setNotes($this->entry->getCollection()->confirm);
-        }
-        if ($this->entry->notes)
-            $this->form->appendField(new Field\Html('notes', htmlentities($this->entry->notes)))->setLabel('Comments')->setFieldset('Entry Details');
-
-        $items = \Skill\Db\ItemMap::create()->findFiltered(array('collectionId' => $this->entry->getCollection()->getId()),
-            \Tk\Db\Tool::create('category_id, order_by'));
-
-        /** @var \Skill\Db\Item $item */
-        foreach ($items as $item) {
-            $fld = $this->form->appendField(new \Skill\Form\Field\Item($item))->setLabel(null)->setDisabled();
-            $val = \Skill\Db\EntryMap::create()->findValue($this->entry->getId(), $item->getId());
-            if ($val)
-                $fld->setValue($val->value);
-        }
-
-    }
-
     public function initActionPanel()
     {
         if ($this->entry->getId() && $this->getUser()->isStaff()) {
@@ -129,29 +87,12 @@ class View extends AdminEditIface
         $this->initActionPanel();
         $template = parent::show();
 
-        $template->insertText('panel-title', $this->entry->getCollection()->name . ' View');
-        if ($this->entry->getCollection()->icon) {
-            $template->setAttr('icon', 'class', $this->entry->getCollection()->icon);
-        }
-
-        // TODO: this is a bit hacky fix it properly....
-        $template->appendCss('.error-block { display: none !important; position: absolute !important; } ');
-
         // Render the form
-        $template->insertTemplate('form', $this->form->getRenderer()->show());
-
-        $template->appendCssUrl(\Tk\Uri::create('/plugin/plg-skill/assets/skill.less'));
-        $template->appendJsUrl(\Tk\Uri::create('/plugin/plg-skill/assets/skill.js'));
-
-        $css = <<<CSS
-.form-group.tk-item:nth-child(odd) .skill-item {
-  background-color: {$this->entry->getCollection()->color};
-}
-.tk-form fieldset:first-child legend {
-  display: none !important;
-}
-CSS;
-        $template->appendCss($css);
+        $template->setAttr('panel', 'data-panel-title', $this->entry->getCollection()->name . ' View');
+        if ($this->entry->getCollection()->icon) {
+            $template->setAttr('panel', 'data-panel-icon', $this->entry->getCollection()->icon);
+        }
+        $template->appendTemplate('panel', $this->form->getRenderer()->show());
 
         return $template;
     }
@@ -165,17 +106,7 @@ CSS;
     {
         $xhtml = <<<HTML
 <div class="EntryEdit">
-  
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h4 class="panel-title"><i class="fa fa-eye" var="icon"></i> <span var="panel-title">Skill Entry View</span></h4>
-    </div>
-    <div class="panel-body">
-      <div var="instructions"></div>
-      <div var="form"></div>
-    </div>
-  </div>
-  
+  <div class="tk-panel" data-panel-title="Skill Entry View" data-panel-icon="fa fa-question" var="panel"></div>
 </div>
 HTML;
 

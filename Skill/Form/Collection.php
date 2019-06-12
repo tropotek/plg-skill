@@ -79,11 +79,11 @@ class Collection extends \App\FormIface
         $this->appendField(new Field\Checkbox('gradable'))->setTabGroup($tab)
             ->setCheckboxLabel('If enabled (Requires Placement) then the student can view a summary of the results for this collection.');
 
-        $list = \App\Db\PlacementTypeMap::create()->findFiltered(array('subjectId' => $this->getCollection()->getSubject()->getId()));
+        $list = \App\Db\PlacementTypeMap::create()->findFiltered(array('subjectId' => $this->getCollectionObj()->getSubject()->getId()));
         $ptiField = $this->appendField(new Field\Select('placementTypeId[]', \Tk\Form\Field\Option\ArrayObjectIterator::create($list)))
             ->setTabGroup($tab)->addCss('tk-dual-select')->setAttr('data-title', 'Placement Types')
             ->setNotes('Enable this collection for the selected placement types.');
-        $list = \Skill\Db\CollectionMap::create()->findPlacementTypes($this->getCollection()->getId());
+        $list = \Skill\Db\CollectionMap::create()->findPlacementTypes($this->getCollectionObj()->getId());
         $ptiField->setValue($list);
 
         $list = \Tk\Form\Field\Select::arrayToSelectList(\Tk\ObjectUtil::getClassConstants('\App\Db\Placement', 'STATUS'));
@@ -105,7 +105,7 @@ class Collection extends \App\FormIface
      */
     public function execute($request = null)
     {
-        $this->load(\Skill\Db\CollectionMap::create()->unmapForm($this->getCollection()));
+        $this->load(\Skill\Db\CollectionMap::create()->unmapForm($this->getCollectionObj()));
         parent::execute($request);
     }
 
@@ -117,51 +117,51 @@ class Collection extends \App\FormIface
     public function doSubmit($form, $event)
     {
         // Load the object with form data
-        \Skill\Db\CollectionMap::create()->mapForm($form->getValues(), $this->getCollection());
+        \Skill\Db\CollectionMap::create()->mapForm($form->getValues(), $this->getCollectionObj());
 
         // Do Custom Validations
         $placemenTypeIds = $form->getFieldValue('placementTypeId');
-        if($this->getCollection()->requirePlacement && !count($placemenTypeIds)) {
+        if($this->getCollectionObj()->requirePlacement && !count($placemenTypeIds)) {
             $form->addFieldError('placementTypeId', 'Please select at least one placement type for this collection to be enabled for.');
         }
 
-        $form->addFieldErrors($this->getCollection()->validate());
+        $form->addFieldErrors($this->getCollectionObj()->validate());
         if ($form->hasErrors()) {
             return;
         }
         
-        $isNew = (bool)$this->getCollection()->getId();
-        $this->getCollection()->save();
+        $isNew = (bool)$this->getCollectionObj()->getId();
+        $this->getCollectionObj()->save();
 
-        \Skill\Db\CollectionMap::create()->removePlacementType($this->getCollection()->getId());
+        \Skill\Db\CollectionMap::create()->removePlacementType($this->getCollectionObj()->getId());
         if (count($placemenTypeIds)) {
             foreach ($placemenTypeIds as $placementTypeId) {
-                \Skill\Db\CollectionMap::create()->addPlacementType($this->getCollection()->getId(), $placementTypeId);
+                \Skill\Db\CollectionMap::create()->addPlacementType($this->getCollectionObj()->getId(), $placementTypeId);
             }
         }
 
         \Tk\Alert::addSuccess('Record saved!');
         $event->setRedirect($this->getBackUrl());
         if ($form->getTriggeredEvent()->getName() == 'save') {
-            $event->setRedirect(\Tk\Uri::create()->set('collectionId', $this->getCollection()->getId()));
+            $event->setRedirect(\Tk\Uri::create()->set('collectionId', $this->getCollectionObj()->getId()));
         }
     }
 
     /**
      * @return \Tk\Db\ModelInterface|\Skill\Db\Collection
      */
-    public function getCollection()
+    public function getCollectionObj()
     {
         return $this->getModel();
     }
 
     /**
+     * NOTE: get/setCollection() cannot be used as  methods due to a clash with the ArrayCollection object
      * @param \Skill\Db\Collection $collection
      * @return $this
      */
-    public function setCollection($collection)
+    public function setCollectionObj($collection)
     {
-        // TODO: WTF????? Why does this return the Db\Collection not the Form\Collection
         return $this->setModel($collection);
     }
     

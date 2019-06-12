@@ -44,7 +44,6 @@ class DateAverage extends \Uni\TableIface
      */
     public function init()
     {
-        //$this->resetSession();
 
         //$this->appendCell(new \Tk\Table\Cell\Checkbox('id'));
         $this->appendCell(new \Tk\Table\Cell\Text('item_uid'));
@@ -80,8 +79,6 @@ class DateAverage extends \Uni\TableIface
         $list = array('Monthly' => '1M', 'Daily' => '1D');
         $this->appendFilter(Field\Select::createSelect('interval', $list));
 
-
-
         // Actions
         $this->appendAction(\Tk\Table\Action\Csv::create());
 
@@ -97,7 +94,7 @@ class DateAverage extends \Uni\TableIface
      */
     public function findList($filter = array(), $tool = null)
     {
-        if (!$tool) $tool = $this->getTool();
+        if (!$tool) $tool = $this->getTool('', 0);
         $filter = array_merge($this->getFilterValues(), $filter);
         $list = \Skill\Db\ReportingMap::create()->findDateAverage($filter, $tool);
         return $list;

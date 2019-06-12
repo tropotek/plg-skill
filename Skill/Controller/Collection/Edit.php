@@ -40,7 +40,7 @@ class Edit extends AdminEditIface
             $this->collection = \Skill\Db\CollectionMap::create()->find($request->get('collectionId'));
         }
 
-        $this->setForm(\Skill\Form\Collection::create()->setCollection($this->collection));
+        $this->setForm(\Skill\Form\Collection::create()->setModel($this->collection));
         $this->initForm($request);
         $this->getForm()->execute();
 

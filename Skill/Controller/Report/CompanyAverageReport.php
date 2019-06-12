@@ -23,7 +23,6 @@ class CompanyAverageReport extends \App\Controller\AdminManagerIface
      */
     public function __construct()
     {
-        parent::__construct();
         $this->setPageTitle('Company Average Report');
     }
 
@@ -38,18 +37,14 @@ class CompanyAverageReport extends \App\Controller\AdminManagerIface
             throw new \Tk\Exception('A report is not available for this collection.');
         }
 
-
-        $this->table = \Skill\Table\CompanyAverage::create();
-        $this->table->setCollectionObject($this->collection);
-        $this->table->init();
+        $this->setTable(\Skill\Table\CompanyAverage::create());
+        $this->getTable()->setCollectionObject($this->collection);
+        $this->getTable()->init();
         $filter = array(
             'collectionId' => $this->collection->id,
         );
-        $this->table->setList($this->table->findList($filter, $this->table->getTool('', 0)));
+        $this->getTable()->setList($this->getTable()->findList($filter));
     }
-
-
-
 
     /**
      * @return \Dom\Template
@@ -60,9 +55,7 @@ class CompanyAverageReport extends \App\Controller\AdminManagerIface
 
         $panelTitle = sprintf('%s Company Average Report', $this->collection->name);
         $template->setAttr('panel', 'data-panel-title', $panelTitle);
-
-        $template->appendTemplate('panel', $this->table->show());
-
+        $template->appendTemplate('panel', $this->getTable()->show());
         $template->insertText('subject', $this->getConfig()->getSubject()->getName());
 
         return $template;

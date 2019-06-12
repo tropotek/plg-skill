@@ -23,7 +23,6 @@ class DateAverageReport extends \App\Controller\AdminManagerIface
      */
     public function __construct()
     {
-        parent::__construct();
         $this->setPageTitle('Date Average Report');
     }
 
@@ -38,18 +37,15 @@ class DateAverageReport extends \App\Controller\AdminManagerIface
             throw new \Tk\Exception('A report is not available for this collection.');
         }
 
-        $this->table = \Skill\Table\DateAverage::create();
-        $this->table->setCollectionObject($this->collection);
-        $this->table->init();
+        $this->setTable(\Skill\Table\DateAverage::create());
+        $this->getTable()->setCollectionObject($this->collection);
+        $this->getTable()->init();
         $filter = array(
             'collectionId' => $this->collection->getId()
         );
-        $this->table->setList($this->table->findList($filter, $this->table->getTool('', 0)));
+        $this->getTable()->setList($this->getTable()->findList($filter));
 
     }
-
-
-
 
     /**
      * @return \Dom\Template
@@ -59,13 +55,9 @@ class DateAverageReport extends \App\Controller\AdminManagerIface
         $template = parent::show();
 
         $panelTitle = sprintf('%s Date Average Report', $this->collection->name);
+
+        $template->appendTemplate('panel', $this->getTable()->show());
         $template->setAttr('panel', 'data-panel-title', $panelTitle);
-
-        $template->appendTemplate('panel', $this->table->show());
-
-        //$template->setAttr('stats-graph', 'data-src', \Tk\Uri::create('/ajax/stats.html'));
-        //$template->setAttr('stats-graph', 'data-collection-id', $this->collection->getId());
-
         $template->insertText('subject', $this->getConfig()->getSubject()->getName());
 
         return $template;

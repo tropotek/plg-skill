@@ -3,7 +3,6 @@ namespace Skill;
 
 
 
-
 /**
  * @author Michael Mifsud <info@tropotek.com>
  * @see http://www.tropotek.com/
@@ -16,8 +15,7 @@ class Plugin extends \App\Plugin\Iface
      * A helper method to get the Plugin instance globally
      *
      * @return static|\Tk\Plugin\Iface
-     * @throws \Tk\Db\Exception
-     * @throws \Tk\Plugin\Exception
+     * @throws \Exception
      */
     static function getInstance()
     {
@@ -49,8 +47,6 @@ class Plugin extends \App\Plugin\Iface
      * plugin control panel
      *
      * @throws \Exception
-     * @throws \Tk\Db\Exception
-     * @throws \Tk\Exception
      */
     function doActivate()
     {
@@ -75,6 +71,7 @@ VALUES
      * Deactivate the plugin removing any DB data and settings
      * Will only be called when deactivating the plugin in the
      * plugin control panel
+     * @throws \Exception
      */
     function doDeactivate()
     {

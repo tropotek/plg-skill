@@ -19,7 +19,7 @@ use Tk\Form;
  * @link http://tropotek.com.au/
  * @license Copyright 2019 Tropotek
  */
-class Category extends \App\FormIface
+class Scale extends \App\FormIface
 {
 
     /**
@@ -28,16 +28,11 @@ class Category extends \App\FormIface
     public function init()
     {
 
-        $layout = $this->getRenderer()->getLayout();
-        $layout->addRow('name', 'col-md-6');
-        $layout->removeRow('label', 'col-md-6');
-
+        // text, textblock, select, checkbox, date, file(????)
         $this->appendField(new Field\Input('name'))->setNotes('');
-        $this->appendField(new Field\Input('label'))->setNotes('');
-        $this->appendField(new Field\Checkbox('publish'))->setCheckboxLabel('Category is visible to students');
-        $this->appendField(new Field\Textarea('description'))->addCss('tkTextareaTool')
-            ->setNotes('A short description of the category');
-
+        //$this->appendField(new Field\Input('value'))->setNotes('');
+        $this->appendField(new Field\Input('description'))->setNotes('A short description');
+        
         $this->appendField(new Event\Submit('update', array($this, 'doSubmit')));
         $this->appendField(new Event\Submit('save', array($this, 'doSubmit')));
         $this->appendField(new Event\Link('cancel', $this->getBackUrl()));
@@ -50,7 +45,7 @@ class Category extends \App\FormIface
      */
     public function execute($request = null)
     {
-        $this->load(\Skill\Db\CategoryMap::create()->unmapForm($this->getCategory()));
+        $this->load(\Skill\Db\ScaleMap::create()->unmapForm($this->getScale()));
         parent::execute($request);
     }
 
@@ -62,42 +57,42 @@ class Category extends \App\FormIface
     public function doSubmit($form, $event)
     {
         // Load the object with form data
-        \Skill\Db\CategoryMap::create()->mapForm($form->getValues(), $this->getCategory());
+        \Skill\Db\ScaleMap::create()->mapForm($form->getValues(), $this->getScale());
 
         // Do Custom Validations
 
-        $form->addFieldErrors($this->getCategory()->validate());
+        $form->addFieldErrors($this->getScale()->validate());
         if ($form->hasErrors()) {
             return;
         }
         
-        $isNew = (bool)$this->getCategory()->getId();
-        $this->getCategory()->save();
+        $isNew = (bool)$this->getScale()->getId();
+        $this->getScale()->save();
 
         // Do Custom data saving
 
         \Tk\Alert::addSuccess('Record saved!');
         $event->setRedirect($this->getBackUrl());
         if ($form->getTriggeredEvent()->getName() == 'save') {
-            $event->setRedirect(\Tk\Uri::create()->set('categoryId', $this->getCategory()->getId()));
+            $event->setRedirect(\Tk\Uri::create()->set('scaleId', $this->getScale()->getId()));
         }
     }
 
     /**
-     * @return \Tk\Db\ModelInterface|\Skill\Db\Category
+     * @return \Tk\Db\ModelInterface|\Skill\Db\Scale
      */
-    public function getCategory()
+    public function getScale()
     {
         return $this->getModel();
     }
 
     /**
-     * @param \Skill\Db\Category $category
+     * @param \Skill\Db\Scale $scale
      * @return $this
      */
-    public function setCategory($category)
+    public function setScale($scale)
     {
-        return $this->setModel($category);
+        return $this->setModel($scale);
     }
     
 }

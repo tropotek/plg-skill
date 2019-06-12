@@ -43,10 +43,6 @@ $routes->add('skill-entry-edit-student', new \Tk\Routing\Route('/student/{subjec
 $routes->add('skill-entry-view-student', new \Tk\Routing\Route('/student/{subjectCode}/entryView.html', 'Skill\Controller\Entry\View::doDefault', $params));
 $routes->add('skill-entry-results-student', new \Tk\Routing\Route('/student/{subjectCode}/entryResults.html', 'Skill\Controller\Report\StudentResults::doDefault', $params));
 
-// Ajax
-$routes->add('skill-ajax-graph-stats', new \Tk\Routing\Route('/ajax/stats.html', 'Skill\Controller\Ajax\Stats::doCalendarData', $params));
-
-
 // Guest Pages
 $routes->add('guest-skill-entry-submit', new \Tk\Routing\Route('/inst/{institutionHash}/skillEdit.html', 'Skill\Controller\Entry\Edit::doPublicSubmission'));
 

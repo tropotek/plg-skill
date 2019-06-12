@@ -23,7 +23,6 @@ class HistoricReportAll extends \App\Controller\AdminManagerIface
      */
     public function __construct()
     {
-        parent::__construct();
         $this->setPageTitle('All Historic Report');
     }
 
@@ -35,19 +34,18 @@ class HistoricReportAll extends \App\Controller\AdminManagerIface
     {
         $this->collection = \Skill\Db\CollectionMap::create()->find($request->get('collectionId'));
         if (!$this->collection->gradable) {
-            throw new \Tk\Exception('A report is not available for this collection.');
+            \Tk\Alert::addError('A report is not available for this collection.');
+            $this->getBackUrl()->redirect();
         }
 
-
-        $this->table = \Skill\Table\HistoricAll::create();
-        $this->table->setCollectionObject($this->collection);
-        $this->table->init();
-
+        $this->setTable(\Skill\Table\HistoricAll::create());
+        $this->getTable()->setCollectionObject($this->collection);
+        $this->getTable()->init();
 
         $filter = array(
             'collectionUid' => $this->collection->uid
         );
-        $this->table->setList($this->table->findList($filter));
+        $this->getTable()->setList($this->getTable()->findList($filter));
 
 
     }

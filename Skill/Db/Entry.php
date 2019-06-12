@@ -124,6 +124,23 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 
 
     /**
+     * A legacy call usefull for EMS II functionality
+     * Try to avoid using it if possible.
+     *
+     * @return bool
+     * @throws \Exception
+     */
+    public function isSelfAssessment()
+    {
+        $collection = $this->getCollection();
+        if ($collection && !$collection->gradable && !$collection->requirePlacement &&
+            $collection->role == \Skill\Db\Collection::ROLE_STUDENT) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * @return int
      * @throws \Exception
      */
@@ -203,7 +220,6 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     /**
      * return the status list for a select field
      * @return array
-     * @throws \ReflectionException
      */
     public static function getStatusList()
     {

@@ -23,18 +23,10 @@ class Manager extends AdminManagerIface
 
 
     /**
-     * @var null|\Tk\Uri
-     */
-    private $editUrl = null;
-
-
-
-    /**
      * Manager constructor.
      */
     public function __construct()
     {
-        parent::__construct();
         $this->setPageTitle('Skill Domain Manager');
     }
 
@@ -46,45 +38,25 @@ class Manager extends AdminManagerIface
     {
         $this->collection = \Skill\Db\CollectionMap::create()->find($request->get('collectionId'));
 
-        $this->editUrl = \Uni\Uri::createSubjectUrl('/domainEdit.html');
+        $this->setTable(\Skill\Table\Domain::create());
+        $this->getTable()->setEditUrl(\Uni\Uri::createSubjectUrl('/domainEdit.html'));
+        $this->getTable()->init();
 
-        $u = clone $this->editUrl;
-        $this->getActionPanel()->add(\Tk\Ui\Button::create('New Domain',
-            $u->set('collectionId', $this->collection->getId()), 'fa fa-black-tie'));
-
-        $this->table = \App\Config::getInstance()->createTable(\App\Config::getInstance()->getUrlName());
-        $this->table->setRenderer(\App\Config::getInstance()->createTableRenderer($this->table));
-
-        $this->table->appendCell(new \Tk\Table\Cell\Checkbox('id'));
-        $this->table->appendCell(new \Tk\Table\Cell\Text('uid'))->setLabel('UID');
-        $this->table->appendCell(new \Tk\Table\Cell\Text('name'))->addCss('key')->setUrl(clone $this->editUrl);
-        $this->table->appendCell(new \Tk\Table\Cell\Text('label'));
-        $this->table->appendCell(new \Tk\Table\Cell\Text('weight'));
-        $this->table->appendCell(new \Tk\Table\Cell\Boolean('active'));
-        $this->table->appendCell(new \Tk\Table\Cell\Date('modified'));
-        $this->table->appendCell(new \Tk\Table\Cell\OrderBy('orderBy'));
-
-        // Filters
-        $this->table->addFilter(new Field\Input('keywords'))->setAttr('placeholder', 'Keywords');
-
-        // Actions
-        $this->table->addAction(\Tk\Table\Action\ColumnSelect::create()->setDisabled(array('id', 'name')));
-        $this->table->addAction(\Tk\Table\Action\Csv::create());
-        $this->table->addAction(\Tk\Table\Action\Delete::create());
-
-        $this->table->setList($this->getList());
+        $filter = array(
+            'collectionId' => $this->collection->getId()
+        );
+        $this->getTable()->setList($this->getTable()->findList($filter));
 
     }
 
     /**
-     * @return \Skill\Db\Domain[]|\Tk\Db\Map\ArrayObject
-     * @throws \Exception
+     *
      */
-    protected function getList()
+    public function initActionPanel()
     {
-        $filter = $this->table->getFilterValues();
-        $filter['collectionId'] = $this->collection->getId();
-        return \Skill\Db\DomainMap::create()->findFiltered($filter, $this->table->getTool());
+        $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('New Domain',
+            $this->getTable()->getEditUrl()->set('collectionId', $this->collection->getId()), 'fa fa-black-tie'));
+
     }
 
     /**
@@ -92,9 +64,10 @@ class Manager extends AdminManagerIface
      */
     public function show()
     {
+        $this->initActionPanel();
         $template = parent::show();
 
-        $template->replaceTemplate('table', $this->table->getRenderer()->show());
+        $template->appendTemplate('panel', $this->getTable()->show());
 
         return $template;
     }
@@ -107,18 +80,7 @@ class Manager extends AdminManagerIface
     public function __makeTemplate()
     {
         $xhtml = <<<HTML
-<div>
-
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h4 class="panel-title"><i class="fa fa-black-tie"></i> Domains</h4>
-    </div>
-    <div class="panel-body">
-      <div var="table"></div>
-    </div>
-  </div>
-
-</div>
+<div class="tk-panel" data-panel-title="Domains" data-panel-icon="fa fa-black-tie" var="panel"></div>
 HTML;
 
         return \Dom\Loader::load($xhtml);

@@ -2,8 +2,6 @@
 namespace Skill\Controller\Category;
 
 use Dom\Template;
-use Tk\Form\Event;
-use Tk\Form\Field;
 use Tk\Request;
 
 

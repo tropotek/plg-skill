@@ -3,7 +3,6 @@ namespace Skill\Controller\Item;
 
 use App\Controller\AdminManagerIface;
 use Dom\Template;
-use Tk\Form\Field;
 use Tk\Request;
 
 
@@ -21,19 +20,12 @@ class Manager extends AdminManagerIface
      */
     private $collection = null;
 
-    /**
-     * @var null|\Tk\Uri
-     */
-    private $editUrl = null;
-
-
 
     /**
      * Manager constructor.
      */
     public function __construct()
     {
-        parent::__construct();
         $this->setPageTitle('Skill Item Manager');
     }
 
@@ -45,79 +37,22 @@ class Manager extends AdminManagerIface
     {
         $this->collection = \Skill\Db\CollectionMap::create()->find($request->get('collectionId'));
 
-        $this->editUrl = \Uni\Uri::createSubjectUrl('/itemEdit.html');
+        $this->setTable(\Skill\Table\Item::create());
+        $this->getTable()->setCollectionObj($this->collection);
+        $this->getTable()->setEditUrl(\Uni\Uri::createSubjectUrl('/itemEdit.html'));
+        $this->getTable()->init();
 
-        $u = clone $this->editUrl;
-        $this->getActionPanel()->append(\Tk\Ui\LINK::createBtn('New Item',
-            $u->set('collectionId', $this->collection->getId()), 'fa fa-question'));
-
-        $this->table = \App\Config::getInstance()->createTable(\App\Config::getInstance()->getUrlName());
-        $this->table->setRenderer(\App\Config::getInstance()->createTableRenderer($this->table));
-
-        $this->table->appendCell(new \Tk\Table\Cell\Checkbox('id'));
-        $this->table->appendCell(new \Tk\Table\Cell\Text('num'))->setLabel('#')->setOnPropertyValue(function ($cell, $obj, $value) {
-            /** @var \Tk\Table\Cell\Text $cell */
-            /** @var \Skill\Db\Item $obj */
-            $value = $cell->getTable()->getRenderer()->getRowId()+1;
-            return $value;
-        });
-        $this->table->appendCell(new \Tk\Table\Cell\Text('question'))->addCss('key')->setUrl(clone $this->editUrl);
-        $this->table->appendCell(new \Tk\Table\Cell\Text('categoryId'))->setOnPropertyValue(function ($cell, $obj, $value) {
-            /** @var \Skill\Db\Item $obj */
-            if ($obj->getCategory()) return $obj->getCategory()->name;
-            return $value;
-        });
-        $domains = \Skill\Db\DomainMap::create()->findFiltered(array('collectionId' => $this->collection->getId()));
-        if (count($domains)) {
-            $this->table->appendCell(new \Tk\Table\Cell\Text('domainId'))->setOnPropertyValue(function ($cell, $obj, $value) {
-                /** @var \Skill\Db\Item $obj */
-                if ($obj->getDomain()) return $obj->getDomain()->name;
-                return 'None';
-            });
-        }
-        $this->table->appendCell(new \Tk\Table\Cell\Boolean('publish'));
-        $this->table->appendCell(new \Tk\Table\Cell\Date('modified'));
-        $this->table->appendCell(new \Tk\Table\Cell\Text('uid'))->setLabel('UID');
-
-        $this->table->appendCell(new \Tk\Table\Cell\Text('values'))->setLabel('Val #')->setOnPropertyValue(function ($cell, $obj, $value) {
-            /** @var \Tk\Table\Cell\Text $cell */
-            /** @var \Skill\Db\Item $obj */
-            $sql = sprintf('SELECT a.id, a.question, COUNT(b.item_id) as \'count\'
-FROM skill_item a, skill_value b
-WHERE a.id = %s AND a.id = b.item_id
-GROUP BY a.id', $obj->getId());
-            $res = \App\Config::getInstance()->getDb()->query($sql);
-            $value = (int)$res->fetchColumn(2);
-
-            return $value;
-        });
-
-        // TODO: this needs to be a nested sub level order system ???????
-        //$this->table->appendCell(new \Tk\Table\Cell\OrderBy('orderBy'));
-        $this->table->setStaticOrderBy('cat.order_by, order_by');
-
-        // Filters
-        $this->table->appendFilter(new Field\Input('keywords'))->setAttr('placeholder', 'Keywords');
-
-        // Actions
-        $this->table->appendAction(\Tk\Table\Action\ColumnSelect::create()->setDisabled(array('id', 'name'))->setUnselected(array('publish', 'modified')));
-        $this->table->appendAction(\Tk\Table\Action\Csv::create());
-        $this->table->appendAction(\Tk\Table\Action\Delete::create());
-
-        $this->table->setList($this->getList());
-        $this->table->resetSession();
+        $filter = array(
+            'collectionId' => $this->collection->getId()
+        );
+        $this->getTable()->setList($this->getTable()->findList($filter));
 
     }
 
-    /**
-     * @return \Skill\Db\Item[]|\Tk\Db\Map\ArrayObject
-     * @throws \Exception
-     */
-    protected function getList()
+    public function initActionPanel()
     {
-        $filter = $this->table->getFilterValues();
-        $filter['collectionId'] = $this->collection->getId();
-        return \Skill\Db\ItemMap::create()->findFiltered($filter, $this->table->getTool('cat.order_by', 100));
+        $this->getActionPanel()->append(\Tk\Ui\LINK::createBtn('New Item',
+            $this->getTable()->getEditUrl()->set('collectionId', $this->collection->getId()), 'fa fa-question'));
     }
 
     /**
@@ -125,9 +60,10 @@ GROUP BY a.id', $obj->getId());
      */
     public function show()
     {
+        $this->initActionPanel();
         $template = parent::show();
 
-        $template->replaceTemplate('table', $this->table->getRenderer()->show());
+        $template->appendTemplate('panel', $this->getTable()->show());
 
         return $template;
     }
@@ -140,18 +76,7 @@ GROUP BY a.id', $obj->getId());
     public function __makeTemplate()
     {
         $xhtml = <<<HTML
-<div>
-
-  <div class="panel panel-default">
-    <div class="panel-heading">
-      <h4 class="panel-title"><i class="fa fa-question"></i> Item Manager</h4>
-    </div>
-    <div class="panel-body">
-      <div var="table"></div>
-    </div>
-  </div>
-
-</div>
+<div class="tk-panel" data-panel-title="Item Manager" data-panel-icon="fa fa-question" var="panel"></div>
 HTML;
 
         return \Dom\Loader::load($xhtml);

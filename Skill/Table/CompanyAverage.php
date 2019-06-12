@@ -155,11 +155,6 @@ jQuery(function ($) {
 JS;
         $this->getRenderer()->getTemplate()->appendJs($js);
 
-
-
-
-
-
         return $this;
     }
 
@@ -171,7 +166,7 @@ JS;
      */
     public function findList($filter = array(), $tool = null)
     {
-        if (!$tool) $tool = $this->getTool();
+        if (!$tool) $tool = $this->getTool('', 0);
         $filter = array_merge($this->getFilterValues(), $filter);
         $list = \Skill\Db\ReportingMap::create()->findCompanyTotalAverage($filter, $tool);
         return $list;
