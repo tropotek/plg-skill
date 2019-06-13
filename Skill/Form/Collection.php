@@ -92,7 +92,7 @@ class Collection extends \App\FormIface
             ->setNotes('Enable this collection on the following placement status');
         
 
-        if ($this->getConfig()->getId())
+        if ($this->getCollectionObj()->getId())
             $this->appendField(new Event\Submit('update', array($this, 'doSubmit')));
         $this->appendField(new Event\Submit('save', array($this, 'doSubmit')));
         $this->appendField(new Event\Link('cancel', $this->getBackUrl()));

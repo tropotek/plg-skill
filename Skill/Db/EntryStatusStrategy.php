@@ -172,7 +172,7 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
 
     /**
      * @return string
-     * @throws \Tk\Db\Exception
+     * @throws \Exception
      */
     public function getLabel()
     {
