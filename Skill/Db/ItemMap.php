@@ -134,19 +134,25 @@ SQL;
     }
 
     /**
-     * Find filtered records
-     *
-     * @param array $filter
+     * @param array|\Tk\Db\Filter $filter
      * @param Tool $tool
      * @return ArrayObject|Item[]
      * @throws \Exception
      */
-    public function findFiltered($filter = array(), $tool = null)
+    public function findFiltered($filter, $tool = null)
     {
-        if (!$tool) $tool = \Tk\Db\Tool::create('orderBy');
-        $select = 'a.*, cat.order_by as \'cat_order\'';
-        $from = sprintf('%s a, `skill_category` cat', $this->getDb()->quoteParameter($this->getTable()));
-        $where = 'a.category_id = cat.id AND ';
+        return $this->selectFromFilter($this->makeQuery(\Tk\Db\Filter::create($filter)), $tool);
+    }
+
+    /**
+     * @param \Tk\Db\Filter $filter
+     * @return \Tk\Db\Filter
+     */
+    public function makeQuery(\Tk\Db\Filter $filter)
+    {
+        $filter->appendSelect('a.*, cat.order_by as \'cat_order\', ');
+        $filter->appendFrom('%s a , `skill_category` cat', $this->quoteParameter($this->getTable()));
+        $filter->appendWhere('a.category_id = cat.id AND ');
 
         if (!empty($filter['keywords'])) {
             $kw = '%' . $this->getDb()->escapeString($filter['keywords']) . '%';
@@ -157,29 +163,26 @@ SQL;
                 $id = (int)$filter['keywords'];
                 $w .= sprintf('a.id = %d OR ', $id);
             }
-            if ($w) {
-                $where .= '(' . substr($w, 0, -3) . ') AND ';
-            }
+            if ($w) $filter->appendWhere('(%s) AND ', substr($w, 0, -3));
         }
-
 
         if (!empty($filter['uid'])) {
-            $where .= sprintf('a.uid = %s AND ', $this->quote($filter['uid']));
+            $filter->appendWhere('a.uid = %s AND ', $this->quote($filter['uid']));
         }
         if (!empty($filter['collectionId'])) {
-            $where .= sprintf('a.collection_id = %s AND ', (int)$filter['collectionId']);
+            $filter->appendWhere('a.collection_id = %s AND ', (int)$filter['collectionId']);
         }
 
         if (!empty($filter['categoryId'])) {
-            $where .= sprintf('a.category_id = %s AND ', (int)$filter['categoryId']);
+            $filter->appendWhere('a.category_id = %s AND ', (int)$filter['categoryId']);
         }
 
         if (!empty($filter['typeId'])) {
             if (!is_array($filter['typeId'])) $filter['typeId'] = array($filter['typeId']);
             foreach ($filter['typeId'] as $i => $tid) {
                 $a = 'b'.$i;
-                $from .= "\n    " . sprintf('INNER JOIN %s %s ON (a.id = %s.item_id AND %s.type_id = %s ) ',
-                        $this->quoteParameter('item_has_type'), $a, $a, $a, (int)$tid);
+                $filter->appendFrom("\n    " . sprintf('INNER JOIN %s %s ON (a.id = %s.item_id AND %s.type_id = %s ) ',
+                        $this->quoteParameter('item_has_type'), $a, $a, $a, (int)$tid));
             }
         }
 
@@ -188,50 +191,39 @@ SQL;
             foreach ($filter['type'] as $typeGroup => $typeId) {
                 $a = 'd' . $i;
                 $w = $this->makeMultiQuery($typeId, $a.'.type_id', 'OR');
-                $from .= "\n    " . sprintf('INNER JOIN %s %s ON (a.id = %s.item_id AND (%s)) ',
-                        $this->quoteParameter('item_has_type'), $a, $a, $w);
+                $filter->appendFrom("\n    " . sprintf('INNER JOIN %s %s ON (a.id = %s.item_id AND (%s)) ',
+                        $this->quoteParameter('item_has_type'), $a, $a, $w));
                 $i++;
             }
         }
 
         if (!empty($filter['domainId'])) {
             $w = $this->makeMultiQuery($filter['domainId'], 'a.domain_id', 'OR');
-            if ($w) {
-                $where .= '('. $w . ') AND ';
-            }
+            if ($w) $filter->appendWhere('(%s) AND ', $w);
         }
 
         if (!empty($filter['entryId'])) {
             $from .= sprintf(', %s c', $this->quoteParameter('skill_selected'));
-            $where .= sprintf('a.id = c.item_id AND c.entry_id = %s AND ', (int)$filter['entryId']);
+            $filter->appendWhere('a.id = c.item_id AND c.entry_id = %s AND ', (int)$filter['entryId']);
         }
 
         if (!empty($filter['question'])) {
-            $where .= sprintf('a.question = %s AND ', $this->quote($filter['question']));
+            $filter->appendWhere('a.question = %s AND ', $this->quote($filter['question']));
         }
 
         if (!empty($filter['publish'])) {
-            $where .= sprintf('a.publish = %s AND ', (int)$filter['publish']);
+            $filter->appendWhere('a.publish = %s AND ', (int)$filter['publish']);
         }
+
+
+
 
         if (!empty($filter['exclude'])) {
             $w = $this->makeMultiQuery($filter['exclude'], 'a.id', 'AND', '!=');
-            if ($w) {
-                $where .= '('. $w . ') AND ';
-            }
+            if ($w) $filter->appendWhere('(%s) AND ', $w);
         }
 
-        if ($where) {
-            $where = substr($where, 0, -4);
-        }
-        
-        
-        $res = $this->selectFrom($from, $where, $tool, $select);
-        //vd($this->getDb()->getLastQuery());
-        return $res;
+        return $filter;
     }
-
-
-
 
 }

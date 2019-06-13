@@ -1,6 +1,7 @@
 <?php
 namespace Skill\Db;
 
+use Tk\Db\Exception;
 use Tk\Db\Tool;
 use Tk\Db\Map\ArrayObject;
 use Tk\DataMap\Db;
@@ -108,17 +109,23 @@ WHERE c.collection_id = b.collection_id AND a.item_id = b.org_id AND a.entry_id 
     }
 
     /**
-     * Find filtered records
-     *
-     * @param array $filter
+     * @param array|\Tk\Db\Filter $filter
      * @param Tool $tool
      * @return ArrayObject|Collection[]
      * @throws \Exception
      */
-    public function findFiltered($filter = array(), $tool = null)
+    public function findFiltered($filter, $tool = null)
     {
-        $from = sprintf('%s a ', $this->getDb()->quoteParameter($this->getTable()));
-        $where = '';
+        return $this->selectFromFilter($this->makeQuery(\Tk\Db\Filter::create($filter)), $tool);
+    }
+
+    /**
+     * @param \Tk\Db\Filter $filter
+     * @return \Tk\Db\Filter
+     */
+    public function makeQuery(\Tk\Db\Filter $filter)
+    {
+        $filter->appendFrom('%s a ', $this->quoteParameter($this->getTable()));
 
         if (!empty($filter['keywords'])) {
             $kw = '%' . $this->getDb()->escapeString($filter['keywords']) . '%';
@@ -130,72 +137,68 @@ WHERE c.collection_id = b.collection_id AND a.item_id = b.org_id AND a.entry_id 
                 $id = (int)$filter['keywords'];
                 $w .= sprintf('a.id = %d OR ', $id);
             }
-            if ($w) {
-                $where .= '(' . substr($w, 0, -3) . ') AND ';
-            }
+            if ($w) $filter->appendWhere('(%s) AND ', substr($w, 0, -3));
         }
 
 //        if (!empty($filter['profileId'])) {
-//            $where .= sprintf('a.profile_id = %s AND ', (int)$filter['profileId']);
+//            $filter->appendWhere('a.profile_id = %s AND ', (int)$filter['profileId']);
 //        }
 
         if (!empty($filter['uid'])) {
-            $where .= sprintf('a.uid = %s AND ', $this->quote($filter['uid']));
+            $filter->appendWhere('a.uid = %s AND ', $this->quote($filter['uid']));
         }
 
         if (!empty($filter['subjectId'])) {
-            $where .= sprintf('a.subject_id = %s AND ', (int)$filter['subjectId']);
+            $filter->appendWhere('a.subject_id = %s AND ', (int)$filter['subjectId']);
         }
 
         if (!empty($filter['profileId'])) {
-            $where .= sprintf('a.profile_id = %s AND ', (int)$filter['profileId']);
+            $filter->appendWhere('a.profile_id = %s AND ', (int)$filter['profileId']);
         }
 
         if (!empty($filter['name'])) {
-            $where .= sprintf('a.name = %s AND ', $this->quote($filter['name']));
+            $filter->appendWhere('a.name = %s AND ', $this->quote($filter['name']));
         }
 
         if (!empty($filter['color'])) {
-            $where .= sprintf('a.color = %s AND ', $this->quote($filter['color']));
+            $filter->appendWhere('a.color = %s AND ', $this->quote($filter['color']));
         }
 
         if (!empty($filter['gradable'])) {
-            $where .= sprintf('a.gradable = %s AND ', (int)$filter['gradable']);
+            $filter->appendWhere('a.gradable = %s AND ', (int)$filter['gradable']);
         }
 
         if (isset($filter['requirePlacement']) && $filter['requirePlacement'] !== null && $filter['requirePlacement'] !== '') {
-            $where .= sprintf('a.require_placement = %s AND ', (int)$filter['requirePlacement']);
+            $filter->appendWhere('a.require_placement = %s AND ', (int)$filter['requirePlacement']);
         }
 
         if (!empty($filter['active'])) {
-            $where .= sprintf('a.active = %s AND ', (int)$filter['active']);
+            $filter->appendWhere('a.active = %s AND ', (int)$filter['active']);
         }
 
         if (!empty($filter['publish'])) {
-            $where .= sprintf('a.publish = %s AND ', (int)$filter['publish']);
+            $filter->appendWhere('a.publish = %s AND ', (int)$filter['publish']);
         }
 
 //        if (isset($filter['enabledSubjectId'])) {      // Only selects collections that have been enabled in the subject
-//            $from .= sprintf(', %s c', $this->quoteTable('skill_collection_subject'));
-//            $where .= sprintf('a.id = c.collection_id AND c.subject_id = %s AND ', (int)$filter['enabledSubjectId']);
+//            $filter->appendFrom(', %s c', $this->quoteTable('skill_collection_subject'));
+//            $filter->appendWhere('a.id = c.collection_id AND c.subject_id = %s AND ', (int)$filter['enabledSubjectId']);
 //        }
 
 //        if (!empty($filter['subjectId'])) {
-//            $from .= sprintf(', %s d', $this->quoteTable('subject'));
-//            $where .= sprintf('a.profile_id = d.profile_id AND d.id = %s AND ', (int)$filter['subjectId']);
+//            $filter->appendFrom(', %s d', $this->quoteTable('subject'));
+//            $filter->appendWhere('a.profile_id = d.profile_id AND d.id = %s AND ', (int)$filter['subjectId']);
 //        }
 
         if (!empty($filter['placementTypeId'])) {
-            $from .= sprintf(' LEFT JOIN %s b ON (a.id = b.collection_id) ',
+            $filter->appendFrom(' LEFT JOIN %s b ON (a.id = b.collection_id) ',
                 $this->quoteTable('skill_collection_placement_type'));
-            $where .= sprintf('b.placement_type_id = %s AND ', (int)$filter['placementTypeId']);
+            $filter->appendWhere('b.placement_type_id = %s AND ', (int)$filter['placementTypeId']);
         }
 
         if (!empty($filter['role'])) {
             $w = $this->makeMultiQuery($filter['role'], 'a.role');
-            if ($w) {
-                $where .= '('. $w . ') AND ';
-            }
+            if ($w) $filter->appendWhere('(%s) AND ', $w);
         }
 
         // Find all collections that are enabled for the given placement statuses
@@ -205,24 +208,17 @@ WHERE c.collection_id = b.collection_id AND a.item_id = b.org_id AND a.entry_id 
             foreach ($filter['available'] as $r) {
                 $w .= sprintf('a.available LIKE %s OR ', $this->getDb()->quote('%'.$r.'%'));
             }
-            if ($w)
-                $where .= '('. rtrim($w, ' OR ') . ') AND ';
+            if ($w) $filter->appendWhere('('. rtrim($w, ' OR ') . ') AND ');
         }
+
+
 
         if (!empty($filter['exclude'])) {
             $w = $this->makeMultiQuery($filter['exclude'], 'a.id', 'AND', '!=');
-            if ($w) {
-                $where .= '('. $w . ') AND ';
-            }
+            if ($w) $filter->appendWhere('(%s) AND ', $w);
         }
 
-        if ($where) {
-            $where = substr($where, 0, -4);
-        }
-
-        $res = $this->selectFrom($from, $where, $tool);
-        //vd($this->getDb()->getLastQuery());
-        return $res;
+        return $filter;
     }
 
 
@@ -235,11 +231,14 @@ WHERE c.collection_id = b.collection_id AND a.item_id = b.org_id AND a.entry_id 
      */
     public function hasPlacementType($collectionId, $placementTypeId)
     {
-        $stm = $this->getDb()->prepare('SELECT * FROM skill_collection_placement_type WHERE collection_id = ? AND placement_type_id = ?');
-        $stm->bindParam(1, $collectionId);
-        $stm->bindParam(2, $placementTypeId);
-        $stm->execute();
-        return ($stm->rowCount() > 0);
+        try {
+            $stm = $this->getDb()->prepare('SELECT * FROM skill_collection_placement_type WHERE collection_id = ? AND placement_type_id = ?');
+            $stm->bindParam(1, $collectionId);
+            $stm->bindParam(2, $placementTypeId);
+            $stm->execute();
+            return ($stm->rowCount() > 0);
+        } catch (Exception $e) {}
+        return false;
     }
 
     /**
@@ -248,14 +247,16 @@ WHERE c.collection_id = b.collection_id AND a.item_id = b.org_id AND a.entry_id 
      */
     public function removePlacementType($collectionId, $placementTypeId = null)
     {
-        $stm = $this->getDb()->prepare('DELETE FROM skill_collection_placement_type WHERE collection_id = ?');
-        $stm->bindParam(1, $collectionId);
-        if ($placementTypeId) {
-            $stm = $this->getDb()->prepare('DELETE FROM skill_collection_placement_type WHERE collection_id = ? AND placement_type_id = ?');
+        try {
+            $stm = $this->getDb()->prepare('DELETE FROM skill_collection_placement_type WHERE collection_id = ?');
             $stm->bindParam(1, $collectionId);
-            $stm->bindParam(2, $placementTypeId);
-        }
-        $stm->execute();
+            if ($placementTypeId) {
+                $stm = $this->getDb()->prepare('DELETE FROM skill_collection_placement_type WHERE collection_id = ? AND placement_type_id = ?');
+                $stm->bindParam(1, $collectionId);
+                $stm->bindParam(2, $placementTypeId);
+            }
+            $stm->execute();
+        } catch (Exception $e) {}
     }
 
     /**
@@ -264,11 +265,13 @@ WHERE c.collection_id = b.collection_id AND a.item_id = b.org_id AND a.entry_id 
      */
     public function addPlacementType($collectionId, $placementTypeId)
     {
-        if ($this->hasPlacementType($collectionId, $placementTypeId)) return;
-        $stm = $this->getDb()->prepare('INSERT INTO skill_collection_placement_type (collection_id, placement_type_id)  VALUES (?, ?)');
-        $stm->bindParam(1, $collectionId);
-        $stm->bindParam(2, $placementTypeId);
-        $stm->execute();
+        try {
+            if ($this->hasPlacementType($collectionId, $placementTypeId)) return;
+            $stm = $this->getDb()->prepare('INSERT INTO skill_collection_placement_type (collection_id, placement_type_id)  VALUES (?, ?)');
+            $stm->bindParam(1, $collectionId);
+            $stm->bindParam(2, $placementTypeId);
+            $stm->execute();
+        } catch (Exception $e) {}
     }
 
     /**
@@ -277,31 +280,17 @@ WHERE c.collection_id = b.collection_id AND a.item_id = b.org_id AND a.entry_id 
      */
     public function findPlacementTypes($collectionId)
     {
-        $stm = $this->getDb()->prepare('SELECT placement_type_id FROM skill_collection_placement_type WHERE collection_id = ?');
-        $stm->bindParam(1, $collectionId);
-        $stm->execute();
         $arr = array();
-        foreach($stm as $row) {
-            $arr[] = $row->placement_type_id;
-        }
+        try {
+            $stm = $this->getDb()->prepare('SELECT placement_type_id FROM skill_collection_placement_type WHERE collection_id = ?');
+            $stm->bindParam(1, $collectionId);
+            $stm->execute();
+            foreach($stm as $row) {
+                $arr[] = $row->placement_type_id;
+            }
+        } catch (Exception $e) {}
         return $arr;
     }
-
-
-//    public function findSubjectAverage($collectionId, $subjectId)
-//    {
-//        $stm = $this->getDb()->prepare('SELECT *
-//          FROM skill_value a, skill_entry b LEFT JOIN skill_item c ON (b.item_id = c.id) LEFT JOIN skill_domain d ON (c.domain_id = d.id)
-//          WHERE a.id = b.entry_id AND collection_id = ? AND subject_id = ? ');
-//        $stm->bindParam(1, $collectionId);
-//        $stm->execute();
-//        $arr = array();
-//        foreach($stm as $row) {
-//            $arr[] = $row->placement_type_id;
-//        }
-//        return $arr;
-//    }
-
 
 
     // Link to subjects
@@ -313,11 +302,14 @@ WHERE c.collection_id = b.collection_id AND a.item_id = b.org_id AND a.entry_id 
      */
     public function hasSubject($subjectId, $collectionId)
     {
-        $stm = $this->getDb()->prepare('SELECT * FROM skill_collection_subject WHERE subject_id = ? AND collection_id = ?');
-        $stm->bindParam(1, $subjectId);
-        $stm->bindParam(2, $collectionId);
-        $stm->execute();
-        return ($stm->rowCount() > 0);
+        try {
+            $stm = $this->getDb()->prepare('SELECT * FROM skill_collection_subject WHERE subject_id = ? AND collection_id = ?');
+            $stm->bindParam(1, $subjectId);
+            $stm->bindParam(2, $collectionId);
+            $stm->execute();
+            return ($stm->rowCount() > 0);
+        } catch (Exception $e) {}
+        return false;
     }
 
     /**
@@ -326,14 +318,16 @@ WHERE c.collection_id = b.collection_id AND a.item_id = b.org_id AND a.entry_id 
      */
     public function removeSubject($subjectId, $collectionId = null)
     {
-        $stm = $this->getDb()->prepare('DELETE FROM skill_collection_subject WHERE subject_id = ?');
-        $stm->bindParam(1, $subjectId);
-        if ($collectionId) {
-            $stm = $this->getDb()->prepare('DELETE FROM skill_collection_subject WHERE subject_id = ? AND collection_id = ?');
+        try {
+            $stm = $this->getDb()->prepare('DELETE FROM skill_collection_subject WHERE subject_id = ?');
             $stm->bindParam(1, $subjectId);
-            $stm->bindParam(2, $collectionId);
-        }
-        $stm->execute();
+            if ($collectionId) {
+                $stm = $this->getDb()->prepare('DELETE FROM skill_collection_subject WHERE subject_id = ? AND collection_id = ?');
+                $stm->bindParam(1, $subjectId);
+                $stm->bindParam(2, $collectionId);
+            }
+            $stm->execute();
+        } catch (Exception $e) {}
     }
 
     /**
@@ -342,11 +336,13 @@ WHERE c.collection_id = b.collection_id AND a.item_id = b.org_id AND a.entry_id 
      */
     public function addSubject($subjectId, $collectionId)
     {
-        if ($this->hasSubject($subjectId, $collectionId)) return;
-        $stm = $this->getDb()->prepare('INSERT INTO skill_collection_subject (subject_id, collection_id)  VALUES (?, ?)');
-        $stm->bindParam(1, $subjectId);
-        $stm->bindParam(2, $collectionId);
-        $stm->execute();
+        try {
+            if ($this->hasSubject($subjectId, $collectionId)) return;
+            $stm = $this->getDb()->prepare('INSERT INTO skill_collection_subject (subject_id, collection_id)  VALUES (?, ?)');
+            $stm->bindParam(1, $subjectId);
+            $stm->bindParam(2, $collectionId);
+            $stm->execute();
+        } catch (Exception $e) {}
     }
 
 

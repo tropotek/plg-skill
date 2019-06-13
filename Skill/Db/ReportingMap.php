@@ -29,13 +29,14 @@ class ReportingMap extends \App\Db\Mapper
     /**
      * Find filtered records
      *
-     * @param array $filter
+     * @param array|\Tk\Db\Filter $filter
      * @param \Tk\Db\Tool $tool
      * @return \Tk\Db\Map\ArrayObject|Item[]
      * @throws \Exception
      */
     public function findFiltered($filter = array(), $tool = null)
     {
+        $filter = \Tk\Db\Filter::create($filter);
         if (!$tool) $tool = \Tk\Db\Tool::create();
 
         $select = <<<SQL
@@ -61,9 +62,9 @@ c.id as 'company_id', c.name as 'company_name',
 
 sup.id as 'supervisor_id', sup.name as 'supervisor_name',
 
-IFNULL(sv.value, '0') as 'item_value'
-
+IFNULL(sv.value, '0') as 'item_value',
 SQL;
+        $filter->setSelect($select);
 
         $from = <<<SQL
           `skill_collection` sc
@@ -80,86 +81,69 @@ LEFT JOIN `skill_category` cat ON (si.category_id = cat.id)
 LEFT JOIN `skill_domain` sd ON (si.domain_id = sd.id)
 
 LEFT JOIN `skill_value` sv ON (se.id = sv.entry_id AND si.id = sv.item_id)
-
 SQL;
+        $filter->setFrom($from);
 
         $where = <<<SQL
 se.id IS NOT NULL AND 
 SQL;
-
+        $filter->setWhere($where);
 
 
         if (!empty($filter['collectionId'])) {
-            $where .= sprintf('sc.id = %s AND ', (int)$filter['collectionId']);
+            $filter->appendWhere('sc.id = %s AND ', (int)$filter['collectionId']);
         }
 
         if (!empty($filter['collectionUid'])) {
-            $where .= sprintf('sc.uid = %s AND ', (int)$filter['collectionUid']);
+            $filter->appendWhere('sc.uid = %s AND ', (int)$filter['collectionUid']);
         }
 
         if (!empty($filter['itemId'])) {
             $w = $this->makeMultiQuery($filter['itemId'], 'si.uid', 'OR');
-            if ($w) {
-                $where .= '('. $w . ') AND ';
-            }
+            if ($w) $filter->appendWhere('(%s) AND ', $w);
         }
 
         if (!empty($filter['categoryId'])) {
             $w = $this->makeMultiQuery($filter['categoryId'], 'cat.uid', 'OR');
-            if ($w) {
-                $where .= '('. $w . ') AND ';
-            }
+            if ($w) $filter->appendWhere('(%s) AND ', $w);
         }
 
         if (!empty($filter['domainId'])) {
             $w = $this->makeMultiQuery($filter['domainId'], 'sd.uid', 'OR');
-            if ($w) {
-                $where .= '('. $w . ') AND ';
-            }
+            if ($w) $filter->appendWhere('(%s) AND ', $w);
         }
 
         if (!empty($filter['scaleId'])) {
             $w = $this->makeMultiQuery($filter['scaleId'], 'sv.value', 'OR');
-            if ($w) {
-                $where .= '('. $w . ') AND ';
-            }
+            if ($w) $filter->appendWhere('(%s) AND ', $w);
         }
 
         if (!empty($filter['studentNumber'])) {
-            $where .= sprintf('u.uid = %s AND ', $this->getDb()->quote($filter['studentNumber']));
+            $filter->appendWhere('u.uid = %s AND ', $this->getDb()->quote($filter['studentNumber']));
         }
 
         if (!empty($filter['placementId'])) {
-            $where .= sprintf('p.id = %s AND ', (int)$filter['placementId']);
+            $filter->appendWhere('p.id = %s AND ', (int)$filter['placementId']);
         }
-
-
-
 
         // Include zero values in the results
         if (!empty($filter['excludeZero'])) {
-            $where .= sprintf('sv.value IS NOT NULL AND sv.value > 0 AND ');
+            $filter->appendWhere('sv.value IS NOT NULL AND sv.value > 0 AND ');
         }
 
         if (!empty($filter['subjectId'])) {
             $w = $this->makeMultiQuery($filter['subjectId'], 's.id', 'OR');
-            if ($w) {
-                $where .= '('. $w . ') AND ';
-            }
+            if ($w) $filter->appendWhere('(%s) AND ', $w);
         }
 
         if (!empty($filter['companyId'])) {
             $w = $this->makeMultiQuery($filter['companyId'], 'c.id', 'OR');
-            if ($w) {
-                $where .= '('. $w . ') AND ';
-            }
+            if ($w) $filter->appendWhere('(%s) AND ', $w);
         }
 
         if (!empty($filter['supervisorId'])) {
             $w = $this->makeMultiQuery($filter['supervisorId'], 'sup.id', 'OR');
-            if ($w) {
-                $where .= '('. $w . ') AND ';
-            }
+            if ($w) $filter->appendWhere('(%s) AND ', $w);
         }
 
 
@@ -169,28 +153,23 @@ SQL;
             /** @var \DateTime $dateEnd */
             $dateEnd = \Tk\Date::floor(\Tk\Date::createFormDate($filter['dateEnd']));
 
-            $where .= sprintf('((p.date_start >= %s AND ', $this->quote($dateStart->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
-            $where .= sprintf('p.date_start <= %s) OR ', $this->quote($dateEnd->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
+            $filter->appendWhere('((p.date_start >= %s AND ', $this->quote($dateStart->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
+            $filter->appendWhere('p.date_start <= %s) OR ', $this->quote($dateEnd->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
 
-            $where .= sprintf('(p.date_end <= %s AND ', $this->quote($dateStart->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
-            $where .= sprintf('p.date_end >= %s)) AND ', $this->quote($dateEnd->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
+            $filter->appendWhere('(p.date_end <= %s AND ', $this->quote($dateStart->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
+            $filter->appendWhere('p.date_end >= %s)) AND ', $this->quote($dateEnd->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
 
         } else if (!empty($filter['dateStart'])) {
             /** @var \DateTime $date */
             $date = \Tk\Date::floor(\Tk\Date::createFormDate($filter['dateStart']));
-            $where .= sprintf('p.date_start >= %s AND ', $this->quote($date->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
+            $filter->appendWhere('p.date_start >= %s AND ', $this->quote($date->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
         } else if (!empty($filter['dateEnd'])) {
             /** @var \DateTime $date */
             $date = \Tk\Date::floor(\Tk\Date::createFormDate($filter['dateEnd']));
-            $where .= sprintf('p.date_end <= %s AND ', $this->quote($date->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
+            $filter->appendWhere('p.date_end <= %s AND ', $this->quote($date->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
         }
 
-
-        if ($where) {
-            $where = substr($where, 0, -4);
-        }
-
-        $res = $this->selectFrom($from, $where, $tool, $select);
+        $res = $this->selectFromFilter($filter, $tool);
         //vd($this->getDb()->getLastQuery());
         return $res;
     }
@@ -207,6 +186,7 @@ SQL;
      */
     public function findItemAverage($filter = array(), $tool = null)
     {
+        $filter = \Tk\Db\Filter::create($filter);
         if (!$tool) $tool = \Tk\Db\Tool::create();
 
         $tool->setDistinct(false);
@@ -222,6 +202,7 @@ c.id as 'company_id', c.name as 'company_name',
 sup.id as 'supervisor_id', sup.name as 'supervisor_name',
 ROUND(AVG(sv.value), 3) as 'average', COUNT(sv.value) as 'count'
 SQL;
+        $filter->setSelect($select);
 
         $from = <<<SQL
 `skill_collection` sc
@@ -236,84 +217,69 @@ LEFT JOIN `skill_category` cat ON (si.category_id = cat.id)
 LEFT JOIN `skill_domain` sd ON (si.domain_id = sd.id)
 LEFT JOIN `skill_value` sv ON (se.id = sv.entry_id AND si.id = sv.item_id)
 SQL;
+        $filter->setFrom($from);
 
         $where = <<<SQL
 se.id IS NOT NULL AND 
 SQL;
+        $filter->setWhere($where);
 
-
-
-
+        
         if (!empty($filter['collectionId'])) {
-            $where .= sprintf('sc.id = %s AND ', (int)$filter['collectionId']);
+            $filter->appendWhere('sc.id = %s AND ', (int)$filter['collectionId']);
         }
 
         if (!empty($filter['collectionUid'])) {
-            $where .= sprintf('sc.uid = %s AND ', (int)$filter['collectionUid']);
+            $filter->appendWhere('sc.uid = %s AND ', (int)$filter['collectionUid']);
         }
 
         if (!empty($filter['itemId'])) {
             $w = $this->makeMultiQuery($filter['itemId'], 'si.uid', 'OR');
-            if ($w) {
-                $where .= '('. $w . ') AND ';
-            }
+            if ($w) $filter->appendWhere('(%s) AND ', $w);
         }
 
         if (!empty($filter['categoryId'])) {
             $w = $this->makeMultiQuery($filter['categoryId'], 'cat.uid', 'OR');
-            if ($w) {
-                $where .= '('. $w . ') AND ';
-            }
+            if ($w) $filter->appendWhere('(%s) AND ', $w);
         }
 
         if (!empty($filter['domainId'])) {
             $w = $this->makeMultiQuery($filter['domainId'], 'sd.uid', 'OR');
-            if ($w) {
-                $where .= '('. $w . ') AND ';
-            }
+            if ($w) $filter->appendWhere('(%s) AND ', $w);
         }
 
         if (!empty($filter['scaleId'])) {
             $w = $this->makeMultiQuery($filter['scaleId'], 'sv.value', 'OR');
-            if ($w) {
-                $where .= '('. $w . ') AND ';
-            }
+            if ($w) $filter->appendWhere('(%s) AND ', $w);
         }
 
         if (!empty($filter['studentNumber'])) {
-            $where .= sprintf('u.uid = %s AND ', $this->getDb()->quote($filter['studentNumber']));
+            $filter->appendWhere('u.uid = %s AND ', $this->getDb()->quote($filter['studentNumber']));
         }
 
         if (!empty($filter['placementId'])) {
-            $where .= sprintf('p.id = %s AND ', (int)$filter['placementId']);
+            $filter->appendWhere('p.id = %s AND ', (int)$filter['placementId']);
         }
 
         // Include zero values in the results
         //if (!empty($filter['excludeZero'])) {
-        $where .= sprintf('sv.value IS NOT NULL AND sv.value > 0 AND ');
+        $filter->appendWhere('sv.value IS NOT NULL AND sv.value > 0 AND ');
         //}
 
         if (!empty($filter['subjectId'])) {
             $w = $this->makeMultiQuery($filter['subjectId'], 's.id', 'OR');
-            if ($w) {
-                $where .= '('. $w . ') AND ';
-            }
+            if ($w) $filter->appendWhere('(%s) AND ', $w);
         }
 
         if (!empty($filter['companyId'])) {
             $w = $this->makeMultiQuery($filter['companyId'], 'c.id', 'OR');
-            if ($w) {
-                $where .= '('. $w . ') AND ';
-            }
+            if ($w) $filter->appendWhere('(%s) AND ', $w);
         }
 
         if (!empty($filter['supervisorId'])) {
             $w = $this->makeMultiQuery($filter['supervisorId'], 'sup.id', 'OR');
-            if ($w) {
-                $where .= '('. $w . ') AND ';
-            }
+            if ($w) $filter->appendWhere('(%s) AND ', $w);
         }
-
 
         if (!empty($filter['dateStart']) && !empty($filter['dateEnd'])) {     // Contains
             /** @var \DateTime $dateStart */
@@ -321,33 +287,26 @@ SQL;
             /** @var \DateTime $dateEnd */
             $dateEnd = \Tk\Date::floor(\Tk\Date::createFormDate($filter['dateEnd']));
 
-            $where .= sprintf('((p.date_start >= %s AND ', $this->quote($dateStart->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
-            $where .= sprintf('p.date_start <= %s) OR ', $this->quote($dateEnd->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
+            $filter->appendWhere('((p.date_start >= %s AND ', $this->quote($dateStart->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
+            $filter->appendWhere('p.date_start <= %s) OR ', $this->quote($dateEnd->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
 
-            $where .= sprintf('(p.date_end <= %s AND ', $this->quote($dateStart->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
-            $where .= sprintf('p.date_end >= %s)) AND ', $this->quote($dateEnd->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
+            $filter->appendWhere('(p.date_end <= %s AND ', $this->quote($dateStart->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
+            $filter->appendWhere('p.date_end >= %s)) AND ', $this->quote($dateEnd->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
 
         } else if (!empty($filter['dateStart'])) {
             /** @var \DateTime $date */
             $date = \Tk\Date::floor(\Tk\Date::createFormDate($filter['dateStart']));
-            $where .= sprintf('p.date_start >= %s AND ', $this->quote($date->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
+            $filter->appendWhere('p.date_start >= %s AND ', $this->quote($date->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
         } else if (!empty($filter['dateEnd'])) {
             /** @var \DateTime $date */
             $date = \Tk\Date::floor(\Tk\Date::createFormDate($filter['dateEnd']));
-            $where .= sprintf('p.date_end <= %s AND ', $this->quote($date->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
+            $filter->appendWhere('p.date_end <= %s AND ', $this->quote($date->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
         }
 
-
-        if ($where) {
-            $where = substr($where, 0, -4);
-        }
-
-        $res = $this->selectFrom($from, $where, $tool, $select);
-        vd($this->getDb()->getLastQuery());
+        $res = $this->selectFromFilter($filter, $tool);
+        //vd($this->getDb()->getLastQuery());
         return $res;
     }
-
-
 
 
     /**
@@ -360,6 +319,7 @@ SQL;
      */
     public function findDateAverage($filter = array(), $tool = null)
     {
+        $filter = \Tk\Db\Filter::create($filter);
         if (!$tool) $tool = \Tk\Db\Tool::create();
 
         $interval = "DATE(CONCAT(YEAR(p.date_start), '-', MONTH(p.date_start), '-01'))";        // Default Monthly
@@ -374,6 +334,7 @@ sc.id as 'collection_id',
 si.uid as 'item_uid', si.question as 'item_question',
 ROUND(AVG(sv.value), 3) as 'average', COUNT(sv.value) as 'count', $interval as 'date'
 SQL;
+        $filter->setSelect($select);
 
         $from = <<<SQL
 `skill_collection` sc
@@ -386,84 +347,68 @@ LEFT JOIN `supervisor` sup ON (p.supervisor_id = sup.id)
 LEFT JOIN `skill_item` si ON (sc.id = si.collection_id)
 LEFT JOIN `skill_value` sv ON (se.id = sv.entry_id AND si.id = sv.item_id)
 SQL;
+        $filter->setFrom($from);
 
         $where = <<<SQL
 se.id IS NOT NULL AND 
 SQL;
-
-
-
+        $filter->setWhere($where);
 
         if (!empty($filter['collectionId'])) {
-            $where .= sprintf('sc.id = %s AND ', (int)$filter['collectionId']);
+            $filter->appendWhere('sc.id = %s AND ', (int)$filter['collectionId']);
         }
 
         if (!empty($filter['collectionUid'])) {
-            $where .= sprintf('sc.uid = %s AND ', (int)$filter['collectionUid']);
+            $filter->appendWhere('sc.uid = %s AND ', (int)$filter['collectionUid']);
         }
 
         if (!empty($filter['itemId'])) {
             $w = $this->makeMultiQuery($filter['itemId'], 'si.uid', 'OR');
-            if ($w) {
-                $where .= '('. $w . ') AND ';
-            }
+            if ($w) $filter->appendWhere('(%s) AND ', $w);
         }
 
         if (!empty($filter['categoryId'])) {
             $w = $this->makeMultiQuery($filter['categoryId'], 'cat.uid', 'OR');
-            if ($w) {
-                $where .= '('. $w . ') AND ';
-            }
+            if ($w) $filter->appendWhere('(%s) AND ', $w);
         }
 
         if (!empty($filter['domainId'])) {
             $w = $this->makeMultiQuery($filter['domainId'], 'sd.uid', 'OR');
-            if ($w) {
-                $where .= '('. $w . ') AND ';
-            }
+            if ($w) $filter->appendWhere('(%s) AND ', $w);
         }
 
         if (!empty($filter['scaleId'])) {
             $w = $this->makeMultiQuery($filter['scaleId'], 'sv.value', 'OR');
-            if ($w) {
-                $where .= '('. $w . ') AND ';
-            }
+            if ($w) $filter->appendWhere('(%s) AND ', $w);
         }
 
         if (!empty($filter['studentNumber'])) {
-            $where .= sprintf('u.uid = %s AND ', $this->getDb()->quote($filter['studentNumber']));
+            $filter->appendWhere('u.uid = %s AND ', $this->getDb()->quote($filter['studentNumber']));
         }
 
         if (!empty($filter['placementId'])) {
-            $where .= sprintf('p.id = %s AND ', (int)$filter['placementId']);
+            $filter->appendWhere('p.id = %s AND ', (int)$filter['placementId']);
         }
 
         // Include zero values in the results
         //if (!empty($filter['excludeZero'])) {
-        $where .= sprintf('sv.value IS NOT NULL AND sv.value > 0 AND ');
+        $filter->appendWhere('sv.value IS NOT NULL AND sv.value > 0 AND ');
         //}
 
         if (!empty($filter['subjectId'])) {
             $w = $this->makeMultiQuery($filter['subjectId'], 's.id', 'OR');
-            if ($w) {
-                $where .= '('. $w . ') AND ';
-            }
+            if ($w) $filter->appendWhere('(%s) AND ', $w);
         }
 
         if (!empty($filter['companyId'])) {
             $w = $this->makeMultiQuery($filter['companyId'], 'c.id', 'OR');
-            if ($w) {
-                $where .= '('. $w . ') AND ';
-            }
+            if ($w) $filter->appendWhere('(%s) AND ', $w);
         }
 
         if (!empty($filter['supervisorId'])) {
             $w = $this->makeMultiQuery($filter['supervisorId'], 'sup.id', 'OR');
-            if ($w) {
-                $where .= '('. $w . ') AND ';
-            }
+            if ($w) $filter->appendWhere('(%s) AND ', $w);
         }
-
 
         if (!empty($filter['dateStart']) && !empty($filter['dateEnd'])) {     // Contains
             /** @var \DateTime $dateStart */
@@ -471,28 +416,23 @@ SQL;
             /** @var \DateTime $dateEnd */
             $dateEnd = \Tk\Date::floor(\Tk\Date::createFormDate($filter['dateEnd']));
 
-            $where .= sprintf('((p.date_start >= %s AND ', $this->quote($dateStart->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
-            $where .= sprintf('p.date_start <= %s) OR ', $this->quote($dateEnd->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
+            $filter->appendWhere('((p.date_start >= %s AND ', $this->quote($dateStart->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
+            $filter->appendWhere('p.date_start <= %s) OR ', $this->quote($dateEnd->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
 
-            $where .= sprintf('(p.date_end <= %s AND ', $this->quote($dateStart->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
-            $where .= sprintf('p.date_end >= %s)) AND ', $this->quote($dateEnd->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
+            $filter->appendWhere('(p.date_end <= %s AND ', $this->quote($dateStart->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
+            $filter->appendWhere('p.date_end >= %s)) AND ', $this->quote($dateEnd->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
 
         } else if (!empty($filter['dateStart'])) {
             /** @var \DateTime $date */
             $date = \Tk\Date::floor(\Tk\Date::createFormDate($filter['dateStart']));
-            $where .= sprintf('p.date_start >= %s AND ', $this->quote($date->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
+            $filter->appendWhere('p.date_start >= %s AND ', $this->quote($date->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
         } else if (!empty($filter['dateEnd'])) {
             /** @var \DateTime $date */
             $date = \Tk\Date::floor(\Tk\Date::createFormDate($filter['dateEnd']));
-            $where .= sprintf('p.date_end <= %s AND ', $this->quote($date->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
+            $filter->appendWhere('p.date_end <= %s AND ', $this->quote($date->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
         }
 
-
-        if ($where) {
-            $where = substr($where, 0, -4);
-        }
-
-        $res = $this->selectFrom($from, $where, $tool, $select);
+        $res = $this->selectFromFilter($filter, $tool);
         //vd($this->getDb()->getLastQuery());
         return $res;
     }
@@ -509,15 +449,17 @@ SQL;
      */
     public function findCompanyTotalAverage($filter = array(), $tool = null)
     {
+        $filter = \Tk\Db\Filter::create($filter);
         if (!$tool) $tool = \Tk\Db\Tool::create();
+
         $tool->setDistinct(false);
         $tool->setGroupBy('a.company_id');
-
 
         $select = <<<SQL
 a.company_id, b.name ,AVG(a.avg) as 'avg', ROUND((AVG(a.avg) / a.scale) * 100, 3) as 'pct',
        COUNT(a.entry_id) as 'entry_count', MIN(a.pct) as 'min', MAX(a.pct) as 'max', b.created
 SQL;
+        $filter->setSelect($select);
 
         $from = <<<SQL
 (
@@ -539,40 +481,32 @@ SQL;
      ) a,
      company b
 SQL;
+        $filter->setFrom($from);
 
         $where = <<<SQL
 !b.del AND a.company_id = b.id AND 
 SQL;
-
+        $filter->setWhere($where);
 
         if (!empty($filter['collectionId'])) {
             $w = $this->makeMultiQuery($filter['collectionId'], 'a.collection_id', 'OR');
-            if ($w) {
-                $where .= '('. $w . ') AND ';
-            }
+            if ($w) $filter->appendWhere('(%s) AND ', $w);
         }
 
         if (!empty($filter['collectionUid'])) {
-            $where .= sprintf('a.collection_uid = %s AND ', (int)$filter['collectionUid']);
+            $filter->appendWhere('a.collection_uid = %s AND ', (int)$filter['collectionUid']);
         }
 
         if (!empty($filter['companyId'])) {
             $w = $this->makeMultiQuery($filter['companyId'], 'b.id', 'OR');
-            if ($w) {
-                $where .= '('. $w . ') AND ';
-            }
+            if ($w) $filter->appendWhere('(%s) AND ', $w);
         }
 
         if (!empty($filter['minEntries'])) {
             $tool->setHaving(sprintf('COUNT(a.entry_id) >= %s ', (int)$filter['minEntries']));
         }
 
-
-        if ($where) {
-            $where = substr($where, 0, -4);
-        }
-
-        $res = $this->selectFrom($from, $where, $tool, $select);
+        $res = $this->selectFromFilter($filter, $tool);
         //vd($this->getDb()->getLastQuery());
         return $res;
     }
@@ -589,15 +523,17 @@ SQL;
      */
     public function findCompanyAverage($filter = array(), $tool = null)
     {
+        $filter = \Tk\Db\Filter::create($filter);
         if (!$tool) $tool = \Tk\Db\Tool::create();
+
         $tool->setDistinct(false);
         $tool->setGroupBy('a.id');
-
 
         $select = <<<SQL
 b.id as 'placement_id', a.collection_id, a1.uid as 'collection_uid', b.supervisor_id, b.company_id, a.id as 'entry_id', s.scale, 
               ROUND(AVG(c.`value`), 3) as 'avg', ROUND((AVG(c.`value`) / s.scale) * 100, 3) as 'pct', a.created, b.date_start, b.date_end
 SQL;
+        $filter->setSelect($select);
 
         $from = <<<SQL
 skill_entry a,
@@ -610,46 +546,30 @@ skill_entry a,
       GROUP BY a.collection_id
     ) s
 SQL;
+        $filter->setFrom($from);
 
         $where = <<<SQL
 !a.del AND !b.del AND a.collection_id = a1.id AND a.placement_id = b.id AND c.value > 0 AND a.id = c.entry_id AND 
 SQL;
+        $filter->setWhere($where);
 
         if (!empty($filter['collectionId'])) {
             $w = $this->makeMultiQuery($filter['collectionId'], 'a.collection_id', 'OR');
-            if ($w) {
-                $where .= '('. $w . ') AND ';
-            }
+            if ($w) $filter->appendWhere('(%s) AND ', $w);
         }
 
         if (!empty($filter['collectionUid'])) {
-            $where .= sprintf('a1.uid = %s AND ', (int)$filter['collectionUid']);
+            $filter->appendWhere('a1.uid = %s AND ', (int)$filter['collectionUid']);
         }
 
         if (!empty($filter['companyId'])) {
             $w = $this->makeMultiQuery($filter['companyId'], 'b.company_id', 'OR');
-            if ($w) {
-                $where .= '('. $w . ') AND ';
-            }
+            if ($w) $filter->appendWhere('(%s) AND ', $w);
         }
 
-
-        if ($where) {
-            $where = substr($where, 0, -4);
-        }
-
-        $res = $this->selectFrom($from, $where, $tool, $select);
+        $res = $this->selectFromFilter($filter, $tool);
         //vd($this->getDb()->getLastQuery());
         return $res;
     }
-
-
-
-
-
-
-
-
-
 
 }
