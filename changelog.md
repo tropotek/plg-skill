@@ -1,5 +1,10 @@
 #CHANGELOG#
 
+Ver 3.0.14 [2019-06-17]:
+-------------------------------
+  - Fixed Student edit links and Skills PDF values
+
+
 Ver 3.0.12 [2019-06-17]:
 -------------------------------
   - Upgraded all DB model mapper filter queries to use new Filter object
