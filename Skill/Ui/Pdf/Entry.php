@@ -263,7 +263,7 @@ CSS;
             }
             $repeat->insertHtml('id', $i+1);
             $repeat->insertHtml('label', $item->question);
-            $repeat->insertHtml('data', $value . '/' . ($item->getCollection()->getScaleCount()+1));
+            $repeat->insertHtml('data', $value . '/' . ($item->getCollection()->getScaleCount()));
             $repeat->insertHtml('tag', $scaleList[$value]);
             $repeat->appendRepeat();
         }
