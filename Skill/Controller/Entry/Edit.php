@@ -171,9 +171,10 @@ class Edit extends AdminEditIface
         $this->setPageTitle($this->entry->getCollection()->name);
 
 
-        $this->setForm(\Skill\Form\Entry::create()->setModel($this->entry));
+        $this->setForm(\Skill\Form\Entry::create());
         if ($this->isPublic)
             $this->getForm()->setMode(\Skill\Form\Entry::MODE_PUBLIC);
+        $this->getForm()->setModel($this->entry);
         $this->initForm($request);
         $this->getForm()->execute();
 
@@ -198,7 +199,7 @@ class Edit extends AdminEditIface
      */
     public function initActionPanel()
     {
-        if ($this->entry->getId() && $this->getUser()->isStaff()) {
+        if ($this->entry->getId() && ($this->getUser() && $this->getUser()->isStaff())) {
             $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('View',
                 \App\Uri::createSubjectUrl('/entryView.html')->set('entryId', $this->entry->getId()), 'fa fa-eye'));
             $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('PDF',

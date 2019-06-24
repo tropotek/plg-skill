@@ -85,7 +85,8 @@ class Entry extends \App\FormIface
         }
 
         if ($this->isPublic()) {
-            $this->appendField(new Event\Submit('submit', array($this, 'doSubmit')))->setIconRight('fa fa-arrow-right')->addCss('pull-right')->setLabel('Submit ');
+            $this->appendField(new Event\Submit('submit', array($this, 'doSubmit')))->addCss('btn-success')->setIconRight('fa fa-arrow-right')->addCss('pull-right')->setLabel('Submit ');
+            $this->appendField(new Event\Link('cancel', \App\Uri::create('/index.html')));
         } else {
             $this->appendField(new Event\Submit('update', array($this, 'doSubmit')));
             $this->appendField(new Event\Submit('save', array($this, 'doSubmit')));
@@ -198,7 +199,7 @@ JS;
         $url = \Tk\Uri::create()->set('entryId', $this->getEntry()->getId());
         if ($form->getTriggeredEvent()->getName() == 'update') {
             $url = $this->getConfig()->getBackUrl();
-            if ($this->getEntry()->getPlacement() && $this->getUser()->isStaff()) {
+            if ($this->getEntry()->getPlacement() && $this->getConfig()->isSubjectUrl()) {
                 $url = \App\Uri::createSubjectUrl('/placementEdit.html')->set('placementId', $this->getEntry()->getPlacement()->getId());
             }
         }
