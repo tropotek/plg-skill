@@ -107,7 +107,6 @@ class SubjectDashboardHandler implements Subscriber
 
             $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('subjectId' => $subject->getId(), 'requirePlacement' => true));
             foreach ($collectionList as $collection) {
-                vd($collection);
                 if (!$collection->isAvailable() || !$collection->publish) continue;
                 $actionCell->addButton(\Tk\Table\Cell\ActionButton::create($collection->name,
                     \Uni\Uri::createSubjectUrl('/entryView.html'), $collection->icon))

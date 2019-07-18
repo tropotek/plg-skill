@@ -59,7 +59,6 @@ class SubjectEditHandler implements Subscriber
     {
         /** @var \Uni\Db\Subject $model */
         $model = $event->getModel();
-        vd();
         if (!$model instanceof \Uni\Db\SubjectIface) return;
         $previous = \Uni\Config::getInstance()->getLastCreatedSubject();
         if (!$previous) return;
