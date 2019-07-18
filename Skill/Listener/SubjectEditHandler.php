@@ -59,6 +59,7 @@ class SubjectEditHandler implements Subscriber
     {
         /** @var \Uni\Db\Subject $model */
         $model = $event->getModel();
+        vd();
         if (!$model instanceof \Uni\Db\SubjectIface) return;
         $previous = \Uni\Config::getInstance()->getLastCreatedSubject();
         if (!$previous) return;
@@ -67,7 +68,6 @@ class SubjectEditHandler implements Subscriber
         }
         $subjectId = $previous->getId();
         $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('subjectId' => $subjectId), \Tk\Db\Tool::create('id'));
-
         // Copy Subject Collections
         foreach ($collectionList as $collection) {
             \Tk\Log::debug('Copying Skill Collection: ' . $collection->name);
