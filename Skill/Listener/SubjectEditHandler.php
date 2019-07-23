@@ -76,9 +76,8 @@ class SubjectEditHandler implements Subscriber
             $newC->subjectId = $model->getVolatileId();
             $newC->publish = false;
             $newC->active = true;
-            vd($newC);
             $newC->save();
-            $newC = \Skill\Db\CollectionMap::create()->find($newC->getId());
+            //$newC = \Skill\Db\CollectionMap::create()->find($newC->getId());
 
             // Copy placement_type
             \Tk\Log::debug('Copying Skill Placement Types');
