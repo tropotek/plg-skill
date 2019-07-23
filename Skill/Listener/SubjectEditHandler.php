@@ -109,15 +109,30 @@ class SubjectEditHandler implements Subscriber
             // Copy Items
             \Tk\Log::debug('Copying Skill Items');
             $list = \Skill\Db\ItemMap::create()->findFiltered(array('collectionId' => $collection->getId()));
+            /** @var \Skill\Db\Item $src */
             foreach ($list as $src) {
+                /** @var \Skill\Db\Item $dst */
                 $dst = clone $src;
+
                 $dst->collectionId = $newC->getId();
+                $orgCat = $src->getCategory();
+                if ($orgCat)
+                    $dstCat = \Skill\Db\CategoryMap::create()->findFiltered(array('collectionId' => $collection->getId(), 'uid' => $orgCat->uid))->current();
+                    if ($dstCat)
+                        $dst->categoryId = $dstCat->getId();
+
+                $orgDomain = $src->getDomain();
+                $dst->domainId = 0;
+                if ($orgDomain)
+                    $dstDomain = \Skill\Db\DomainMap::create()->findFiltered(array('collectionId' => $collection->getId(), 'uid' => $orgDomain->uid))->current();
+                if ($dstDomain)
+                    $dst->domainId = $dstDomain->getId();
+
                 $dst->save();
             }
         }
         \Tk\Log::debug('Copying Collections Complete');
     }
-
 
 
     /**
