@@ -93,6 +93,10 @@ class DomainMap extends \App\Db\Mapper
             $filter->appendWhere('a.uid = %s AND ', $this->quote($filter['uid']));
         }
 
+        if (!empty($filter['label'])) {
+            $filter->appendWhere('a.label = %s AND ', $this->quote($filter['label']));
+        }
+
         if (!empty($filter['collectionId'])) {
             $filter->appendWhere('a.collection_id = %s AND ', (int)$filter['collectionId']);
         }
