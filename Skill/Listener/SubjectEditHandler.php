@@ -115,22 +115,26 @@ class SubjectEditHandler implements Subscriber
             foreach ($list as $src) {
                 /** @var \Skill\Db\Item $dst */
                 $dst = clone $src;
-
                 $dst->collectionId = $newC->getId();
-                $orgCat = $src->getCategory();
-                if ($orgCat) {
-                    $dstCat = \Skill\Db\CategoryMap::create()->findFiltered(array('collectionId' => $collection->getId(), 'uid' => $orgCat->uid))->current();
-                    if ($dstCat) {
-                        $dst->categoryId = $dstCat->getId();
+
+                $orgDomain = $src->getDomain();
+                if ($orgDomain) {
+                    $dstDomain = \Skill\Db\DomainMap::create()->findFiltered(array('collectionId' => $collection->getId(), 'uid' => $orgDomain->uid));
+                    vd($dstDomain);
+                    $dstDomain = $dstDomain->current();
+                    if ($dstDomain) {
+                        $dst->domainId = $dstDomain->getId();
                     }
                 }
 
-                $orgDomain = $src->getDomain();
-                $dst->domainId = 0;
-                if ($orgDomain) {
-                    $dstDomain = \Skill\Db\DomainMap::create()->findFiltered(array('collectionId' => $collection->getId(), 'uid' => $orgDomain->uid))->current();
-                    if ($dstDomain)
-                        $dst->domainId = $dstDomain->getId();
+                $orgCat = $src->getCategory();
+                if ($orgCat) {
+                    $dstCat = \Skill\Db\CategoryMap::create()->findFiltered(array('collectionId' => $collection->getId(), 'uid' => $orgCat->uid));
+                    vd($dstCat);
+                    $dstCat = $dstCat->current();
+                    if ($dstCat) {
+                        $dst->categoryId = $dstCat->getId();
+                    }
                 }
 
                 $dst->save();
