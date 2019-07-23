@@ -1,5 +1,11 @@
 #CHANGELOG#
 
+Ver 3.0.22 [2019-07-23]:
+-------------------------------
+  - Merge branch 'master' of ssh://github.com/tropotek/plg-skill
+  - fixed dimain and category IDs on copy subject
+
+
 Ver 3.0.20 [2019-07-18]:
 -------------------------------
 

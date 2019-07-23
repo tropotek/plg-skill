@@ -9,9 +9,9 @@
         "goals",
         "EMS"
     ],
-    "time": "2019-04-09",
+    "time": "2019-07-23",
     "license": "MIT",
-    "version": "master",
+    "version": "3.0.22",
     "access": "admin, subject",
     "authors":  [
          {
