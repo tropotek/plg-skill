@@ -121,7 +121,7 @@ class SubjectEditHandler implements Subscriber
 
                 $orgDomain = $src->getDomain();
                 if ($orgDomain) {
-                    $dstDomain = \Skill\Db\DomainMap::create()->findFiltered(array('collectionId' => $collection->getId(), 'uid' => $orgDomain->uid));
+                    $dstDomain = \Skill\Db\DomainMap::create()->findFiltered(array('collectionId' => $newC->getId(), 'uid' => $orgDomain->uid));
                     $dstDomain = $dstDomain->current();
                     if ($dstDomain) {
                         $dst->domainId = $dstDomain->getId();
@@ -130,7 +130,7 @@ class SubjectEditHandler implements Subscriber
 
                 $orgCat = $src->getCategory();
                 if ($orgCat) {
-                    $dstCat = \Skill\Db\CategoryMap::create()->findFiltered(array('collectionId' => $collection->getId(), 'uid' => $orgCat->uid));
+                    $dstCat = \Skill\Db\CategoryMap::create()->findFiltered(array('collectionId' => $newC->getId(), 'uid' => $orgCat->uid));
                     $dstCat = $dstCat->current();
                     if ($dstCat) {
                         $dst->categoryId = $dstCat->getId();
