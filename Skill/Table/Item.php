@@ -41,11 +41,6 @@ class Item extends \App\TableIface
             return $value;
         });
         $this->appendCell(new \Tk\Table\Cell\Text('question'))->addCss('key')->setUrl($this->getEditUrl());
-        $this->appendCell(new \Tk\Table\Cell\Text('categoryId'))->setOnPropertyValue(function ($cell, $obj, $value) {
-            /** @var \Skill\Db\Item $obj */
-            if ($obj->getCategory()) return $obj->getCategory()->name;
-            return $value;
-        });
         $domains = \Skill\Db\DomainMap::create()->findFiltered(array('collectionId' => $this->getCollectionObj()->getId()));
         if (count($domains)) {
             $this->appendCell(new \Tk\Table\Cell\Text('domainId'))->setOnPropertyValue(function ($cell, $obj, $value) {
@@ -54,6 +49,11 @@ class Item extends \App\TableIface
                 return 'None';
             });
         }
+        $this->appendCell(new \Tk\Table\Cell\Text('categoryId'))->setOnPropertyValue(function ($cell, $obj, $value) {
+            /** @var \Skill\Db\Item $obj */
+            if ($obj->getCategory()) return $obj->getCategory()->name;
+            return $value;
+        });
         $this->appendCell(new \Tk\Table\Cell\Boolean('publish'));
         $this->appendCell(new \Tk\Table\Cell\Date('modified'));
         $this->appendCell(new \Tk\Table\Cell\Text('uid'))->setLabel('UID');
