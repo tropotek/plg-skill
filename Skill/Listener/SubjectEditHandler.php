@@ -76,6 +76,7 @@ class SubjectEditHandler implements Subscriber
             $newC->subjectId = $model->getVolatileId();
             $newC->publish = false;
             $newC->active = true;
+            vd($newC);
             $newC->save();
 
             // Copy placement_type
