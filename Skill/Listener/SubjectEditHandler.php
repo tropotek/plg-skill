@@ -78,6 +78,7 @@ class SubjectEditHandler implements Subscriber
             $newC->active = true;
             vd($newC);
             $newC->save();
+            $newC = \Skill\Db\CollectionMap::create()->find($newC->getId());
 
             // Copy placement_type
             \Tk\Log::debug('Copying Skill Placement Types');
@@ -121,7 +122,6 @@ class SubjectEditHandler implements Subscriber
                 $orgDomain = $src->getDomain();
                 if ($orgDomain) {
                     $dstDomain = \Skill\Db\DomainMap::create()->findFiltered(array('collectionId' => $collection->getId(), 'uid' => $orgDomain->uid));
-                    vd($dstDomain);
                     $dstDomain = $dstDomain->current();
                     if ($dstDomain) {
                         $dst->domainId = $dstDomain->getId();
@@ -131,7 +131,6 @@ class SubjectEditHandler implements Subscriber
                 $orgCat = $src->getCategory();
                 if ($orgCat) {
                     $dstCat = \Skill\Db\CategoryMap::create()->findFiltered(array('collectionId' => $collection->getId(), 'uid' => $orgCat->uid));
-                    vd($dstCat);
                     $dstCat = $dstCat->current();
                     if ($dstCat) {
                         $dst->categoryId = $dstCat->getId();
