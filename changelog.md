@@ -1,5 +1,9 @@
 #CHANGELOG#
 
+Ver 3.0.26 [2019-08-02]:
+-------------------------------
+
+
 Ver 3.0.24 [2019-07-24]:
 -------------------------------
   - Merge branch 'master' of ssh://github.com/tropotek/plg-skill
