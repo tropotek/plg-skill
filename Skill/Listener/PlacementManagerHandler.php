@@ -73,6 +73,7 @@ class PlacementManagerHandler implements Subscriber
                     ->setOnShow(function ($cell, $obj, $btn) use ($collection) {
                         /* @var $obj \App\Db\Placement */
                         /* @var $btn \Tk\Table\Cell\ActionButton */
+                        $url = \App\Uri::createSubjectUrl('/entryEdit.html', $obj->getSubject())->set('collectionId', $collection->getId());
                         $btn->getUrl()->set('placementId', $obj->getId());
                         if (!$collection->isAvailable($obj)) {
                             $btn->setVisible(false);
