@@ -73,22 +73,26 @@ class PlacementManagerHandler implements Subscriber
                     ->setOnShow(function ($cell, $obj, $btn) use ($collection) {
                         /* @var $obj \App\Db\Placement */
                         /* @var $btn \Tk\Table\Cell\ActionButton */
-                        
-                        $btn->setUrl(\App\Uri::createSubjectUrl('/entryEdit.html', $obj->getSubject())->set('collectionId', $collection->getId()));
+
+                        $placementCollection = \Skill\Db\CollectionMap::create()->findFiltered(array('subjectId' => $obj->getSubjectId(),
+                            'active' => true, 'requirePlacement' => true, 'uid' => $collection->uid))->current();
+                        if (!$placementCollection) $placementCollection = $collection;
+
+                        $btn->setUrl(\App\Uri::createSubjectUrl('/entryEdit.html', $obj->getSubject())->set('collectionId', $placementCollection->getId()));
                         $btn->getUrl()->set('placementId', $obj->getId());
-                        if (!$collection->isAvailable($obj)) {
+                        if (!$placementCollection->isAvailable($obj)) {
                             $btn->setVisible(false);
                             return;
                         }
 
-                        $entry = \Skill\Db\EntryMap::create()->findFiltered(array('collectionId' => $collection->getId(),
+                        $entry = \Skill\Db\EntryMap::create()->findFiltered(array('collectionId' => $placementCollection->getId(),
                             'placementId' => $obj->getId()))->current();
                         if ($entry) {
                             $btn->addCss('btn-default');
-                            $btn->setTitle('Edit ' . $collection->name);
+                            $btn->setTitle('Edit ' . $placementCollection->name);
                         } else {
                             $btn->addCss('btn-success');
-                            $btn->setTitle('Create ' . $collection->name);
+                            $btn->setTitle('Create ' . $placementCollection->name);
                         }
                     });
             }
