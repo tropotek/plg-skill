@@ -9,7 +9,7 @@ namespace Skill\Table\Action;
  */
 class Graph extends \Tk\Table\Action\Link
 {
-    /** @var null|\Tk\Ui\DialogBox */
+    /** @var null|\Tk\Ui\Dialog\Dialog */
     protected $dialog = null;
 
 
@@ -24,7 +24,7 @@ class Graph extends \Tk\Table\Action\Link
         parent::__construct($name);
 
 
-        $this->dialog = \Tk\Ui\DialogBox::create('skill-avg-graph', 'Average Report Graph');
+        $this->dialog = \Tk\Ui\Dialog\Dialog::create('Average Report Graph');
         $this->dialog->setLarge(true);
 
         $this->setAttr('data-toggle', 'modal');

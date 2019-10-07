@@ -44,19 +44,27 @@ class CompanyAverage extends \Uni\TableIface
      */
     public function init()
     {
-        $cid = $this->collectionObject->getId();
-
-        //$this->resetSession();
-        //$this->setStaticOrderBy('');
-        //$this->appendCell(new \Tk\Table\Cell\Checkbox('id'));
+        $collection = $this->getCollectionObject();
 
         $this->appendCell(new \Tk\Table\Cell\Text('company_id'));
         $this->appendCell(new \Tk\Table\Cell\Text('name'))->addCss('key')->setUrl(\App\Uri::create('#'))
-            ->setOnCellHtml(function ($cell, $obj, $html) use ($cid) {
+            ->setOnCellHtml(function ($cell, $obj, $html) use ($collection) {
                 /** @var $cell \Tk\Table\Cell\Text */
                 /** @var $obj \stdClass */
+                //vd($obj);
                 $config = \App\Config::getInstance();
-                $list = \Skill\Db\ReportingMap::create()->findCompanyAverage(array('collectionId' => $cid, 'companyId' => $obj->company_id));
+                $subjectId = array();
+                if ($config->getSubjectId()) $subjectId = array($config->getSubjectId());
+                if ($cell->getTable()->getFilterForm()->getField('subjectId')->getValue())
+                    $subjectId = $cell->getTable()->getFilterForm()->getField('subjectId')->getValue();
+                $filter = array('collectionUid' => $collection->uid, 'companyId' => $obj->company_id, 'subjectId' => $subjectId);
+
+                if ($cell->getTable()->getFilterForm()->getField('date')->getValue()) {
+                    $filter = array_merge($filter, $cell->getTable()->getFilterForm()->getField('date')->getValue());
+                }
+                $list = \Skill\Db\ReportingMap::create()->findCompanyAverage($filter,
+                    \Tk\Db\Tool::create('b.date_start DESC', 0));
+
                 $tbl = '';
                 if ($list->count()) {
                     $ttable = $config->createTable('ptable-'.$obj->company_id);
@@ -67,14 +75,39 @@ class CompanyAverage extends \Uni\TableIface
                     //$ttable->getRenderer()->setAttr('style', 'display:none;');
 
                     $ttable->appendCell(\Tk\Table\Cell\Text::create('placement_id'))->addCss('key')
+                        ->setUrlProperty(null)
                         ->setOnPropertyValue(function ($cell, $obj, $value) {
                             /** @var $cell \Tk\Table\Cell\Text */
                             /** @var $obj \stdClass */
                             /** @var \App\Db\Placement $placement */
                             $placement = \App\Db\PlacementMap::create()->find($value);
-                            if ($placement)
+                            $cell->setAttr('data-slt-title', 'N/A');
+                            $cell->setUrl(\App\Uri::createSubjectUrl('/placementEdit.html', $placement->getSubject())->set('placementId', $placement->getId()), null);
+
+                            if ($placement) {
+                                if ($placement->getUser()) {
+                                    $cell->setAttr('data-slt-title', $placement->getUser()->getName() . ' - ' . $placement->getDateStart()->format(\Tk\Date::FORMAT_SHORT_DATE));
+                                }
                                 return $placement->getTitle(true);
+                            }
                             return $value;
+                        })->setOnCellHtml(function ($cell, $obj, $html) {
+                            /** @var $cell \Tk\Table\Cell\Text */
+                            /** @var $obj \stdClass */
+                            $value = $propValue = $cell->getPropertyValue($obj);
+                            if ($cell->getCharLimit() && strlen($propValue) > $cell->getCharLimit()) {
+                                $propValue = \Tk\Str::wordcat($propValue, $cell->getCharLimit()-3, '...');
+                            }
+                            if (!$cell->hasAttr('title')) {
+                                $cell->setAttr('title', htmlentities($propValue));
+                            }
+
+                            $str = htmlentities($propValue);
+                            $url = $cell->getCellUrl($obj);
+                            if ($url) {
+                                $str = sprintf('<a href="%s" title="Click to view placement" target="_blank">%s</a>', htmlentities($url->toString()), htmlentities($propValue));
+                            }
+                            return $str;
                         });
                     $ttable->appendCell(\Tk\Table\Cell\Text::create('supervisor_id'))
                         ->setOnPropertyValue(function ($cell, $obj, $value) {
@@ -85,7 +118,7 @@ class CompanyAverage extends \Uni\TableIface
                             if ($supervisor) {
                                 $value = $supervisor->name;
                                 if ($supervisor->academic) {
-                                    $value .= ' [aa]';
+                                    $value .= ' [AA]';
                                 }
                             }
                             return $value;
@@ -101,6 +134,12 @@ class CompanyAverage extends \Uni\TableIface
 
                 return $html . $tbl;
             });
+        $this->appendCell(new \Tk\Table\Cell\Text('graph'))->setOnCellHtml(function ($cell, $obj, $html) {
+            /** @var $cell \Tk\Table\Cell\Text */
+            /** @var $obj \stdClass */
+            $config = \App\Config::getInstance();
+            return sprintf('<span class="%s" data-company-id="%d"></span>', 'spark', $obj->company_id);
+        });
         $this->appendCell(new \Tk\Table\Cell\Text('min'));
         $this->appendCell(new \Tk\Table\Cell\Text('max'));
         $this->appendCell(new \Tk\Table\Cell\Text('pct'));
@@ -108,9 +147,12 @@ class CompanyAverage extends \Uni\TableIface
         $this->appendCell(new \Tk\Table\Cell\Text('entry_count'));
         $this->appendCell(\Tk\Table\Cell\Date::createDate('created', \Tk\Date::FORMAT_SHORT_DATE));
 
-
         // Filters
         $values = array();
+//        $values = array(
+//            'dateStart' => $this->getConfig()->getSubject()->dateStart->format(\Tk\Date::$formFormat),
+//            'dateEnd' => $this->getConfig()->getSubject()->dateEnd->format(\Tk\Date::$formFormat)
+//        );
 
         $list = \App\Db\CompanyMap::create()->findFiltered(array(
             'profileId' => $this->getConfig()->getProfileId(),
@@ -120,40 +162,95 @@ class CompanyAverage extends \Uni\TableIface
         ), \Tk\Db\Tool::create('name'));
         $this->appendFilter(new Field\CheckboxSelect('companyId', $list));
 
-        $this->appendFilter(new Field\Input('minEntries'))->setAttr('placeholder', 'Minimum Entries/Placements');
+        $list = \App\Db\SubjectMap::create()->findFiltered(array('profileId' => $this->getConfig()->getProfileId()), \Tk\Db\Tool::create('a.name DESC'));
+        $c = $this->appendFilter(new Field\CheckboxSelect('subjectId', \Tk\Form\Field\Option\ArrayObjectIterator::create($list)));
+        if ($this->getConfig()->getSubjectId()) {
+            $c->setValue(array($this->getConfig()->getSubjectId()));
+        }
 
+        $this->appendFilter(new Field\Input('minEntries'))->setAttr('placeholder', 'Minimum Entries/Placements');
+        $this->appendFilter(new Field\DateRange('date')); //->setValue($values);
 
         $this->getFilterForm()->load($values);
+
         // Actions
         $this->appendAction(\Tk\Table\Action\Csv::create());
-
 
         $js = <<<JS
 jQuery(function ($) {
   $('.mName').each(function () {
-    var trigger = $(this).find('> a');
+    //var trigger = $(this).find('> a');
+    var trigger = $(this);
     var table = $(this).find('> .tk-table');
     var upIcon = 'fa-caret-up';
     var dnIcon = 'fa-caret-down';
-    
-    trigger.append(' <i class="fa fa-caret-up"></i>');
+
+    trigger.append(' <i class="fa fa-caret-up pull-right" style="position: absolute; right: 10px; top: 5px;"></i>');
     table.hide();
-    
+
     trigger.on('click', function () {
       if (table.isVisible()) {
-         $(this).find('.fa').removeClass(dnIcon).addClass(upIcon);
-         //table.hide();
-         table.slideUp();
+        $(this).find('.fa').removeClass(dnIcon).addClass(upIcon);
+        //table.hide();
+        table.slideUp();
       } else {
-         $(this).find('.fa').removeClass(upIcon).addClass(dnIcon);
-         //table.show();
-         table.slideDown();
+        $(this).find('.fa').removeClass(upIcon).addClass(dnIcon);
+        //table.show();
+        table.slideDown();
       }
     });
   });
+
+  
+  $('td.mGraph .spark').each(function () {
+    var spark = $(this);
+    var table = spark.closest('tr').find('.mName table');
+    if (!table) {
+      return;
+    }
+    var data = [];
+    var names = [];
+    table.find('.mPct').each(function () {
+      data.push(Math.round($(this).text(), 2));
+      names.push($(this).parent('tr').find('.mPlacement_id').data('sltTitle'));
+    });
+    spark.sparkline(data, {
+      type: 'bar',
+      chartRangeMin: 0,
+      chartRangeMax: 100,
+      colorMap: {':50': 'red', '51:70': 'orange', '71:': 'blue'},
+      barWidth: 5,
+      tooltipFormat: $.spformat('{{offset:offset}} [{{value}}%]', 'tooltip-class'),
+      tooltipValueLookups: {
+        'offset': names
+    }
+    });
+
+  });
+
 });
 JS;
         $this->getRenderer()->getTemplate()->appendJs($js);
+
+        $css = <<<CSS
+.jqstooltip {
+  -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+}
+/*
+span.spark {
+  border: 1px solid #EFEFEF;
+}
+*/
+.mName {
+  position: relative;
+}
+.mName:hover {
+  cursor: pointer;
+}
+CSS;
+        $this->getRenderer()->getTemplate()->appendCss($css);
 
         return $this;
     }
@@ -166,7 +263,7 @@ JS;
      */
     public function findList($filter = array(), $tool = null)
     {
-        if (!$tool) $tool = $this->getTool('', 0);
+        if (!$tool) $tool = $this->getTool('');
         $filter = array_merge($this->getFilterValues(), $filter);
         $list = \Skill\Db\ReportingMap::create()->findCompanyTotalAverage($filter, $tool);
         return $list;
@@ -190,7 +287,6 @@ JS;
         return $this;
     }
 
-
     /**
      * @return \App\Config|\Uni\Config
      */
@@ -198,4 +294,5 @@ JS;
     {
         return parent::getConfig();
     }
+
 }

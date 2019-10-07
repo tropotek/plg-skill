@@ -456,15 +456,15 @@ SQL;
         $tool->setGroupBy('a.company_id');
 
         $select = <<<SQL
-a.company_id, b.name ,AVG(a.avg) as 'avg', ROUND((AVG(a.avg) / a.scale) * 100, 3) as 'pct',
+a.company_id, b.name, a.subject_id, AVG(a.avg) as 'avg', ROUND((AVG(a.avg) / a.scale) * 100, 3) as 'pct',
        COUNT(a.entry_id) as 'entry_count', MIN(a.pct) as 'min', MAX(a.pct) as 'max', b.created
 SQL;
         $filter->setSelect($select);
 
         $from = <<<SQL
 (
-       SELECT b.id as 'placement_id', a.collection_id, a1.uid as 'collection_uid', b.supervisor_id, b.company_id, a.id as 'entry_id', s.scale, 
-              ROUND(AVG(c.`value`), 3) as 'avg', ROUND((AVG(c.`value`) / s.scale) * 100, 3) as 'pct'
+       SELECT b.id as 'placement_id', a.collection_id, a1.uid as 'collection_uid',b.subject_id , b.supervisor_id, b.company_id, a.id as 'entry_id', s.scale, 
+              ROUND(AVG(c.`value`), 3) as 'avg', ROUND((AVG(c.`value`) / s.scale) * 100, 3) as 'pct', b.date_start, b.date_end
        FROM skill_entry a,
             skill_collection a1,
             placement b,
@@ -475,7 +475,6 @@ SQL;
               GROUP BY a.collection_id
             ) s
        WHERE !a.del AND !b.del AND a.collection_id = a1.id
---       AND a.collection_id = 27
              AND a.placement_id = b.id AND c.value > 0 AND a.id = c.entry_id
        GROUP BY a.id
      ) a,
@@ -497,6 +496,11 @@ SQL;
             $filter->appendWhere('a.collection_uid = %s AND ', (int)$filter['collectionUid']);
         }
 
+        if (!empty($filter['subjectId'])) {
+            $w = $this->makeMultiQuery($filter['subjectId'], 'a.subject_id', 'OR');
+            if ($w) $filter->appendWhere('(%s) AND ', $w);
+        }
+
         if (!empty($filter['companyId'])) {
             $w = $this->makeMultiQuery($filter['companyId'], 'b.id', 'OR');
             if ($w) $filter->appendWhere('(%s) AND ', $w);
@@ -504,6 +508,28 @@ SQL;
 
         if (!empty($filter['minEntries'])) {
             $tool->setHaving(sprintf('COUNT(a.entry_id) >= %s ', (int)$filter['minEntries']));
+        }
+
+        if (!empty($filter['dateStart']) && !empty($filter['dateEnd'])) {     // Contains
+            /** @var \DateTime $dateStart */
+            $dateStart = \Tk\Date::floor(\Tk\Date::createFormDate($filter['dateStart']));
+            /** @var \DateTime $dateEnd */
+            $dateEnd = \Tk\Date::floor(\Tk\Date::createFormDate($filter['dateEnd']));
+
+            $filter->appendWhere('((a.date_start >= %s AND ', $this->quote($dateStart->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
+            $filter->appendWhere('a.date_start <= %s) OR ', $this->quote($dateEnd->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
+
+            $filter->appendWhere('(a.date_end <= %s AND ', $this->quote($dateStart->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
+            $filter->appendWhere('a.date_end >= %s)) AND ', $this->quote($dateEnd->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
+
+        } else if (!empty($filter['dateStart'])) {
+            /** @var \DateTime $date */
+            $date = \Tk\Date::floor(\Tk\Date::createFormDate($filter['dateStart']));
+            $filter->appendWhere('a.date_start >= %s AND ', $this->quote($date->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
+        } else if (!empty($filter['dateEnd'])) {
+            /** @var \DateTime $date */
+            $date = \Tk\Date::floor(\Tk\Date::createFormDate($filter['dateEnd']));
+            $filter->appendWhere('a.date_end <= %s AND ', $this->quote($date->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
         }
 
         $res = $this->selectFromFilter($filter, $tool);
@@ -565,6 +591,33 @@ SQL;
         if (!empty($filter['companyId'])) {
             $w = $this->makeMultiQuery($filter['companyId'], 'b.company_id', 'OR');
             if ($w) $filter->appendWhere('(%s) AND ', $w);
+        }
+
+        if (!empty($filter['subjectId'])) {
+            $w = $this->makeMultiQuery($filter['subjectId'], 'b.subject_id', 'OR');
+            if ($w) $filter->appendWhere('(%s) AND ', $w);
+        }
+
+        if (!empty($filter['dateStart']) && !empty($filter['dateEnd'])) {     // Contains
+            /** @var \DateTime $dateStart */
+            $dateStart = \Tk\Date::floor(\Tk\Date::createFormDate($filter['dateStart']));
+            /** @var \DateTime $dateEnd */
+            $dateEnd = \Tk\Date::floor(\Tk\Date::createFormDate($filter['dateEnd']));
+
+            $filter->appendWhere('((b.date_start >= %s AND ', $this->quote($dateStart->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
+            $filter->appendWhere('b.date_start <= %s) OR ', $this->quote($dateEnd->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
+
+            $filter->appendWhere('(b.date_end <= %s AND ', $this->quote($dateStart->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
+            $filter->appendWhere('b.date_end >= %s)) AND ', $this->quote($dateEnd->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
+
+        } else if (!empty($filter['dateStart'])) {
+            /** @var \DateTime $date */
+            $date = \Tk\Date::floor(\Tk\Date::createFormDate($filter['dateStart']));
+            $filter->appendWhere('b.date_start >= %s AND ', $this->quote($date->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
+        } else if (!empty($filter['dateEnd'])) {
+            /** @var \DateTime $date */
+            $date = \Tk\Date::floor(\Tk\Date::createFormDate($filter['dateEnd']));
+            $filter->appendWhere('b.date_end <= %s AND ', $this->quote($date->format(\Tk\Date::FORMAT_ISO_DATETIME)) );
         }
 
         $res = $this->selectFromFilter($filter, $tool);

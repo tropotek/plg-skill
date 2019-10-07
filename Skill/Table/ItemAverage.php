@@ -71,6 +71,12 @@ class ItemAverage extends \Uni\TableIface
 
         $this->appendFilter(new Field\DateRange('date')); //->setValue($values);
 
+        $list = \App\Db\SubjectMap::create()->findFiltered(array('profileId' => $this->getConfig()->getProfileId()), \Tk\Db\Tool::create('a.name DESC'));
+        $c = $this->appendFilter(new Field\CheckboxSelect('subjectId', \Tk\Form\Field\Option\ArrayObjectIterator::create($list)));
+        if ($this->getConfig()->getSubjectId()) {
+            $c->setValue(array($this->getConfig()->getSubjectId()));
+        }
+
         $list = \App\Db\CompanyMap::create()->findFiltered(array(
             'profileId' => $this->getConfig()->getProfileId(),
             'placementSubjectId' => $this->getConfig()->getSubjectId(),
@@ -119,7 +125,6 @@ class ItemAverage extends \Uni\TableIface
     {
         if (!$tool) $tool = $this->getTool('cat.order_by, sd.order_by, si.order_by');
         $filter = array_merge($this->getFilterValues(), $filter);
-        //vd($filter);
         $list = \Skill\Db\ReportingMap::create()->findItemAverage($filter, $tool->setOrderBy('cat.order_by, sd.order_by, si.order_by'));
         return $list;
     }

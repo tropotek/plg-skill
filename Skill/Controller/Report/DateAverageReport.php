@@ -41,7 +41,8 @@ class DateAverageReport extends \App\Controller\AdminManagerIface
         $this->getTable()->setCollectionObject($this->collection);
         $this->getTable()->init();
         $filter = array(
-            'collectionId' => $this->collection->getId()
+            'collectionUid' => $this->collection->uid,
+            //'collectionId' => $this->collection->getId()
         );
         $this->getTable()->setList($this->getTable()->findList($filter));
 

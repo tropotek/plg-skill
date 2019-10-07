@@ -41,9 +41,11 @@ class CompanyAverageReport extends \App\Controller\AdminManagerIface
         $this->getTable()->setCollectionObject($this->collection);
         $this->getTable()->init();
         $filter = array(
-            'collectionId' => $this->collection->id,
+            'collectionUid' => $this->collection->uid,
+            //'collectionId' => $this->collection->id,
         );
         $this->getTable()->setList($this->getTable()->findList($filter));
+
     }
 
     /**

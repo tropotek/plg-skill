@@ -53,6 +53,12 @@ class DateAverage extends \Uni\TableIface
         $this->appendCell(new \Tk\Table\Cell\Text('date'));
 
 
+        $list = \App\Db\SubjectMap::create()->findFiltered(array('profileId' => $this->getConfig()->getProfileId()), \Tk\Db\Tool::create('a.name DESC'));
+        $c = $this->appendFilter(new Field\CheckboxSelect('subjectId', \Tk\Form\Field\Option\ArrayObjectIterator::create($list)));
+        if ($this->getConfig()->getSubjectId()) {
+            $c->setValue(array($this->getConfig()->getSubjectId()));
+        }
+
         $list = \Skill\Db\ItemMap::create()->findFiltered(array(    // TODO: we need to use the uid here
             'collectionId' => $this->getCollectionObject()->getId()
         ), \Tk\Db\Tool::create('uid'));

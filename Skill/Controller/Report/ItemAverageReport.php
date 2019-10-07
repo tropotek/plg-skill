@@ -38,21 +38,17 @@ class ItemAverageReport extends \App\Controller\AdminManagerIface
             $this->getBackUrl()->redirect();
         }
 
-
         $this->setTable(\Skill\Table\ItemAverage::create());
         $this->getTable()->setCollectionObject($this->collection);
         $this->getTable()->init();
         $filter = array(
-            'collectionId' => $this->collection->id,
+            'collectionUid' => $this->collection->uid,
+            //'collectionId' => $this->collection->id,
             //'subjectId' => $this->getConfig()->getSubjectId()
         );
         $this->getTable()->setList($this->getTable()->findList($filter, $this->getTable()->getTool('', 0)));
 
-
     }
-
-
-
 
     /**
      * @return \Dom\Template
@@ -64,12 +60,10 @@ class ItemAverageReport extends \App\Controller\AdminManagerIface
         $panelTitle = sprintf('%s Item Average Report', $this->collection->name);
         $template->setAttr('panel', 'data-panel-title', $panelTitle);
 
-
         $template->appendTemplate('panel', $this->table->show());
 
         //$template->setAttr('stats-graph', 'data-src', \Tk\Uri::create('/ajax/stats.html'));
         //$template->setAttr('stats-graph', 'data-collection-id', $this->collection->getId());
-
 
         $template->insertText('subject', $this->getConfig()->getSubject()->getName());
 
