@@ -2,6 +2,7 @@
 namespace Skill\Table;
 
 use Coa\Adapter\Company;
+use Tk\Alert;
 use Tk\Form\Field;
 
 /**
@@ -134,7 +135,9 @@ class CompanyAverage extends \Uni\TableIface
 
                 return $html . $tbl;
             });
-        $this->appendCell(new \Tk\Table\Cell\Text('graph'))->setOnCellHtml(function ($cell, $obj, $html) {
+        $this->appendCell(new \Tk\Table\Cell\Text('graph'))
+            ->setOrderProperty('avg')
+            ->setOnCellHtml(function ($cell, $obj, $html) {
             /** @var $cell \Tk\Table\Cell\Text */
             /** @var $obj \stdClass */
             $config = \App\Config::getInstance();
@@ -263,9 +266,20 @@ CSS;
      */
     public function findList($filter = array(), $tool = null)
     {
-        if (!$tool) $tool = $this->getTool('');
-        $filter = array_merge($this->getFilterValues(), $filter);
-        $list = \Skill\Db\ReportingMap::create()->findCompanyTotalAverage($filter, $tool);
+        $list = array();
+        try {
+            if (!$tool) $tool = $this->getTool('');
+            $filter = array_merge($this->getFilterValues(), $filter);
+            $list = \Skill\Db\ReportingMap::create()->findCompanyTotalAverage($filter, $tool);
+        } catch (\Tk\Db\Exception $e) {
+            if (strstr($e->getMessage(), 'Column not found')) {
+                \Tk\Log::error($e->__toString());
+                $this->resetSessionTool();
+                \Tk\Alert::addWarning('Table order reset due to error!');
+                \Tk\Uri::create()->redirect();
+            }
+            throw $e;
+        }
         return $list;
     }
 
