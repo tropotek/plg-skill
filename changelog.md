@@ -1,5 +1,10 @@
 #CHANGELOG#
 
+Ver 3.0.32 [2019-10-07]:
+-------------------------------
+  - Updated the Skills Company Average Report
+
+
 Ver 3.0.30 [2019-10-04]:
 -------------------------------
   - Fixed Skills links in the placement manager
