@@ -220,20 +220,22 @@ jQuery(function ($) {
     trigger.append(' <i class="fa fa-caret-up pull-right" style="position: absolute; right: 10px; top: 5px;"></i>');
     table.hide();
 
-    trigger.on('click', function () {
+    trigger.on('click', function (e) {
+      console.log(e);
+      if ($(e.target).is('a[target="_blank"], button')) return;
       if (table.isVisible()) {
-        $(this).find('.fa').removeClass(dnIcon).addClass(upIcon);
+        $(this).find('.fa.fa-caret-up').removeClass(dnIcon).addClass(upIcon);
         //table.hide();
         table.slideUp();
       } else {
-        $(this).find('.fa').removeClass(upIcon).addClass(dnIcon);
+        $(this).find('.fafa-caret-up').removeClass(upIcon).addClass(dnIcon);
         //table.show();
         table.slideDown();
       }
     });
   });
 
-  $('td.mGraph .spark').html('<i class="fa fa-spinner fa-spin"></i>');
+  //$('td.mGraph .spark').html('<i class="fa fa-spinner fa-spin"></i>');
   
   $('td.mGraph .spark').each(function () {
     var spark = $(this);
@@ -271,16 +273,14 @@ JS;
   -moz-box-sizing: content-box;
   box-sizing: content-box;
 }
-/*
-span.spark {
-  border: 1px solid #EFEFEF;
-}
-*/
 .mName {
   position: relative;
 }
 .mName:hover {
   cursor: pointer;
+}
+.mName .tk-table {
+  margin-top: 15px;
 }
 CSS;
         $this->getRenderer()->getTemplate()->appendCss($css);
