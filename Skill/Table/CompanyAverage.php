@@ -172,6 +172,7 @@ class CompanyAverage extends \Uni\TableIface
               /** @var $cell \Tk\Table\Cell\Text */
               /** @var $obj \stdClass */
               //vd($cell->getRow()->get('cellList'));
+              $cell->setAttr('title', '');
               return sprintf('<span class="%s" data-company-id="%d"></span>', 'spark', $obj->company_id);
             });
         $this->appendCell(new \Tk\Table\Cell\Text('min'));
