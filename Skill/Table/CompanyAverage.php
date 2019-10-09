@@ -97,6 +97,7 @@ class CompanyAverage extends \Uni\TableIface
                     $ttable->removeCss('table-striped table-hover');
                     //$ttable->getRenderer()->setAttr('style', 'display:none;');
 
+                    $ttable->appendCell(\Tk\Table\Cell\Text::create('company_id'));
                     $ttable->appendCell(\Tk\Table\Cell\Text::create('placement_id'))->addCss('key')
                         ->setUrlProperty(null)
                         ->setOnPropertyValue(function ($cell, $obj, $value) {
@@ -137,6 +138,7 @@ class CompanyAverage extends \Uni\TableIface
                             /** @var $cell \Tk\Table\Cell\Text */
                             /** @var $obj \stdClass */
                             /** @var \App\Db\Supervisor $supervisor */
+                            if (!$value) $value = 'N/A';
                             $supervisor = \App\Db\SupervisorMap::create()->find($value);
                             if ($supervisor) {
                                 $value = $supervisor->name;
@@ -203,10 +205,15 @@ class CompanyAverage extends \Uni\TableIface
         $this->appendFilter(new Field\Input('minEntries'))->setAttr('placeholder', 'Minimum Entries/Placements');
         $this->appendFilter(new Field\DateRange('date')); //->setValue($values);
 
-        $this->getFilterForm()->load($values);
-
         // Actions
         $this->appendAction(\Tk\Table\Action\Csv::create());
+
+
+        //$this->appendAction(\Tk\Table\Action\ColumnSelect::create()->addUnselected(array('company_id')));
+
+
+        $this->getFilterForm()->load($values);
+
 
         $js = <<<JS
 jQuery(function ($) {
@@ -253,7 +260,7 @@ jQuery(function ($) {
       type: 'bar',
       chartRangeMin: 0,
       chartRangeMax: 100,
-      colorMap: {':50': 'red', '51:70': 'orange', '71:': 'blue'},
+      colorMap: {':49': 'red', '50:69': 'orange', '70:': 'blue'},
       barWidth: 5,
       tooltipFormat: $.spformat('{{offset:offset}} [{{value}}%]', 'tooltip-class'),
       tooltipValueLookups: {
