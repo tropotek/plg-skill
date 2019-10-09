@@ -36,6 +36,7 @@ class CompanyAverage extends \Uni\TableIface
      */
     public function __construct($tableId = '')
     {
+        set_time_limit(0);
         parent::__construct($tableId);
     }
 
@@ -49,10 +50,9 @@ class CompanyAverage extends \Uni\TableIface
 
         $this->appendCell(new \Tk\Table\Cell\Text('company_id'));
         $this->appendCell(new \Tk\Table\Cell\Text('name'))->addCss('key')->setUrl(\App\Uri::create('#'))
-            ->setOnCellHtml(function ($cell, $obj, $html) use ($collection) {
+            ->setOnPropertyValue(function ($cell, $obj, $value) use ($collection) {
                 /** @var $cell \Tk\Table\Cell\Text */
                 /** @var $obj \stdClass */
-                //vd($obj);
                 $config = \App\Config::getInstance();
                 $subjectId = array();
                 if ($config->getSubjectId()) $subjectId = array($config->getSubjectId());
@@ -65,7 +65,29 @@ class CompanyAverage extends \Uni\TableIface
                 }
                 $list = \Skill\Db\ReportingMap::create()->findCompanyAverage($filter,
                     \Tk\Db\Tool::create('b.date_start DESC', 0));
+                $cell->getRow()->set('cellList', $list);
 
+                return $value;
+            })
+            ->setOnCellHtml(function ($cell, $obj, $html) use ($collection) {
+                /** @var $cell \Tk\Table\Cell\Text */
+                /** @var $obj \stdClass */
+                $config = \App\Config::getInstance();
+
+//                $subjectId = array();
+//                if ($config->getSubjectId()) $subjectId = array($config->getSubjectId());
+//                if ($cell->getTable()->getFilterForm()->getField('subjectId')->getValue())
+//                    $subjectId = $cell->getTable()->getFilterForm()->getField('subjectId')->getValue();
+//                $filter = array('collectionUid' => $collection->uid, 'companyId' => $obj->company_id, 'subjectId' => $subjectId);
+//
+//                if ($cell->getTable()->getFilterForm()->getField('date')->getValue()) {
+//                    $filter = array_merge($filter, $cell->getTable()->getFilterForm()->getField('date')->getValue());
+//                }
+//                $list = \Skill\Db\ReportingMap::create()->findCompanyAverage($filter,
+//                    \Tk\Db\Tool::create('b.date_start DESC', 0));
+//                $cell->getRow()->set('cellList', $list);
+
+                $list = $cell->getRow()->get('cellList');
                 $tbl = '';
                 if ($list->count()) {
                     $ttable = $config->createTable('ptable-'.$obj->company_id);
@@ -126,6 +148,8 @@ class CompanyAverage extends \Uni\TableIface
                         });
                     $ttable->appendCell(\Tk\Table\Cell\Text::create('avg'));
                     $ttable->appendCell(\Tk\Table\Cell\Text::create('pct'));
+
+                    $ttable->appendAction(\Tk\Table\Action\Csv::create());
                     //$ttable->appendCell(\Tk\Table\Cell\Date::createDate('date_start', \Tk\Date::FORMAT_SHORT_DATE));
                     $ttable->setList($list);
                     $ttable->getRenderer()->getTemplate()->setAttr('tk-table', 'style', 'display: none;');
@@ -137,12 +161,17 @@ class CompanyAverage extends \Uni\TableIface
             });
         $this->appendCell(new \Tk\Table\Cell\Text('graph'))
             ->setOrderProperty('avg')
+            ->setOnPropertyValue(function ($cell, $obj, $value) {
+                $list = $cell->getRow()->get('cellList');
+                $value = implode('; ', $list->toArray('pct'));
+                return $value;
+            })
             ->setOnCellHtml(function ($cell, $obj, $html) {
-            /** @var $cell \Tk\Table\Cell\Text */
-            /** @var $obj \stdClass */
-            $config = \App\Config::getInstance();
-            return sprintf('<span class="%s" data-company-id="%d"></span>', 'spark', $obj->company_id);
-        });
+              /** @var $cell \Tk\Table\Cell\Text */
+              /** @var $obj \stdClass */
+              //vd($cell->getRow()->get('cellList'));
+              return sprintf('<span class="%s" data-company-id="%d"></span>', 'spark', $obj->company_id);
+            });
         $this->appendCell(new \Tk\Table\Cell\Text('min'));
         $this->appendCell(new \Tk\Table\Cell\Text('max'));
         $this->appendCell(new \Tk\Table\Cell\Text('pct'));
@@ -204,6 +233,7 @@ jQuery(function ($) {
     });
   });
 
+  $('td.mGraph .spark').html('<i class="fa fa-spinner fa-spin"></i>');
   
   $('td.mGraph .spark').each(function () {
     var spark = $(this);
@@ -217,7 +247,7 @@ jQuery(function ($) {
       data.push(Math.round($(this).text(), 2));
       names.push($(this).parent('tr').find('.mPlacement_id').data('sltTitle'));
     });
-    spark.sparkline(data, {
+    spark.empty().sparkline(data, {
       type: 'bar',
       chartRangeMin: 0,
       chartRangeMax: 100,
