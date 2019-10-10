@@ -74,19 +74,6 @@ class CompanyAverage extends \Uni\TableIface
                 /** @var $obj \stdClass */
                 $config = \App\Config::getInstance();
 
-//                $subjectId = array();
-//                if ($config->getSubjectId()) $subjectId = array($config->getSubjectId());
-//                if ($cell->getTable()->getFilterForm()->getField('subjectId')->getValue())
-//                    $subjectId = $cell->getTable()->getFilterForm()->getField('subjectId')->getValue();
-//                $filter = array('collectionUid' => $collection->uid, 'companyId' => $obj->company_id, 'subjectId' => $subjectId);
-//
-//                if ($cell->getTable()->getFilterForm()->getField('date')->getValue()) {
-//                    $filter = array_merge($filter, $cell->getTable()->getFilterForm()->getField('date')->getValue());
-//                }
-//                $list = \Skill\Db\ReportingMap::create()->findCompanyAverage($filter,
-//                    \Tk\Db\Tool::create('b.date_start DESC', 0));
-//                $cell->getRow()->set('cellList', $list);
-
                 $list = $cell->getRow()->get('cellList');
                 $tbl = '';
                 if ($list->count()) {
