@@ -13,6 +13,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
 class PlacementManagerHandler implements Subscriber
 {
 
+
     /**
      * @var \App\Db\Subject|\Uni\Db\SubjectIface
      */
