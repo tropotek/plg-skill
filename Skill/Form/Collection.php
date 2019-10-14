@@ -89,7 +89,7 @@ class Collection extends \App\FormIface
         $list = \Tk\Form\Field\Select::arrayToSelectList(\Tk\ObjectUtil::getClassConstants('\App\Db\Placement', 'STATUS'));
         $this->appendField(new Field\Select('available[]', $list))->setTabGroup($tab)
             ->addCss('tk-dual-select')->setAttr('data-title', 'Placement Status')
-            ->setNotes('Enable this collection on the following placement status');
+            ->setNotes('Enable editing for entries on the following placement status');
         
 
         if ($this->getCollectionObj()->getId())

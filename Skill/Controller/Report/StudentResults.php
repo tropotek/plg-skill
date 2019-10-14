@@ -86,7 +86,6 @@ class StudentResults extends AdminIface
         //$studentGrade = $results->gradeList[$this->user->getId()];
         $studentGrade = $calc->getStudentGrade($this->user, $filter);
 
-
         $template->insertText('avg', sprintf('%.2f / %d', $studentGrade->getAverage(), $this->collection->getScaleCount()));
         $template->insertText('grade', sprintf('%.2f / %d', $studentGrade->getWeightedGrade(), $this->collection->maxGrade));
         $template->insertText('gradePcnt', sprintf('%.2f%%', $studentGrade->getWeightedPercent()));
@@ -112,11 +111,13 @@ class StudentResults extends AdminIface
             $row->insertText('name', $domain->name . ' (' . $domain->label . ')');
             $row->insertText('weight', round($domain->weight * 100) . '%');
             if ($domainAvg && property_exists($domainAvg, 'avg')) {
-                $row->insertText('avg', sprintf('%.2f', round($domainAvg->avg, 2)));
-                $row->insertText('grade', sprintf('%.2f', round($domainAvg->weightedAvg * $studentGrade->getGradeMultiplier(), 2)));
+                $avgPct = ($domainAvg->avg/$domainAvg->scaleCount)*100;
+                $row->insertText('avg', sprintf('%.2f', round($avgPct, 2)));        // To percentile
+                //$row->insertText('avg', sprintf('%.2f', round($domainAvg->avg, 2)));
+                //$row->insertText('grade', sprintf('%.2f', round($domainAvg->weightedAvg * $studentGrade->getGradeMultiplier(), 2)));
             } else {
                 $row->insertText('avg', sprintf('%.2f', 0));
-                $row->insertText('grade', sprintf('%.2f', 0));
+                //$row->insertText('grade', sprintf('%.2f', 0));
             }
             $row->appendRepeat();
         }
@@ -229,7 +230,7 @@ class StudentResults extends AdminIface
             <!--<td class="kv-value" var="entryCount">0</td>-->
           <!--</tr>-->
           <tr>
-            <td class="kv-key"><i class="fa fa-calculator kv-icon kv-icon-danger"></i> Calculated Grade</td>
+            <td class="kv-key"><i class="fa fa-calculator kv-icon kv-icon-danger"></i> Calculated Grade (Weighted)</td>
             <td class="kv-value" var="gradePcnt">0.00%</td>
           </tr>
           
@@ -246,11 +247,11 @@ class StudentResults extends AdminIface
             <td class="kv-value" var="class-min">0.00%</td>
           </tr>
           
-          <tr choice="debug">
+          <tr choice="debug1">
             <td class="kv-key"><i class="fa fa-exchange kv-icon kv-icon-tertiary"></i> Average Response</td>
             <td class="kv-value" var="avg">0</td>
           </tr>
-          <tr choice="debug">
+          <tr choice="debug1">
             <td class="kv-key"><i class="fa fa-graduation-cap kv-icon kv-icon-primary"></i> Calculated Grade</td>
             <td class="kv-value" var="grade">0.0</td>
           </tr>
@@ -262,14 +263,14 @@ class StudentResults extends AdminIface
           <tr>
             <th>Domain</th>
             <th>Weight</th>
-            <th title="Standard Avg. (unweighted)">Avg.</th>
-            <th title="Weighted Grade">Grade</th>
+            <th title="Standard Avg. (unweighted)">Avg %</th>
+<!--            <th title="Weighted Grade">Grade</th>-->
           </tr>
           <tr repeat="domain-row" var="domain-row">
             <td var="name"></td>
             <td var="weight"></td>
             <td var="avg"></td>
-            <td var="grade"></td>
+<!--            <td var="grade"></td>-->
           </tr>
         </table>
       </div>

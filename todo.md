@@ -1,12 +1,11 @@
 #TODO
 
 
-  - We need to research a better way to manage all the entry values and report on them
-    Currently it is slow and bulky... ;-?
+  - Deprecated, All GOALS will be deprecated soon and all grads will only be informatave and not used
+    for actual assessment. So the grades and weights and all that can be reduced in priority.
+  - Look ad migrating these to plg-cat in the future as that plugin will be more directed at the new
+    uni requirements.
        
-    
-    
-    
     
     
     
