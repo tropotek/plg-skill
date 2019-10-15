@@ -1,5 +1,10 @@
 #CHANGELOG#
 
+Ver 3.0.38 [2019-10-15]:
+-------------------------------
+  - Updated GOALS grade display to be less confusing
+
+
 Ver 3.0.36 [2019-10-09]:
 -------------------------------
 
