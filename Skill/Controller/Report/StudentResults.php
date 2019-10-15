@@ -112,7 +112,7 @@ class StudentResults extends AdminIface
             $row->insertText('weight', round($domain->weight * 100) . '%');
             if ($domainAvg && property_exists($domainAvg, 'avg')) {
                 $avgPct = ($domainAvg->avg/$domainAvg->scaleCount)*100;
-                $row->insertText('avg', sprintf('%.2f', round($avgPct, 2)));        // To percentile
+                $row->insertText('avg', sprintf('%.2f%%', round($avgPct, 2)));        // To percentile
                 //$row->insertText('avg', sprintf('%.2f', round($domainAvg->avg, 2)));
                 //$row->insertText('grade', sprintf('%.2f', round($domainAvg->weightedAvg * $studentGrade->getGradeMultiplier(), 2)));
             } else {
