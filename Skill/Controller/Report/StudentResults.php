@@ -83,7 +83,6 @@ class StudentResults extends AdminIface
 
 
         /** @var \Skill\Util\Grade $studentGrade */
-        //$studentGrade = $results->gradeList[$this->user->getId()];
         $studentGrade = $calc->getStudentGrade($this->user, $filter);
 
         $template->insertText('avg', sprintf('%.2f / %d', $studentGrade->getAverage(), $this->collection->getScaleCount()));
@@ -101,23 +100,17 @@ class StudentResults extends AdminIface
         $entryList = \Skill\Db\EntryMap::create()->findFiltered($filter, \Tk\Db\Tool::create('created DESC'));
         $template->insertText('entryCount', $entryList->count());
 
-
-        //$domainList = \Skill\Db\DomainMap::create()->findFiltered(array('collectionId' => $this->collection->getId(), 'active' => true), \Tk\Db\Tool::create());
         $domainList = \Skill\Db\DomainMap::create()->findFiltered(array('collectionId' => $this->collection->getId(), 'active' => true), \Tk\Db\Tool::create());
         foreach ($domainList as $domain) {
             $domainAvg = (object)$studentGrade->getDomainAvg($domain->getId());
-
             $row = $template->getRepeat('domain-row');
             $row->insertText('name', $domain->name . ' (' . $domain->label . ')');
             $row->insertText('weight', round($domain->weight * 100) . '%');
             if ($domainAvg && property_exists($domainAvg, 'avg')) {
                 $avgPct = ($domainAvg->avg/$domainAvg->scaleCount)*100;
-                $row->insertText('avg', sprintf('%.2f%%', round($avgPct, 2)));        // To percentile
-                //$row->insertText('avg', sprintf('%.2f', round($domainAvg->avg, 2)));
-                //$row->insertText('grade', sprintf('%.2f', round($domainAvg->weightedAvg * $studentGrade->getGradeMultiplier(), 2)));
+                $row->insertText('avg', sprintf('%.2f%%', round($avgPct, 2)));
             } else {
                 $row->insertText('avg', sprintf('%.2f', 0));
-                //$row->insertText('grade', sprintf('%.2f', 0));
             }
             $row->appendRepeat();
         }
@@ -152,9 +145,6 @@ class StudentResults extends AdminIface
                 $row->appendRepeat();
                 $i++;
             }
-            // Not sure we need this
-            //$catRow->insertText('category-avg', sprintf('%.2f', round(\Tk\Math::average($itemAvg), 2)));
-            //$catRow->setChoice('category-avg');
 
             $catRow->appendRepeat();
         }
@@ -225,10 +215,6 @@ class StudentResults extends AdminIface
       <div class="col-lg-6">
         <table class="table keyvalue-table">
           <tbody>
-          <!--<tr>-->
-            <!--<td class="kv-key"><i class="fa fa-hashtag kv-icon kv-icon-default"></i> Placements Assessed</td>-->
-            <!--<td class="kv-value" var="entryCount">0</td>-->
-          <!--</tr>-->
           <tr>
             <td class="kv-key"><i class="fa fa-calculator kv-icon kv-icon-danger"></i> Calculated Grade (Weighted)</td>
             <td class="kv-value" var="gradePcnt">0.00%</td>
@@ -264,13 +250,11 @@ class StudentResults extends AdminIface
             <th>Domain</th>
             <th>Weight</th>
             <th title="Standard Avg. (unweighted)">Avg %</th>
-<!--            <th title="Weighted Grade">Grade</th>-->
           </tr>
           <tr repeat="domain-row" var="domain-row">
             <td var="name"></td>
             <td var="weight"></td>
             <td var="avg"></td>
-<!--            <td var="grade"></td>-->
           </tr>
         </table>
       </div>
