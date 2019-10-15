@@ -1,5 +1,10 @@
 #CHANGELOG#
 
+Ver 3.0.40 [2019-10-15]:
+-------------------------------
+  - Fixed dialog in placement import
+
+
 Ver 3.0.38 [2019-10-15]:
 -------------------------------
   - Updated GOALS grade display to be less confusing
