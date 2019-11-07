@@ -61,7 +61,7 @@ class Entry extends \App\FormIface
 
         if (!$this->getEntry()->isSelfAssessment()) {
             $this->appendField(new Field\Input('assessor'))->setFieldset('Entry Details')->setRequired();
-            $this->appendField(new Field\Input('absent'))->setFieldset('Entry Details');
+            $this->appendField(new Field\Input('absent'))->setFieldset('Entry Details')->setNotes('Enter the number of days absent if any.');
         }
 
         $this->appendField(new Field\Textarea('notes'))->addCss('')->setLabel('Comments')->setFieldset('Entry Details');
