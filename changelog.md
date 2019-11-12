@@ -1,5 +1,10 @@
 #CHANGELOG#
 
+Ver 3.0.42 [2019-11-12]:
+-------------------------------
+  - Added more to the new CA plugin
+
+
 Ver 3.0.40 [2019-10-15]:
 -------------------------------
   - Fixed dialog in placement import
