@@ -63,18 +63,17 @@ class PlacementManagerHandler implements Subscriber
             $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('subjectId' => $this->subject->getId(),
                 'active' => true, 'requirePlacement' => true));
 
-            /** @var \Tk\Table\Cell\Actions $actionsCell */
+            /** @var \Tk\Table\Cell\ButtonCollection $actionsCell */
             $actionsCell = $event->getTable()->findCell('actions');
 
             /** @var \Skill\Db\Collection $collection */
             foreach ($collectionList as $collection) {
                 $url = \App\Uri::createSubjectUrl('/entryEdit.html')->set('collectionId', $collection->getId());
 
-                $actionsCell->addButton(\Tk\Table\Cell\ActionButton::create($collection->name, $url, $collection->icon))
-                    ->setOnShow(function ($cell, $obj, $btn) use ($collection) {
+                $actionsCell->append(\Tk\Table\Ui\ActionButton::createBtn($collection->name, $url, $collection->icon))
+                    ->setGroup('skills')->setOnShow(function ($cell, $obj, $btn) use ($collection) {
                         /* @var $obj \App\Db\Placement */
                         /* @var $btn \Tk\Table\Cell\ActionButton */
-
                         $placementCollection = \Skill\Db\CollectionMap::create()->findFiltered(array('subjectId' => $obj->getSubjectId(),
                             'active' => true, 'requirePlacement' => true, 'uid' => $collection->uid))->current();
                         if (!$placementCollection) $placementCollection = $collection;
@@ -90,13 +89,47 @@ class PlacementManagerHandler implements Subscriber
                             'placementId' => $obj->getId()))->current();
                         if ($entry) {
                             $btn->addCss('btn-default');
-                            $btn->setTitle('Edit ' . $placementCollection->name);
+                            $btn->setText('Edit ' . $placementCollection->name);
+                            //$btn->setTitle('Edit ' . $placementCollection->name);
                         } else {
                             $btn->addCss('btn-success');
-                            $btn->setTitle('Create ' . $placementCollection->name);
+                            $btn->setText('Create ' . $placementCollection->name);
+                            //$btn->setTitle('Create ' . $placementCollection->name);
                         }
                     });
             }
+
+//            /** @var \Skill\Db\Collection $collection */
+//            foreach ($collectionList as $collection) {
+//                $url = \App\Uri::createSubjectUrl('/entryEdit.html')->set('collectionId', $collection->getId());
+//
+//                $actionsCell->addButton(\Tk\Table\Cell\ActionButton::create($collection->name, $url, $collection->icon))
+//                    ->setOnShow(function ($cell, $obj, $btn) use ($collection) {
+//                        /* @var $obj \App\Db\Placement */
+//                        /* @var $btn \Tk\Table\Cell\ActionButton */
+//
+//                        $placementCollection = \Skill\Db\CollectionMap::create()->findFiltered(array('subjectId' => $obj->getSubjectId(),
+//                            'active' => true, 'requirePlacement' => true, 'uid' => $collection->uid))->current();
+//                        if (!$placementCollection) $placementCollection = $collection;
+//
+//                        $btn->setUrl(\App\Uri::createSubjectUrl('/entryEdit.html', $obj->getSubject())->set('collectionId', $placementCollection->getId()));
+//                        $btn->getUrl()->set('placementId', $obj->getId());
+//                        if (!$placementCollection->isAvailable($obj)) {
+//                            $btn->setVisible(false);
+//                            return;
+//                        }
+//
+//                        $entry = \Skill\Db\EntryMap::create()->findFiltered(array('collectionId' => $placementCollection->getId(),
+//                            'placementId' => $obj->getId()))->current();
+//                        if ($entry) {
+//                            $btn->addCss('btn-default');
+//                            $btn->setTitle('Edit ' . $placementCollection->name);
+//                        } else {
+//                            $btn->addCss('btn-success');
+//                            $btn->setTitle('Create ' . $placementCollection->name);
+//                        }
+//                    });
+//            }
         }
     }
 
