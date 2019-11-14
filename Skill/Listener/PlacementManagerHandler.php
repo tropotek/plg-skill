@@ -98,38 +98,6 @@ class PlacementManagerHandler implements Subscriber
                         }
                     });
             }
-
-//            /** @var \Skill\Db\Collection $collection */
-//            foreach ($collectionList as $collection) {
-//                $url = \App\Uri::createSubjectUrl('/entryEdit.html')->set('collectionId', $collection->getId());
-//
-//                $actionsCell->addButton(\Tk\Table\Cell\ActionButton::create($collection->name, $url, $collection->icon))
-//                    ->setOnShow(function ($cell, $obj, $btn) use ($collection) {
-//                        /* @var $obj \App\Db\Placement */
-//                        /* @var $btn \Tk\Table\Cell\ActionButton */
-//
-//                        $placementCollection = \Skill\Db\CollectionMap::create()->findFiltered(array('subjectId' => $obj->getSubjectId(),
-//                            'active' => true, 'requirePlacement' => true, 'uid' => $collection->uid))->current();
-//                        if (!$placementCollection) $placementCollection = $collection;
-//
-//                        $btn->setUrl(\App\Uri::createSubjectUrl('/entryEdit.html', $obj->getSubject())->set('collectionId', $placementCollection->getId()));
-//                        $btn->getUrl()->set('placementId', $obj->getId());
-//                        if (!$placementCollection->isAvailable($obj)) {
-//                            $btn->setVisible(false);
-//                            return;
-//                        }
-//
-//                        $entry = \Skill\Db\EntryMap::create()->findFiltered(array('collectionId' => $placementCollection->getId(),
-//                            'placementId' => $obj->getId()))->current();
-//                        if ($entry) {
-//                            $btn->addCss('btn-default');
-//                            $btn->setTitle('Edit ' . $placementCollection->name);
-//                        } else {
-//                            $btn->addCss('btn-success');
-//                            $btn->setTitle('Create ' . $placementCollection->name);
-//                        }
-//                    });
-//            }
         }
     }
 
@@ -176,7 +144,7 @@ class PlacementManagerHandler implements Subscriber
                                 htmlentities($url->toString()), $collection->name, $collection->icon);
                         }
                     }
-                    return $html;
+                    return '<div class="btn-toolbar" role="toolbar">'.$html.'</div>';
                 });
         }
     }
