@@ -79,6 +79,7 @@ class PlacementEditHandler implements Subscriber
                     $form->appendField(new \App\Form\Field\InputLink('collection-' . $collection->getId()))
                         ->setTabGroup('Details')->setReadonly()->setLabel($collection->name)
                         ->setFieldset('Company Skill Urls')->setValue($url->toString())
+                        ->setCopyEnabled()
                         ->setNotes('Copy this URL to send to the ' .
                             \App\Db\Phrase::findValue('company', $placement->getSubject()->getProfileId()) .
                             ' to access this ' . \App\Db\Phrase::findValue('placement', $placement->getSubject()->getProfileId(), true) .
