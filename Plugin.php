@@ -59,9 +59,9 @@ class Plugin extends \App\Plugin\Iface
 
         $stm = $db->prepare("INSERT INTO mail_template_type (event, name, description)
 VALUES
-  ('status.entry.pending', 'Skill Entry - Pending', ''),
-  ('status.entry.approved', 'Skill Entry - Approved', ''),
-  ('status.entry.not approved', 'Skill Entry - Not Approved', '')
+  ('status.skill.entry.pending', 'Skill Entry - Pending', ''),
+  ('status.skill.entry.approved', 'Skill Entry - Approved', ''),
+  ('status.skill.entry.not approved', 'Skill Entry - Not Approved', '')
 ");
         $stm->execute();
 
@@ -79,7 +79,7 @@ VALUES
         $db = $this->getConfig()->getDb();
 
         // Remove status types
-        $stm = $db->prepare("DELETE FROM mail_template_type WHERE event LIKE 'status.entry.%' ");
+        $stm = $db->prepare("DELETE FROM mail_template_type WHERE event LIKE 'status.skill.entry.%' ");
         $stm->execute();
 
 
