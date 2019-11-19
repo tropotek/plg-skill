@@ -2,7 +2,6 @@
 namespace Skill\Listener;
 
 use Tk\Event\Subscriber;
-use Rate\Plugin;
 
 /**
  * @author Michael Mifsud <info@tropotek.com>
