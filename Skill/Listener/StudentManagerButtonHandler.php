@@ -36,7 +36,11 @@ class StudentManagerButtonHandler implements Subscriber
         $controller = $event->get('controller');
         if ($controller instanceof \App\Controller\User\StudentManager) {
 
-            $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('subjectId' => $this->subject->getId(), 'active' => true, 'requirePlacement' => false));
+            $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array(
+                'subjectId' => $this->subject->getId(),
+                'active' => true,
+                'requirePlacement' => false)
+            );
             $actionsCell = $controller->getActionsCell();
 
             /** @var \Skill\Db\Collection $collection */
