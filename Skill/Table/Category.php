@@ -28,13 +28,13 @@ class Category extends \App\TableIface
     public function init()
     {
 
+        $this->appendCell(new \Tk\Table\Cell\OrderBy('orderBy'))->setIconOnly();
         $this->appendCell(new \Tk\Table\Cell\Checkbox('id'));
         $this->appendCell(new \Tk\Table\Cell\Text('uid'))->setLabel('UID');
         $this->appendCell(new \Tk\Table\Cell\Text('name'))->addCss('key')->setUrl($this->getEditUrl());
         $this->appendCell(new \Tk\Table\Cell\Text('label'));
         $this->appendCell(new \Tk\Table\Cell\Boolean('publish'));
         $this->appendCell(new \Tk\Table\Cell\Date('modified'));
-        $this->appendCell(new \Tk\Table\Cell\OrderBy('orderBy'));
 
         // Filters
         $this->appendFilter(new \Tk\Form\Field\Input('keywords'))->setAttr('placeholder', 'Keywords');

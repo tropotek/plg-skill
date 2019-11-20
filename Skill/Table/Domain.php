@@ -28,6 +28,7 @@ class Domain extends \App\TableIface
     public function init()
     {
 
+        $this->appendCell(new \Tk\Table\Cell\OrderBy('orderBy'))->setIconOnly();
         $this->appendCell(new \Tk\Table\Cell\Checkbox('id'));
         $this->appendCell(new \Tk\Table\Cell\Text('uid'))->setLabel('UID');
         $this->appendCell(new \Tk\Table\Cell\Text('name'))->addCss('key')->setUrl($this->getEditUrl());
@@ -35,7 +36,6 @@ class Domain extends \App\TableIface
         $this->appendCell(new \Tk\Table\Cell\Text('weight'));
         $this->appendCell(new \Tk\Table\Cell\Boolean('active'));
         $this->appendCell(new \Tk\Table\Cell\Date('modified'));
-        $this->appendCell(new \Tk\Table\Cell\OrderBy('orderBy'));
 
         // Filters
         $this->appendFilter(new \Tk\Form\Field\Input('keywords'))->setAttr('placeholder', 'Keywords');

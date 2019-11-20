@@ -33,6 +33,8 @@ class Item extends \App\TableIface
     public function init()
     {
 
+        // TODO: this needs to be a nested sub level order system ???????
+        //$this->appendCell(new \Tk\Table\Cell\OrderBy('orderBy'))->setIconOnly();
         $this->appendCell(new \Tk\Table\Cell\Checkbox('id'));
         $this->appendCell(new \Tk\Table\Cell\Text('num'))->setLabel('#')->setOnPropertyValue(function ($cell, $obj, $value) {
             /** @var \Tk\Table\Cell\Text $cell */
@@ -71,8 +73,6 @@ GROUP BY a.id', $obj->getId());
             return $value;
         });
 
-        // TODO: this needs to be a nested sub level order system ???????
-        //$this->appendCell(new \Tk\Table\Cell\OrderBy('orderBy'));
         $this->setStaticOrderBy('cat.order_by, order_by');
 
         // Filters
