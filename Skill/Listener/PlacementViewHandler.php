@@ -43,8 +43,9 @@ class PlacementViewHandler implements Subscriber
 
                 if ($entry) {
                     $url = \Uni\Uri::createSubjectUrl('/entryView.html')->set('entryId', $entry->getId());
-                    $btn = \Tk\Ui\Button::create($collection->name, $url, $collection->icon);
-                    $btn->setAttr('title', 'View ' . $collection->name);
+                    $btn = \Tk\Ui\Link::createBtn($collection->name, $url, $collection->icon);
+                    $btn->setAttr('title', 'View ' . $collection->name)
+                    ->addCss('btn-sm');
                     $template->appendTemplate('placement-actions', $btn->show());
                 }
             }
