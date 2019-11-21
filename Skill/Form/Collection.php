@@ -121,7 +121,7 @@ class Collection extends \App\FormIface
 
         // Do Custom Validations
         $placemenTypeIds = $form->getFieldValue('placementTypeId');
-        if($this->getCollectionObj()->requirePlacement && !count($placemenTypeIds)) {
+        if($this->getCollectionObj()->requirePlacement && is_array($placemenTypeIds) && !count($placemenTypeIds)) {
             $form->addFieldError('placementTypeId', 'Please select at least one placement type for this collection to be enabled for.');
         }
 
@@ -134,7 +134,7 @@ class Collection extends \App\FormIface
         $this->getCollectionObj()->save();
 
         \Skill\Db\CollectionMap::create()->removePlacementType($this->getCollectionObj()->getId());
-        if (count($placemenTypeIds)) {
+        if ($this->getCollectionObj()->requirePlacement && count($placemenTypeIds)) {
             foreach ($placemenTypeIds as $placementTypeId) {
                 \Skill\Db\CollectionMap::create()->addPlacementType($this->getCollectionObj()->getId(), $placementTypeId);
             }

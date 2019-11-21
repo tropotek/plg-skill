@@ -218,6 +218,24 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     }
 
     /**
+     * @return string
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    /**
+     * @param string $status
+     * @return Entry
+     */
+    public function setStatus(string $status)
+    {
+        $this->status = $status;
+        return $this;
+    }
+
+    /**
      * return the status list for a select field
      * @return array
      */
