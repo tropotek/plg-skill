@@ -252,7 +252,7 @@ class Collection extends \Tk\Db\Map\Model
         }
 
         // Available for status types
-        if (!$this->available) {
+        if ($this->requirePlacement && !$this->available) {
         //if (!$this->available && $this->requirePlacement) {
             $errors['available'] = 'Please select at least one valid status for this collection to be available for.';
         }
