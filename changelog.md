@@ -1,5 +1,11 @@
 #CHANGELOG#
 
+Ver 3.0.44 [2019-11-25]:
+-------------------------------
+  - Updated status emails and notices for the new Assessment plugin
+  - Added a little more to the CA plugin, prolly over half way there now
+
+
 Ver 3.0.42 [2019-11-12]:
 -------------------------------
   - Added more to the new CA plugin
