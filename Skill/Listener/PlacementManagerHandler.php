@@ -112,7 +112,7 @@ class PlacementManagerHandler implements Subscriber
         if ($this->controller) {
             $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('subjectId' => $this->subject->getId(),
                 'active' => true, 'requirePlacement' => true));
-            
+
             if (!$collectionList->count()) return;
 
             $table = $event->getTable();
