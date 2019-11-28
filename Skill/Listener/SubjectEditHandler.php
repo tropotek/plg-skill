@@ -66,7 +66,7 @@ class SubjectEditHandler implements Subscriber
             $previous = \Uni\Config::getInstance()->getLastCreatedSubject(true);
         }
         $subjectId = $previous->getId();
-        $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('subjectId' => $subjectId), \Tk\Db\Tool::create('id'));
+        $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('subjectId' => $subjectId, 'active' => true), \Tk\Db\Tool::create('id'));
         // Copy Subject Collections
         foreach ($collectionList as $collection) {
             \Tk\Log::debug('Copying Skill Collection: ' . $collection->name);

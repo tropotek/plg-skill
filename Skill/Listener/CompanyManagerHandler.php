@@ -48,7 +48,8 @@ class CompanyManagerHandler implements Subscriber
             $collections = \Skill\Db\CollectionMap::create()->findFiltered(array(
                 'subjectId' => $this->subject->getId(),
                 'gradable' => true,
-                'requirePlacement' => true
+                'requirePlacement' => true,
+                'active' => true
             ));
             foreach ($collections as $collection) {
                 $links[] = \Tk\Ui\Link::create($collection->name,
@@ -56,12 +57,12 @@ class CompanyManagerHandler implements Subscriber
                     $collection->icon
                 );
             }
-
-            $controller->getActionPanel()->append(\Tk\Ui\ButtonDropdown::createButtonDropdown(
-                'Skills Average Report',
-                'fa fa-graduation-cap',
-                $links)->setForceList(true));
-
+            if (count($links)) {
+                $controller->getActionPanel()->append(\Tk\Ui\ButtonDropdown::createButtonDropdown(
+                    'Skills Average Report',
+                    'fa fa-graduation-cap',
+                    $links)->setForceList(true));
+            }
         }
     }
 

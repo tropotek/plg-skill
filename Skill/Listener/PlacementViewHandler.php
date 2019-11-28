@@ -31,7 +31,7 @@ class PlacementViewHandler implements Subscriber
             $placement = $controller->getPlacement();
 
             $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(
-                array('subjectId' => $placement->subjectId, 'requirePlacement' => true, 'publish' => true)
+                array('subjectId' => $placement->subjectId, 'requirePlacement' => true, 'publish' => true, 'active' => true)
             );
             foreach ($collectionList as $collection) {
                 if (!$placement->getPlacementType() || !$placement->getPlacementType()->enableReport) continue;

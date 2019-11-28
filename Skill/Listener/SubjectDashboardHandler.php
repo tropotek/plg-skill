@@ -51,7 +51,7 @@ class SubjectDashboardHandler implements Subscriber
             $userList = $this->controller->getSubjectUserList();
             $userList->setOnShowUser(function (\Dom\Template $template, \App\Db\User $user) use ($subject) {
                 $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(
-                    array('subjectId' => $subject->getId(), 'gradable' => true, 'requirePlacement' => true));
+                    array('subjectId' => $subject->getId(), 'gradable' => true, 'requirePlacement' => true, 'active' => true));
                 /** @var \Skill\Db\Collection $collection */
                 foreach ($collectionList as $collection) {
                     if (!$collection->isAvailable()) continue;
@@ -71,7 +71,7 @@ class SubjectDashboardHandler implements Subscriber
 
                 }
 
-                $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('subjectId' => $subject->getId(), 'requirePlacement' => false));
+                $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('subjectId' => $subject->getId(), 'requirePlacement' => false, 'active' => true));
                 /** @var \Skill\Db\Collection $collection */
                 foreach ($collectionList as $collection) {
                     if (!$collection->isAvailable()) continue;
@@ -105,7 +105,7 @@ class SubjectDashboardHandler implements Subscriber
             $placementList = $this->controller->getPlacementList();
             $actionCell = $placementList->getActionCell();
 
-            $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('subjectId' => $subject->getId(), 'requirePlacement' => true));
+            $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(array('subjectId' => $subject->getId(), 'requirePlacement' => true, 'active' => true));
             foreach ($collectionList as $collection) {
                 if (!$collection->isAvailable() || !$collection->publish) continue;
                 $actionCell->addButton(\Tk\Table\Cell\ActionButton::create($collection->name,

@@ -62,12 +62,12 @@ class SidebarHandler implements Subscriber
         if ($user->isStudent()) {
 
             $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(
-                array('subjectId' => $subject->getId(), 'publish' => true)
+                array('subjectId' => $subject->getId(), 'publish' => true, 'active' => true)
             );
 
             /** @var \Skill\Db\Collection $collection */
             foreach ($collectionList as $collection) {
-                if (!$collection->isAvailable()) continue;
+                if (!$collection->isAvailable() || !$collection->active) continue;
                 $html = '';
                 if ($collection->requirePlacement) {        // Results views
                     if ($collection->gradable) {
@@ -97,7 +97,7 @@ class SidebarHandler implements Subscriber
             }
         } else if ($this->controller->getUser()->isStaff()) {
             /** @var \App\Ui\Sidebar\StaffMenu $sidebar */
-            $list = \Skill\Db\CollectionMap::create()->findFiltered( array('subjectId' => $this->subject->getId(), 'gradable' => true) );
+            $list = \Skill\Db\CollectionMap::create()->findFiltered( array('subjectId' => $this->subject->getId(), 'gradable' => true, 'active' => true) );
             foreach ($list as $collection) {
                 $sidebar->addReportUrl(\Tk\Ui\Link::create($collection->name . ' Grades',
                     \Uni\Uri::createSubjectUrl('/collectionReport.html')->set('collectionId', $collection->getId()), $collection->icon));
