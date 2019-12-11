@@ -17,7 +17,7 @@ INSERT INTO skill_collection (org_id, uid, profile_id, subject_id, name, role, i
     SELECT b.id, b.id, b.profile_id, a.id, b.name, b.role, b.icon, b.color, b.available, b.active, b.gradable, b.require_placement, b.max_grade,
            b.view_grade, b.include_zero, b.confirm, b.instructions, b.notes, b.del, b.modified, b.created
     FROM subject a, skill_collection b
-    WHERE a.profile_id = b.profile_id
+    WHERE a.course_id = b.profile_id
   )
 ;
 
