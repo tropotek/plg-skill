@@ -90,6 +90,11 @@ SQL;
         $filter->setWhere($where);
 
 
+        if (!empty($filter['id'])) {
+            $w = $this->makeMultiQuery($filter['id'], 'a.id');
+            if ($w) $filter->appendWhere('(%s) AND ', $w);
+        }
+
         if (!empty($filter['collectionId'])) {
             $filter->appendWhere('sc.id = %s AND ', (int)$filter['collectionId']);
         }

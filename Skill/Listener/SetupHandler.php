@@ -68,8 +68,8 @@ class SetupHandler implements Subscriber
 //            $dispatcher->addSubscriber(new \Skill\Listener\ExampleHandler(Plugin::ZONE_SUBJECT, $subject->getId()));
 //        }
 
-        $profile = \App\Config::getInstance()->getProfile();
-        if ($profile && $plugin->isZonePluginEnabled(Plugin::ZONE_SUBJECT_PROFILE, $profile->getId())) {
+        $course = \Uni\Config::getInstance()->getCourse();
+        if ($course && $plugin->isZonePluginEnabled(Plugin::ZONE_COURSE, $course->getId())) {
             $subject = \Uni\Config::getInstance()->getSubject();
             if ($subject) {
                 $dispatcher->addSubscriber(new \Skill\Listener\PlacementEditHandler($subject));

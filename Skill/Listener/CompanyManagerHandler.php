@@ -53,7 +53,7 @@ class CompanyManagerHandler implements Subscriber
             ));
             foreach ($collections as $collection) {
                 $links[] = \Tk\Ui\Link::create($collection->name,
-                    \App\Uri::createSubjectUrl('/companyAverageReport.html', $this->subject)->set('collectionId', $collection->getId()),
+                    \Uni\Uri::createSubjectUrl('/companyAverageReport.html', $this->subject)->set('collectionId', $collection->getId()),
                     $collection->icon
                 );
             }

@@ -34,7 +34,7 @@ class Plugin extends \App\Plugin\Iface
         
         // Register the plugin for the different client areas if they are to be enabled/disabled/configured by those roles.
         //$this->getPluginFactory()->registerZonePlugin($this, self::ZONE_INSTITUTION);
-        $this->getPluginFactory()->registerZonePlugin($this, self::ZONE_SUBJECT_PROFILE);
+        $this->getPluginFactory()->registerZonePlugin($this, self::ZONE_COURSE);
         //$this->getPluginFactory()->registerZonePlugin($this, self::ZONE_SUBJECT);
         
         \App\Config::getInstance()->getEventDispatcher()->addSubscriber(new \Skill\Listener\SetupHandler());

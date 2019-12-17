@@ -74,7 +74,7 @@ class View extends AdminEditIface
     {
         if ($this->entry->getId() && $this->getUser()->isStaff()) {
             $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('PDF',
-                \App\Uri::create()->set('p', 'p'), 'fa fa-file-pdf-o')->setAttr('target', '_blank'));
+                \Uni\Uri::create()->set('p', 'p'), 'fa fa-file-pdf-o')->setAttr('target', '_blank'));
         }
     }
 

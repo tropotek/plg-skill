@@ -49,7 +49,7 @@ class CompanyAverage extends \Uni\TableIface
         $collection = $this->getCollectionObject();
 
         $this->appendCell(new \Tk\Table\Cell\Text('company_id'));
-        $this->appendCell(new \Tk\Table\Cell\Text('name'))->addCss('key')->setUrl(\App\Uri::create('#'))
+        $this->appendCell(new \Tk\Table\Cell\Text('name'))->addCss('key')->setUrl(\Uni\Uri::create('#'))
             ->setOnPropertyValue(function ($cell, $obj, $value) use ($collection) {
                 /** @var $cell \Tk\Table\Cell\Text */
                 /** @var $obj \stdClass */
@@ -93,7 +93,7 @@ class CompanyAverage extends \Uni\TableIface
                             /** @var \App\Db\Placement $placement */
                             $placement = \App\Db\PlacementMap::create()->find($value);
                             $cell->setAttr('data-slt-title', 'N/A');
-                            $cell->setUrl(\App\Uri::createSubjectUrl('/placementEdit.html', $placement->getSubject())->set('placementId', $placement->getId()), null);
+                            $cell->setUrl(\Uni\Uri::createSubjectUrl('/placementEdit.html', $placement->getSubject())->set('placementId', $placement->getId()), null);
 
                             if ($placement) {
                                 if ($placement->getUser()) {
@@ -176,14 +176,15 @@ class CompanyAverage extends \Uni\TableIface
 //        );
 
         $list = \App\Db\CompanyMap::create()->findFiltered(array(
-            'profileId' => $this->getConfig()->getProfileId(),
+            'courseId' => $this->getConfig()->getCourseId(),
             'placementSubjectId' => $this->getConfig()->getSubjectId(),
             'status' => array('approved'),
             'placementsOnly' => true
         ), \Tk\Db\Tool::create('name'));
         $this->appendFilter(new Field\CheckboxSelect('companyId', $list));
 
-        $list = \App\Db\SubjectMap::create()->findFiltered(array('profileId' => $this->getConfig()->getProfileId()), \Tk\Db\Tool::create('a.name DESC'));
+        $list = \App\Db\SubjectMap::create()->findFiltered(array('courseId' => $this->getConfig()->getCourseId()),
+            \Tk\Db\Tool::create('a.name DESC'));
         $c = $this->appendFilter(new Field\CheckboxSelect('subjectId', \Tk\Form\Field\Option\ArrayObjectIterator::create($list)));
         if ($this->getConfig()->getSubjectId()) {
             $c->setValue(array($this->getConfig()->getSubjectId()));

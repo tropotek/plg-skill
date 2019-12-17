@@ -79,7 +79,7 @@ class Historic extends \Uni\TableIface
         $this->appendFilter(Field\CheckboxSelect::createSelect('itemId', \Tk\Form\Field\Option\ArrayObjectIterator::create($list, 'question', 'uid')))->setLabel('Question');
 
         $list = \App\Db\CompanyMap::create()->findFiltered(array(
-            'profileId' => $this->getConfig()->getProfileId(),
+            'courseId' => $this->getConfig()->getCourseId(),
             'placementSubjectId' => $this->getConfig()->getSubjectId(),
             'status' => array('approved'),
             'placementsOnly' => true
@@ -87,7 +87,7 @@ class Historic extends \Uni\TableIface
         $this->appendFilter(new Field\CheckboxSelect('companyId', $list));
 
         $list = \App\Db\SupervisorMap::create()->findFiltered(array(
-            'profileId' => $this->getConfig()->getProfileId(),
+            'courseId' => $this->getConfig()->getCourseId(),
             'placementSubjectId' => $this->getConfig()->getSubjectId(),
             'status' => array('approved'),
             'placementsOnly' => true

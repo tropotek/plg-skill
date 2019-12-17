@@ -70,17 +70,18 @@ class HistoricAll extends \Uni\TableIface
         $this->appendCell(new \Tk\Table\Cell\Text('supervisor_id'));
 
         // Filters
-        $list = \App\Db\SubjectMap::create()->findFiltered(array('profileId' => $this->getConfig()->getProfileId()), \Tk\Db\Tool::create('id DESC'));
+        $list = \App\Db\SubjectMap::create()->findFiltered(array('courseId' => $this->getConfig()->getCourseId()),
+            \Tk\Db\Tool::create('id DESC'));
         $this->appendFilter(new Field\CheckboxSelect('subjectId', $list));
 
         $list = \App\Db\CompanyMap::create()->findFiltered(array(
-            'profileId' => $this->getConfig()->getProfileId(),
+            'courseId' => $this->getConfig()->getCourseId(),
             'status' => array('approved')
         ), \Tk\Db\Tool::create('name'));
         $this->appendFilter(new Field\CheckboxSelect('companyId', $list));
 
         $list = \App\Db\SupervisorMap::create()->findFiltered(array(
-            'profileId' => $this->getConfig()->getProfileId(),
+            'courseId' => $this->getConfig()->getCourseId(),
             'status' => array('approved')
         ), \Tk\Db\Tool::create('id DESC'));
         $this->appendFilter(new Field\CheckboxSelect('supervisorId', $list));

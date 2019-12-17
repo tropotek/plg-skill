@@ -51,7 +51,7 @@ class Entry extends \App\FormIface
             $this->appendField(new Field\Html('average', sprintf('%.2f &nbsp; (%d%%)', $avg, $ratio)))->setFieldset('Entry Details');
         }
 
-        $urlRole = \App\Uri::create()->getRoleType($this->getConfig()->getAvailableUserRoleTypes());
+        $urlRole = \Uni\Uri::create()->getRoleType($this->getConfig()->getAvailableUserRoleTypes());
         if ($user && $user->isStaff() && $user->getRole()->hasType($urlRole)) {
             $this->appendField(new \App\Form\Field\CheckSelect('status', \Skill\Db\Entry::getStatusList()))
                 ->setRequired()->prependOption('-- Status --', '')->setNotes('Set the status. Use the checkbox to disable notification emails.')->setFieldset('Entry Details');
@@ -86,7 +86,7 @@ class Entry extends \App\FormIface
 
         if ($this->isPublic()) {
             $this->appendField(new Event\Submit('submit', array($this, 'doSubmit')))->addCss('btn-success')->setIconRight('fa fa-arrow-right')->addCss('pull-right')->setLabel('Submit ');
-            $this->appendField(new Event\Link('cancel', \App\Uri::create('/index.html')));
+            $this->appendField(new Event\Link('cancel', \Uni\Uri::create('/index.html')));
         } else {
             $this->appendField(new Event\Submit('update', array($this, 'doSubmit')));
             $this->appendField(new Event\Submit('save', array($this, 'doSubmit')));
@@ -183,16 +183,16 @@ JS;
         }
 
         // TODO: Although this seems redundant, there was a bug where the getEntry()->userId == placement->id (try to trace?)
-        $this->getEntry()->userId = $this->getEntry()->getPlacement()->userId;
+        $this->getEntry()->userId = $this->getEntry()->getPlacement()->getUserId();
         $this->getEntry()->save();
 
         // Create status if changed and trigger notifications
         if (!$this->isPublic() && $form->getField('status')) {
             \App\Db\Status::createFromField($this->getEntry(), $form->getField('status'),
-                $this->getEntry()->getSubject()->getProfile(), $this->getEntry()->getSubject());
+                $this->getEntry()->getSubject()->getCourse(), $this->getEntry()->getSubject());
         } else {
-            \App\Db\Status::create($this->getEntry(), $this->getEntry()->status, true, '',
-                $this->getEntry()->getSubject()->getProfile(), $this->getEntry()->getSubject());
+            \App\Db\Status::create($this->getEntry(), $this->getEntry()->getStatus(), true, '',
+                $this->getEntry()->getSubject()->getCourse(), $this->getEntry()->getSubject());
         }
 
         \Tk\Alert::addSuccess('You response has been successfully submitted. Please return at any time to make changes while this Entry remains in the pending status.');
@@ -200,7 +200,7 @@ JS;
         if ($form->getTriggeredEvent()->getName() == 'update') {
             $url = $this->getConfig()->getBackUrl();
             if ($this->getEntry()->getPlacement() && $this->getConfig()->isSubjectUrl()) {
-                $url = \App\Uri::createSubjectUrl('/placementEdit.html')->set('placementId', $this->getEntry()->getPlacement()->getId());
+                $url = \Uni\Uri::createSubjectUrl('/placementEdit.html')->set('placementId', $this->getEntry()->getPlacement()->getId());
             }
         }
         $event->setRedirect($url);

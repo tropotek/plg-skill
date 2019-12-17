@@ -68,7 +68,7 @@ class PlacementManagerHandler implements Subscriber
 
             /** @var \Skill\Db\Collection $collection */
             foreach ($collectionList as $collection) {
-                $url = \App\Uri::createSubjectUrl('/entryEdit.html')->set('collectionId', $collection->getId());
+                $url = \Uni\Uri::createSubjectUrl('/entryEdit.html')->set('collectionId', $collection->getId());
 
                 $actionsCell->append(\Tk\Table\Ui\ActionButton::createBtn($collection->name, $url, $collection->icon))
                     ->setGroup('skills')->setOnShow(function ($cell, $obj, $btn) use ($collection) {
@@ -78,7 +78,7 @@ class PlacementManagerHandler implements Subscriber
                             'active' => true, 'requirePlacement' => true, 'uid' => $collection->uid))->current();
                         if (!$placementCollection) $placementCollection = $collection;
 
-                        $btn->setUrl(\App\Uri::createSubjectUrl('/entryEdit.html', $obj->getSubject())->set('collectionId', $placementCollection->getId()));
+                        $btn->setUrl(\Uni\Uri::createSubjectUrl('/entryEdit.html', $obj->getSubject())->set('collectionId', $placementCollection->getId()));
                         $btn->getUrl()->set('placementId', $obj->getId());
                         if (!$placementCollection->isAvailable($obj)) {
                             $btn->setVisible(false);
@@ -122,7 +122,7 @@ class PlacementManagerHandler implements Subscriber
                     $value = '';
                     /** @var \Skill\Db\Collection $collection */
                     foreach ($collectionList as $collection) {
-                        $url = \App\Uri::createInstitutionUrl('/skillEdit.html', $collection->getSubject()->getInstitution())
+                        $url = \Uni\Uri::createInstitutionUrl('/skillEdit.html', $collection->getSubject()->getInstitution())
                             ->set('h', $obj->getHash())
                             ->set('collectionId', $collection->getId());
                         if ($collection->isAvailable($obj)) {
@@ -138,7 +138,7 @@ class PlacementManagerHandler implements Subscriber
 
                     /** @var \Skill\Db\Collection $collection */
                     foreach ($collectionList as $collection) {
-                        $url = \App\Uri::createInstitutionUrl('/skillEdit.html', $collection->getSubject()->getInstitution())
+                        $url = \Uni\Uri::createInstitutionUrl('/skillEdit.html', $collection->getSubject()->getInstitution())
                             ->set('h', $obj->getHash())
                             ->set('collectionId', $collection->getId());
                         if ($collection->isAvailable($obj)) {

@@ -50,12 +50,12 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
 
         $placement = $model->getPlacement();
         if (!$placement->getPlacementType()->notifications) {
-            \Tk\Log::warning('PlacementType[' . $placement->getPlacementType()->name . '] Notifications Disabled');
+            \Tk\Log::warning('PlacementType[' . $placement->getPlacementType()->getName() . '] Notifications Disabled');
             return null;
         }
-        $message = \Tk\Mail\CurlyMessage::create($mailTemplate->template);
-        $message->setSubject('[#'.$model->getId().'] ' . $model->getCollection()->name . ' Entry ' . ucfirst($status->name) . ' for ' . $placement->getTitle(true) . ' ');
-        $message->setFrom(\Tk\Mail\Message::joinEmail($status->getProfile()->email, $status->getSubjectName()));
+        $message = \Tk\Mail\CurlyMessage::create($mailTemplate->getTemplate());
+        $message->setSubject('[#'.$model->getId().'] ' . $model->getCollection()->getName() . ' Entry ' . ucfirst($status->getName()) . ' for ' . $placement->getTitle(true) . ' ');
+        $message->setFrom(\Tk\Mail\Message::joinEmail($status->getCourse()->getEmail(), $status->getSubjectName()));
 
         // Setup the message vars
         \App\Util\StatusMessage::setStudent($message, $placement->getUser());
@@ -65,8 +65,8 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
 
         // A`dd entry details
         $message->set('collection::id', $model->getCollection()->getId());
-        $message->set('collection::name', $model->getCollection()->name);
-        $message->set('collection::instructions', $model->getCollection()->instructions);
+        $message->set('collection::name', $model->getCollection()->getName());
+        $message->set('collection::instructions', $model->getCollection()->getInstructions());
         $message->set('entry::id', $model->getId());
         $message->set('entry::title', $model->title);
         $message->set('entry::assessor', $model->assessor);
@@ -76,27 +76,27 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
         switch ($mailTemplate->recipient) {
             case \App\Db\MailTemplate::RECIPIENT_STUDENT:
                 if ($placement->getUser()) {
-                    $message->addTo(\Tk\Mail\Message::joinEmail($placement->getUser()->email, $placement->getUser()->name));
+                    $message->addTo(\Tk\Mail\Message::joinEmail($placement->getUser()->getEmail(), $placement->getUser()->getName()));
                 }
                 break;
             case \App\Db\MailTemplate::RECIPIENT_COMPANY:
                 if ($placement->getCompany()) {
-                    $message->addTo(\Tk\Mail\Message::joinEmail($placement->getCompany()->email, $placement->getCompany()->name));
+                    $message->addTo(\Tk\Mail\Message::joinEmail($placement->getCompany()->getEmail(), $placement->getCompany()->getName()));
                 }
                 break;
             case \App\Db\MailTemplate::RECIPIENT_SUPERVISOR:
-                if ($placement->getSupervisor() && $placement->getSupervisor()->email)
-                    $message->addTo(\Tk\Mail\Message::joinEmail($placement->getSupervisor()->email, $placement->getSupervisor()->name));
+                if ($placement->getSupervisor() && $placement->getSupervisor()->getEmail())
+                    $message->addTo(\Tk\Mail\Message::joinEmail($placement->getSupervisor()->getEmail(), $placement->getSupervisor()->getName()));
                 break;
             case \App\Db\MailTemplate::RECIPIENT_STAFF:
-                $staffList = $status->getSubject()->getStaffList();
+                $staffList = $status->getSubject()->getCourse()->getUsers();
                 if (count($staffList)) {
                     /** @var \App\Db\User $s */
                     foreach ($staffList as $s) {
-                        $message->addBcc(\Tk\Mail\Message::joinEmail($s->email, $s->name));
+                        $message->addBcc(\Tk\Mail\Message::joinEmail($s->getEmail(), $s->getName()));
                     }
-                    $message->addTo(\Tk\Mail\Message::joinEmail($status->getSubject()->getProfile()->email, $status->getSubjectName()));
-                    $message->set('recipient::email', $status->getSubject()->getProfile()->email);
+                    $message->addTo(\Tk\Mail\Message::joinEmail($status->getSubject()->getCourse()->getEmail(), $status->getSubjectName()));
+                    $message->set('recipient::email', $status->getSubject()->getCourse()->getEmail());
                     $message->set('recipient::name', $status->getSubjectName());
                 }
                 break;
@@ -123,7 +123,8 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
 
         // TODO: get the icon from the entry collection
         $collection = $model->getCollection();
-        return sprintf('<a href="%s"><div class="status-icon bg-secondary"><i class="'.$collection->icon.'"></i></div></a>', htmlentities($editUrl));
+        return sprintf('<a href="%s"><div class="status-icon bg-secondary"><i class="'.$collection->icon.'"></i></div></a>',
+            htmlentities($editUrl));
     }
 
     /**
@@ -135,7 +136,7 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
         /** @var Entry $model */
         $model = $this->getStatus()->getModel();
         $collection = $model->getCollection();
-//        $editUrl = \App\Uri::createSubjectUrl('/entryEdit.html')->set('collectionId', $model->collectionId)->
+//        $editUrl = \Uni\Uri::createSubjectUrl('/entryEdit.html')->set('collectionId', $model->collectionId)->
 //        set('userId', $model->userId)->set('placementId', $model->placementId);
         $editUrl = \Uni\Uri::createSubjectUrl('/entryEdit.html')->set('entryId', $model->getId());
         $from = '';
@@ -149,8 +150,8 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
 //        }
 
         if ($model->getPlacement()) {
-            //$editUrl = \App\Uri::createSubjectUrl('/entryEdit.html')->set('placementId', $model->getPlacement()->getId());
-            $from = 'from <em>' . htmlentities($model->getPlacement()->getCompany()->name) . '</em>';
+            //$editUrl = \Uni\Uri::createSubjectUrl('/entryEdit.html')->set('placementId', $model->getPlacement()->getId());
+            $from = 'from <em>' . htmlentities($model->getPlacement()->getCompany()->getName()) . '</em>';
             //$userName = $model->getPlacement()->getUser()->name;
         }
 
@@ -165,7 +166,7 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
     -->
   </div>
 </div>',
-            htmlentities($model->assessor), $from, htmlentities($collection->name), htmlentities($userName), htmlentities($editUrl));
+            htmlentities($model->assessor), $from, htmlentities($collection->getName()), htmlentities($userName), htmlentities($editUrl));
 
         return $html;
     }
@@ -180,6 +181,6 @@ class EntryStatusStrategy extends \App\Db\StatusStrategyInterface
         $model = $this->getStatus()->getModel();
         $collection = $model->getCollection();
 
-        return $collection->name . ' ' . \Tk\ObjectUtil::basename($this->getStatus()->fkey);
+        return $collection->getName() . ' ' . \Tk\ObjectUtil::basename($this->getStatus()->getFkey());
     }
 }

@@ -17,7 +17,7 @@ class StatusMailHandler implements Subscriber
      */
     public function onSendAllStatusMessages(\App\Event\StatusEvent $event)
     {
-        if (!$event->getStatus()->notify || !$event->getStatus()->getProfile()->notifications) return;   // do not send messages
+        if (!$event->getStatus()->isNotify() || !$event->getStatus()->getCourse()->getProfile()->isNotifications()) return;   // do not send messages
 
         /** @var \Tk\Mail\CurlyMessage $message */
         foreach ($event->getMessageList() as $message) {
@@ -33,7 +33,7 @@ class StatusMailHandler implements Subscriber
                         'subjectId' => $message->get('placement::subjectId'),
                         'role' => \Skill\Db\Collection::ROLE_COMPANY,
                         'requirePlacement' => true,
-                        'placementTypeId' => $placement->placementTypeId
+                        'placementTypeId' => $placement->getPlacementTypeId()
                     );
                     $collections = \Skill\Db\CollectionMap::create()->findFiltered($filter);
                     /** @var \Skill\Db\Collection $collection */
@@ -46,8 +46,8 @@ class StatusMailHandler implements Subscriber
                             $avail = ' [Currently Unavailable]';
                         }
                         $skillLinkHtml .= sprintf('<a href="%s" title="%s">%s</a> | ', htmlentities($url->toString()),
-                            htmlentities($collection->name).$avail, htmlentities($collection->name).$avail);
-                        $skillLinkText .= sprintf('%s: %s | ', htmlentities($collection->name).$avail, htmlentities($url->toString()));
+                            htmlentities($collection->getName()).$avail, htmlentities($collection->getName()).$avail);
+                        $skillLinkText .= sprintf('%s: %s | ', htmlentities($collection->getName()).$avail, htmlentities($url->toString()));
                     }
                 }
 

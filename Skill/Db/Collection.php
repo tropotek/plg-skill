@@ -2,6 +2,10 @@
 namespace Skill\Db;
 
 
+use Bs\Db\Traits\TimestampTrait;
+use Uni\Db\Traits\CourseTrait;
+use Uni\Db\Traits\SubjectTrait;
+
 /**
  * @author Michael Mifsud <info@tropotek.com>
  * @see http://www.tropotek.com/
@@ -9,6 +13,10 @@ namespace Skill\Db;
  */
 class Collection extends \Tk\Db\Map\Model
 {
+    use CourseTrait;
+    use SubjectTrait;
+    use TimestampTrait;
+
     const ROLE_STAFF    = 'staff';
     const ROLE_STUDENT  = 'student';
     const ROLE_COMPANY  = 'company';
@@ -28,9 +36,8 @@ class Collection extends \Tk\Db\Map\Model
 
     /**
      * @var int
-     * @deprecated Flagged for removal avoid using it!
      */
-    public $profileId = 0;
+    public $courseId = 0;
 
     /**
      * @var int
@@ -144,20 +151,11 @@ class Collection extends \Tk\Db\Map\Model
 
 
     /**
-     * @var \Uni\Db\SubjectIface
-     */
-    private $subject = null;
-
-
-
-
-    /**
      * constructor.
      */
     public function __construct()
     {
-        $this->modified = \Tk\Date::create();
-        $this->created = \Tk\Date::create();
+        $this->_TimestampTrait();
     }
 
     /**
@@ -170,18 +168,6 @@ class Collection extends \Tk\Db\Map\Model
             $calc = new \Skill\Util\GradeCalculator($this);
             $calc->deleteSubjectGradeCache();
         }
-    }
-
-    /**
-     * @return \Uni\Db\SubjectIface|\App\Db\Subject
-     * @throws \Exception
-     */
-    public function getSubject()
-    {
-        if (!$this->subject) {
-            $this->subject = \Uni\Config::getInstance()->getSubjectMapper()->find($this->subjectId);
-        }
-        return $this->subject;
     }
 
     /**
@@ -235,28 +221,259 @@ class Collection extends \Tk\Db\Map\Model
     }
 
     /**
+     * @return string
+     */
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     * @return Collection
+     */
+    public function setName(string $name): Collection
+    {
+        $this->name = $name;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRole(): string
+    {
+        return $this->role;
+    }
+
+    /**
+     * @param string $role
+     * @return Collection
+     */
+    public function setRole(string $role): Collection
+    {
+        $this->role = $role;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getIcon(): string
+    {
+        return $this->icon;
+    }
+
+    /**
+     * @param string $icon
+     * @return Collection
+     */
+    public function setIcon(string $icon): Collection
+    {
+        $this->icon = $icon;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getColor(): string
+    {
+        return $this->color;
+    }
+
+    /**
+     * @param string $color
+     * @return Collection
+     */
+    public function setColor(string $color): Collection
+    {
+        $this->color = $color;
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAvailable(): array
+    {
+        return $this->available;
+    }
+
+    /**
+     * @param array $available
+     * @return Collection
+     */
+    public function setAvailable(array $available): Collection
+    {
+        $this->available = $available;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isPublish(): bool
+    {
+        return $this->publish;
+    }
+
+    /**
+     * @param bool $publish
+     * @return Collection
+     */
+    public function setPublish(bool $publish): Collection
+    {
+        $this->publish = $publish;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isActive(): bool
+    {
+        return $this->active;
+    }
+
+    /**
+     * @param bool $active
+     * @return Collection
+     */
+    public function setActive(bool $active): Collection
+    {
+        $this->active = $active;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getConfirm(): string
+    {
+        return $this->confirm;
+    }
+
+    /**
+     * @param string $confirm
+     * @return Collection
+     */
+    public function setConfirm(string $confirm): Collection
+    {
+        $this->confirm = $confirm;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isGradable(): bool
+    {
+        return $this->gradable;
+    }
+
+    /**
+     * @param bool $gradable
+     * @return Collection
+     */
+    public function setGradable(bool $gradable): Collection
+    {
+        $this->gradable = $gradable;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRequirePlacement(): bool
+    {
+        return $this->requirePlacement;
+    }
+
+    /**
+     * @param bool $requirePlacement
+     * @return Collection
+     */
+    public function setRequirePlacement(bool $requirePlacement): Collection
+    {
+        $this->requirePlacement = $requirePlacement;
+        return $this;
+    }
+
+    /**
+     * @return float
+     */
+    public function getMaxGrade(): float
+    {
+        return $this->maxGrade;
+    }
+
+    /**
+     * @param float $maxGrade
+     * @return Collection
+     */
+    public function setMaxGrade(float $maxGrade): Collection
+    {
+        $this->maxGrade = $maxGrade;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getInstructions(): string
+    {
+        return $this->instructions;
+    }
+
+    /**
+     * @param string $instructions
+     * @return Collection
+     */
+    public function setInstructions(string $instructions): Collection
+    {
+        $this->instructions = $instructions;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNotes(): string
+    {
+        return $this->notes;
+    }
+
+    /**
+     * @param string $notes
+     * @return Collection
+     */
+    public function setNotes(string $notes): Collection
+    {
+        $this->notes = $notes;
+        return $this;
+    }
+
+    /**
      *
      */
     public function validate()
     {
         $errors = array();
+        //$errors = $this->validateCourseId($errors);
+        $errors = $this->validateSubjectId($errors);
 
-        if ((int)$this->subjectId <= 0) {
-            $errors['subjectId'] = 'Invalid subject ID';
-        }
-        if (!$this->name) {
+        if (!$this->getName()) {
             $errors['name'] = 'Please enter a valid name for this collection';
         }
-        if (!$this->role) {
+        if (!$this->getRole()) {
             $errors['role'] = 'Please enter a valid role for this collection';
         }
 
         // Available for status types
-        if ($this->requirePlacement && !$this->available) {
-        //if (!$this->available && $this->requirePlacement) {
+        if ($this->isRequirePlacement() && !$this->getAvailable()) {
             $errors['available'] = 'Please select at least one valid status for this collection to be available for.';
         }
-        // TODO: Also requires a placement type ????
 
         
         return $errors;

@@ -55,7 +55,7 @@ class Entry extends \App\TableIface
         $this->appendFilter(new \Tk\Form\Field\Input('keywords'))->setAttr('placeholder', 'Keywords');
 
         $list = \App\Db\CompanyMap::create()->findFiltered(array(
-            'profileId' => $this->getConfig()->getProfileId(),
+            'courseId' => $this->getConfig()->getCourseId(),
             'status' => \App\Db\Placement::STATUS_APPROVED
         ), \Tk\Db\Tool::create('name'));
         $this->appendFilter(new \Tk\Form\Field\Select('companyId', $list))->prependOption('-- Company --', '');
