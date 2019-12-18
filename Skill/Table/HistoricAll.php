@@ -148,7 +148,7 @@ class HistoricAll extends \Uni\TableIface
 
     /**
      * @param \Skill\Db\Collection $collection
-     * @return Historic
+     * @return HistoricAll
      */
     public function setCollectionObject($collection)
     {
@@ -156,12 +156,4 @@ class HistoricAll extends \Uni\TableIface
         return $this;
     }
 
-
-    /**
-     * @return \App\Config|\Uni\Config
-     */
-    public function getConfig()
-    {
-        return parent::getConfig();
-    }
 }

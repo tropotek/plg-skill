@@ -124,12 +124,4 @@ class DateAverage extends \Uni\TableIface
         return $this;
     }
 
-
-    /**
-     * @return \App\Config|\Uni\Config
-     */
-    public function getConfig()
-    {
-        return parent::getConfig();
-    }
 }

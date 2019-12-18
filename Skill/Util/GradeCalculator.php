@@ -2,6 +2,8 @@
 
 namespace Skill\Util;
 
+use Tk\ConfigTrait;
+
 /**
  * @author Tropotek <info@tropotek.com>
  * @created: 6/08/18
@@ -10,6 +12,7 @@ namespace Skill\Util;
  */
 class GradeCalculator
 {
+    use ConfigTrait;
 
     const PRECISION = 2;
 
@@ -247,17 +250,5 @@ class GradeCalculator
     {
         $this->cacheEnabled = $cacheEnabled;
     }
-
-    /**
-     * @return \Tk\Config|\Uni\Config
-     */
-    public function getConfig()
-    {
-        return \Uni\Config::getInstance();
-    }
-
-
-
-
 
 }

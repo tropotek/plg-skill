@@ -139,7 +139,7 @@ class ItemAverage extends \Uni\TableIface
 
     /**
      * @param \Skill\Db\Collection $collection
-     * @return Historic
+     * @return $this
      */
     public function setCollectionObject($collection)
     {
@@ -147,12 +147,4 @@ class ItemAverage extends \Uni\TableIface
         return $this;
     }
 
-
-    /**
-     * @return \App\Config|\Uni\Config
-     */
-    public function getConfig()
-    {
-        return parent::getConfig();
-    }
 }

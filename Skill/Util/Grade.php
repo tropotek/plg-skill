@@ -2,6 +2,8 @@
 namespace Skill\Util;
 
 
+use Tk\ConfigTrait;
+
 /**
  * This object saves an individual students results for a collection
  *
@@ -11,6 +13,8 @@ namespace Skill\Util;
  */
 class Grade implements \Serializable
 {
+    use ConfigTrait;
+
 
     /**
      * @var int
@@ -279,17 +283,4 @@ class Grade implements \Serializable
         return $avg/$cnt;
     }
 
-
-
-
-
-
-
-    /**
-     * @return \Tk\Config|\Uni\Config
-     */
-    public function getConfig()
-    {
-        return \Uni\Config::getInstance();
-    }
 }
