@@ -1,10 +1,9 @@
 <?php
 namespace Skill\Listener;
 
-use Tk\Db\Exception;
-use Tk\Event\Subscriber;
-use Tk\Event\Event;
 use Symfony\Component\Console\Output\Output;
+use Tk\Event\Event;
+use Tk\Event\Subscriber;
 
 /**
  * @author Michael Mifsud <info@tropotek.com>

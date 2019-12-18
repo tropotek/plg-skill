@@ -1,8 +1,6 @@
 <?php
 namespace Skill\Table;
 
-use Coa\Adapter\Company;
-use Tk\Alert;
 use Tk\Form\Field;
 
 /**

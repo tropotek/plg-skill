@@ -3,7 +3,6 @@ namespace Skill\Controller\Collection;
 
 use App\Controller\AdminManagerIface;
 use Dom\Template;
-use Tk\Form\Field;
 use Tk\Request;
 
 

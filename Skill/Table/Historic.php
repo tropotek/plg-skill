@@ -2,7 +2,6 @@
 namespace Skill\Table;
 
 use Tk\Form\Field;
-use Tk\Table\Cell;
 
 /**
  * Example:

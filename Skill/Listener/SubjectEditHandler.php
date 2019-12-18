@@ -1,10 +1,9 @@
 <?php
 namespace Skill\Listener;
 
-use Tk\Event\Subscriber;
-use Tk\Event\Event;
-use Skill\Plugin;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Tk\Event\Event;
+use Tk\Event\Subscriber;
 
 /**
  * @author Michael Mifsud <info@tropotek.com>

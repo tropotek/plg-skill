@@ -1,8 +1,8 @@
 <?php
 namespace Skill\Listener;
 
-use Tk\Event\Subscriber;
 use Tk\Event\Event;
+use Tk\Event\Subscriber;
 
 /**
  * @author Michael Mifsud <info@tropotek.com>
