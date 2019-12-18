@@ -17,7 +17,7 @@ class StatusMailHandler implements Subscriber
      */
     public function onSendAllStatusMessages(\App\Event\StatusEvent $event)
     {
-        if (!$event->getStatus()->isNotify() || !$event->getStatus()->getCourse()->getProfile()->isNotifications()) return;   // do not send messages
+        if (!$event->getStatus()->isNotify() || !$event->getStatus()->getCourse()->getCourseProfile()->isNotifications()) return;   // do not send messages
 
         /** @var \Tk\Mail\CurlyMessage $message */
         foreach ($event->getMessageList() as $message) {
