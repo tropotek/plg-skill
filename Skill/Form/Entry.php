@@ -53,7 +53,7 @@ class Entry extends \App\FormIface
 
         $urlRole = \Uni\Uri::create()->getRoleType($this->getConfig()->getAvailableUserRoleTypes());
         if ($user && $user->isStaff() && $user->getRole()->hasType($urlRole)) {
-            $this->appendField(new \Uni\Form\Field\StatusSelect('status', \Skill\Db\Entry::getStatusList()))
+            $this->appendField(new \App\Form\Field\StatusSelect('status', \Skill\Db\Entry::getStatusList()))
                 ->setRequired()->prependOption('-- Status --', '')->setNotes('Set the status. Use the checkbox to disable notification emails.')->setFieldset('Entry Details');
         } else {
             $this->appendField(new \Tk\Form\Field\Html('status'))->setFieldset('Entry Details');
