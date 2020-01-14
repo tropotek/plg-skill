@@ -53,7 +53,7 @@ class Entry extends \App\FormIface
 
         $urlRole = \Uni\Uri::create()->getRoleType($this->getConfig()->getAvailableUserRoleTypes());
         if ($user && $user->isStaff() && $user->getRole()->hasType($urlRole)) {
-            $this->appendField(new \App\Form\Field\CheckSelect('status', \Skill\Db\Entry::getStatusList()))
+            $this->appendField(new \Uni\Form\Field\StatusSelect('status', \Skill\Db\Entry::getStatusList()))
                 ->setRequired()->prependOption('-- Status --', '')->setNotes('Set the status. Use the checkbox to disable notification emails.')->setFieldset('Entry Details');
         } else {
             $this->appendField(new \Tk\Form\Field\Html('status'))->setFieldset('Entry Details');
@@ -188,10 +188,10 @@ JS;
 
         // Create status if changed and trigger notifications
         if (!$this->isPublic() && $form->getField('status')) {
-            \App\Db\Status::createFromField($this->getEntry(), $form->getField('status'),
+            \Uni\Db\Status::createFromField($this->getEntry(), $form->getField('status'),
                 $this->getEntry()->getSubject()->getCourse(), $this->getEntry()->getSubject());
         } else {
-            \App\Db\Status::create($this->getEntry(), $this->getEntry()->getStatus(), true, '',
+            \Uni\Db\Status::create($this->getEntry(), $this->getEntry()->getStatus(), true, '',
                 $this->getEntry()->getSubject()->getCourse(), $this->getEntry()->getSubject());
         }
 

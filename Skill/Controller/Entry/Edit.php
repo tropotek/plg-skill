@@ -25,7 +25,7 @@ class Edit extends AdminEditIface
     protected $placement = null;
 
     /**
-     * @var \App\Table\Status
+     * @var \Uni\Table\Status
      */
     protected $statusTable = null;
 
@@ -180,7 +180,8 @@ class Edit extends AdminEditIface
 
 
         if ($this->getUser() && $this->getUser()->isStaff() && $this->entry->getId()) {
-            $this->statusTable = \App\Table\Status::create(\App\Config::getInstance()->getUrlName().'-status')->init();
+            $this->statusTable = \Uni\Table\Status::create(\App\Config::getInstance()->getUrlName().'-status')
+                ->setEditUrl(\Uni\Uri::createSubjectUrl('/mailLogManager.html'))->init();
             $filter = array(
                 'model' => $this->entry,
                 'subjectId' => $this->entry->subjectId

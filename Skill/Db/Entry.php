@@ -164,7 +164,7 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 
     public function delete()
     {
-        \App\Db\StatusMap::create()->deleteByModel(get_class($this), $this->getId());
+        \Uni\Db\StatusMap::create()->deleteByModel(get_class($this), $this->getId());
         return parent::delete();
     }
 

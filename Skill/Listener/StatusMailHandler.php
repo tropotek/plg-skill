@@ -12,10 +12,10 @@ class StatusMailHandler implements Subscriber
 {
 
     /**
-     * @param \App\Event\StatusEvent $event
+     * @param \Uni\Event\StatusEvent $event
      * @throws \Exception
      */
-    public function onSendAllStatusMessages(\App\Event\StatusEvent $event)
+    public function onSendAllStatusMessages(\Uni\Event\StatusEvent $event)
     {
         if (!$event->getStatus()->isNotify() || !$event->getStatus()->getCourse()->getCourseProfile()->isNotifications()) return;   // do not send messages
 
@@ -82,7 +82,7 @@ class StatusMailHandler implements Subscriber
     public static function getSubscribedEvents()
     {
         return array(
-            \App\StatusEvents::STATUS_SEND_MESSAGES => array('onSendAllStatusMessages', 10)
+            \Uni\StatusEvents::STATUS_SEND_MESSAGES => array('onSendAllStatusMessages', 10)
         );
     }
     
