@@ -188,11 +188,9 @@ JS;
 
         // Create status if changed and trigger notifications
         if (!$this->isPublic() && $form->getField('status')) {
-            \Uni\Db\Status::createFromField($this->getEntry(), $form->getField('status'),
-                $this->getEntry()->getSubject()->getCourse(), $this->getEntry()->getSubject());
+            \Uni\Db\Status::createFromStatusSelect($this->getEntry(), $form->getField('status'));
         } else {
-            \Uni\Db\Status::create($this->getEntry(), $this->getEntry()->getStatus(), true, '',
-                $this->getEntry()->getSubject()->getCourse(), $this->getEntry()->getSubject());
+            \Uni\Db\Status::createFromTrait($this->getEntry());
         }
 
         \Tk\Alert::addSuccess('You response has been successfully submitted. Please return at any time to make changes while this Entry remains in the pending status.');
