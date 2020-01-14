@@ -2,6 +2,9 @@
 namespace Skill\Db;
 
 
+use App\Db\MailTemplate;
+use Tk\Mail\CurlyMessage;
+
 /**
  * @author Michael Mifsud <info@tropotek.com>
  * @see http://www.tropotek.com/
@@ -39,22 +42,23 @@ class EntryStatusStrategy extends \Uni\Db\StatusStrategyInterface
 
     /**
      * @param \Uni\Db\Status $status
-     * @param \App\Db\MailTemplate $mailTemplate
+     * @param CurlyMessage $message
      * @return null|\Tk\Mail\CurlyMessage
      * @throws \Exception
      */
-    public function makeStatusMessage($status, $mailTemplate)
+    public function formatStatusMessage($status, $message)
     {
         /** @var Entry $model */
         $model = $status->getModel();
 
         $placement = $model->getPlacement();
-        if (!$placement->getPlacementType()->notifications) {
+        if (!$placement->getPlacementType()->isNotifications()) {
             \Tk\Log::warning('PlacementType[' . $placement->getPlacementType()->getName() . '] Notifications Disabled');
             return null;
         }
-        $message = \Tk\Mail\CurlyMessage::create($mailTemplate->getTemplate());
-        $message->setSubject('[#'.$model->getId().'] ' . $model->getCollection()->getName() . ' Entry ' . ucfirst($status->getName()) . ' for ' . $placement->getTitle(true) . ' ');
+
+        $message->setSubject('[#'.$model->getId().'] ' . $model->getCollection()->getName() . ' Entry ' .
+            ucfirst($status->getName()) . ' for ' . $placement->getTitle(true) . ' ');
         $message->setFrom(\Tk\Mail\Message::joinEmail($status->getCourse()->getEmail(), $status->getSubjectName()));
 
         // Setup the message vars
@@ -68,12 +72,15 @@ class EntryStatusStrategy extends \Uni\Db\StatusStrategyInterface
         $message->set('collection::name', $model->getCollection()->getName());
         $message->set('collection::instructions', $model->getCollection()->getInstructions());
         $message->set('entry::id', $model->getId());
-        $message->set('entry::title', $model->title);
-        $message->set('entry::assessor', $model->assessor);
-        $message->set('entry::status', $model->status);
-        $message->set('entry::notes', nl2br($model->notes, true));
+        $message->set('entry::title', $model->getTitle());
+        $message->set('entry::assessor', $model->getAssessor());
+        $message->set('entry::status', $model->getStatus());
+        $message->set('entry::notes', nl2br($model->getNotes(), true));
 
-        switch ($mailTemplate->recipient) {
+        /** @var MailTemplate $mailTemplate */
+        $mailTemplate = $message->get('_mailTemplate');
+
+        switch ($mailTemplate->getRecipient()) {
             case \App\Db\MailTemplate::RECIPIENT_STUDENT:
                 if ($placement->getUser()) {
                     $message->addTo(\Tk\Mail\Message::joinEmail($placement->getUser()->getEmail(), $placement->getUser()->getName()));

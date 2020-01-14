@@ -293,6 +293,132 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
         return EntryMap::create()->getEntryAverage($this->getId());
     }
 
+    /**
+     * @return string
+     */
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
+
+    /**
+     * @param string $title
+     * @return Entry
+     */
+    public function setTitle(string $title): Entry
+    {
+        $this->title = $title;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAssessor(): string
+    {
+        return $this->assessor;
+    }
+
+    /**
+     * @param string $assessor
+     * @return Entry
+     */
+    public function setAssessor(string $assessor): Entry
+    {
+        $this->assessor = $assessor;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getAbsent(): int
+    {
+        return $this->absent;
+    }
+
+    /**
+     * @param int $absent
+     * @return Entry
+     */
+    public function setAbsent(int $absent): Entry
+    {
+        $this->absent = $absent;
+        return $this;
+    }
+
+    /**
+     * @return float
+     */
+    public function getAverage(): float
+    {
+        return $this->average;
+    }
+
+    /**
+     * @param float $average
+     * @return Entry
+     */
+    public function setAverage(float $average): Entry
+    {
+        $this->average = $average;
+        return $this;
+    }
+
+    /**
+     * @return float
+     */
+    public function getWeightedAverage(): float
+    {
+        return $this->weightedAverage;
+    }
+
+    /**
+     * @param float $weightedAverage
+     * @return Entry
+     */
+    public function setWeightedAverage(float $weightedAverage): Entry
+    {
+        $this->weightedAverage = $weightedAverage;
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getConfirm(): ?int
+    {
+        return $this->confirm;
+    }
+
+    /**
+     * @param int|null $confirm
+     * @return Entry
+     */
+    public function setConfirm(?int $confirm): Entry
+    {
+        $this->confirm = $confirm;
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getNotes(): string
+    {
+        return $this->notes;
+    }
+
+    /**
+     * @param string $notes
+     * @return Entry
+     */
+    public function setNotes(string $notes): Entry
+    {
+        $this->notes = $notes;
+        return $this;
+    }
+
 
     /**
      * @return array
