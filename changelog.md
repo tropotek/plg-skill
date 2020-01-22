@@ -1,5 +1,9 @@
 #CHANGELOG#
 
+Ver 3.0.54 [2020-01-23]:
+-------------------------------
+
+
 Ver 3.0.52 [2020-01-21]:
 -------------------------------
   - Moved Status system to tk-uni lib updated files
