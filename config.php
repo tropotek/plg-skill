@@ -47,3 +47,4 @@ $routes->add('skill-entry-results-student', new \Tk\Routing\Route('/student/{sub
 $routes->add('guest-skill-entry-submit', new \Tk\Routing\Route('/inst/{institutionHash}/skillEdit.html', 'Skill\Controller\Entry\Edit::doPublicSubmission'));
 
 
+
