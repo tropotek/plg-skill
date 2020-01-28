@@ -110,7 +110,7 @@ class SubjectDashboardHandler implements Subscriber
                 $actionCell->addButton(\Tk\Table\Cell\ActionButton::create($collection->name,
                     \Uni\Uri::createSubjectUrl('/entryView.html'), $collection->icon))
                     ->setShowLabel()
-                    ->setOnShow(function ($cell, $obj, $btn) use ($collection) {
+                    ->addOnShow(function ($cell, $obj, $btn) use ($collection) {
                         /** @var \Tk\Table\Cell\Actions $cell */
                         /** @var \App\Db\Placement $obj */
                         /** @var \Tk\Table\Cell\ActionButton $btn */
