@@ -48,7 +48,7 @@ class EntryView extends \App\FormIface
             $this->appendField(new Field\Html('absent'))->setLabel('Days Absent')
                 ->addCss('form-control form-control-static form-control-plaintext')->setFieldset('Entry Details');
 
-        if ($this->getEntry()->getCollection()->confirm && $this->getUser()->isStaff()) {
+        if ($this->getEntry()->getCollection()->confirm && $this->getAuthUser()->isStaff()) {
             $s = ($this->getEntry()->confirm === null) ? '' : ($this->getEntry()->confirm ? 'Yes' : 'No');
             $this->appendField(new Field\Html('confirm', $s))
                 ->addCss('form-control form-control-static form-control-plaintext')

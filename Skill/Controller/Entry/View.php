@@ -26,7 +26,7 @@ class View extends AdminEditIface
     public function __construct()
     {
         $this->setPageTitle('Skill Entry View');
-        if ($this->getUser()->isStudent()) {
+        if ($this->getAuthUser()->isStudent()) {
             $this->getActionPanel()->setEnabled(false);
         }
     }
@@ -72,7 +72,7 @@ class View extends AdminEditIface
      */
     public function initActionPanel()
     {
-        if ($this->entry->getId() && $this->getUser()->isStaff()) {
+        if ($this->entry->getId() && $this->getAuthUser()->isStaff()) {
             $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('PDF',
                 \Uni\Uri::create()->set('p', 'p'), 'fa fa-file-pdf-o')->setAttr('target', '_blank'));
         }

@@ -94,7 +94,7 @@ class SidebarHandler implements Subscriber
                 if ($html)
                     $sidebar->getTemplate()->appendHtml('menu', $html);
             }
-        } else if ($this->controller->getUser()->isStaff()) {
+        } else if ($this->controller->getAuthUser()->isStaff()) {
             /** @var \App\Ui\Sidebar\StaffMenu $sidebar */
             $list = \Skill\Db\CollectionMap::create()->findFiltered( array('subjectId' => $this->subject->getId(), 'gradable' => true, 'active' => true) );
             foreach ($list as $collection) {

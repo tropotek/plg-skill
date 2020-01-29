@@ -48,7 +48,7 @@ class Edit extends AdminEditIface
     public function __construct()
     {
         $this->setPageTitle('Skill Entry Edit');
-        if ($this->getUser() && $this->getUser()->isStudent()) {
+        if ($this->getAuthUser() && $this->getAuthUser()->isStudent()) {
             $this->getActionPanel()->setEnabled(false);
         }
     }
@@ -73,8 +73,8 @@ class Edit extends AdminEditIface
     {
         $this->entry = new \Skill\Db\Entry();
         $this->entry->userId = (int)$request->get('userId', 0);
-        if ($this->getUser()) {
-            $this->entry->userId = $this->getUser()->getId();
+        if ($this->getAuthUser()) {
+            $this->entry->userId = $this->getAuthUser()->getId();
         }
         $this->entry->subjectId = (int)$request->get('subjectId');
         $this->entry->collectionId = (int)$request->get('collectionId');
@@ -124,7 +124,7 @@ class Edit extends AdminEditIface
                 $this->entry = $e;
         }
 
-        if ($request->get('collectionId') && $request->get('userId') && $this->getUser()->isStaff()) {          // Staff view student self assessment
+        if ($request->get('collectionId') && $request->get('userId') && $this->getAuthUser()->isStaff()) {          // Staff view student self assessment
             $e = \Skill\Db\EntryMap::create()->findFiltered(array(
                     'collectionId' => $request->get('collectionId'),
                     'userId' => $request->get('userId'))
@@ -133,7 +133,7 @@ class Edit extends AdminEditIface
                 $this->entry = $e;
         }
 
-        if (!$request->has('userId') && !$request->has('subjectId') && $this->getUser() && $this->getUser()->isStudent()) {         // Assumed to be student self assessment form
+        if (!$request->has('userId') && !$request->has('subjectId') && $this->getAuthUser() && $this->getAuthUser()->isStudent()) {         // Assumed to be student self assessment form
             $e = \Skill\Db\EntryMap::create()->findFiltered(array(
                     'collectionId' => $this->entry->collectionId,
                     'subjectId' => $this->entry->subjectId,
@@ -164,8 +164,8 @@ class Edit extends AdminEditIface
         }
 
         if ($this->entry->isSelfAssessment() && !$this->entry->getId()) {
-            $this->entry->title = $this->entry->getCollection()->name . ' for ' . $this->entry->getUser()->getName();
-            $this->entry->assessor = $this->entry->getUser()->getName();
+            $this->entry->title = $this->entry->getCollection()->name . ' for ' . $this->entry->getAuthUser()->getName();
+            $this->entry->assessor = $this->entry->getAuthUser()->getName();
         }
 
         $this->setPageTitle($this->entry->getCollection()->name);
@@ -179,7 +179,7 @@ class Edit extends AdminEditIface
         $this->getForm()->execute();
 
 
-        if ($this->getUser() && $this->getUser()->isStaff() && $this->entry->getId()) {
+        if ($this->getAuthUser() && $this->getAuthUser()->isStaff() && $this->entry->getId()) {
             $this->statusTable = \Uni\Table\Status::create(\App\Config::getInstance()->getUrlName().'-status')
                 ->setEditUrl(\Uni\Uri::createSubjectUrl('/mailLogManager.html'))->init();
             $filter = array(
@@ -200,7 +200,7 @@ class Edit extends AdminEditIface
      */
     public function initActionPanel()
     {
-        if ($this->entry->getId() && ($this->getUser() && $this->getUser()->isStaff())) {
+        if ($this->entry->getId() && ($this->getAuthUser() && $this->getAuthUser()->isStaff())) {
             $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('View',
                 \Uni\Uri::createSubjectUrl('/entryView.html')->set('entryId', $this->entry->getId()), 'fa fa-eye'));
             $this->getActionPanel()->append(\Tk\Ui\Link::createBtn('PDF',
@@ -231,7 +231,7 @@ class Edit extends AdminEditIface
             }
         } else {
             $template->setVisible('edit');
-            if ($this->getUser()->isStaff()) {
+            if ($this->getAuthUser()->isStaff()) {
                 if ($this->entry->getId()) {
                     if ($this->statusTable) {
                         $template->appendTemplate('statusLog', $this->statusTable->show());

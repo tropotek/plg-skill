@@ -31,7 +31,7 @@ class StudentResults extends AdminIface
     public function __construct()
     {
         $this->setPageTitle('Results');
-        if ($this->getUser()->isStudent()) {
+        if ($this->getAuthUser()->isStudent()) {
             $this->getActionPanel()->setEnabled(false);
         }
     }
@@ -45,12 +45,12 @@ class StudentResults extends AdminIface
 
         $this->user = \App\Db\UserMap::create()->find($request->get('userId'));
         if (!$this->user) {
-            $this->user = $this->getUser();
+            $this->user = $this->getAuthUser();
         }
 
         $this->collection = \Skill\Db\CollectionMap::create()->find($request->get('collectionId'));
 
-        if (!$this->collection->active && !$this->getUser()->isStaff()) {
+        if (!$this->collection->active && !$this->getAuthUser()->isStaff()) {
             throw new \Tk\Exception('This page is not available.');
         }
     }

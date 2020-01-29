@@ -143,7 +143,7 @@ class CollectionReport extends \App\TableIface
 
         // Filters
         $this->appendFilter(new \Tk\Form\Field\Input('uid'))->setAttr('placeholder', 'Student Number');
-        if ($this->getUser()->isCoordinator()) {
+        if ($this->getAuthUser()->isCoordinator()) {
             $this->appendFilter(new \Tk\Form\Field\Input('exclude'))->setAttr('style', 'width: 250px;')
                 ->setAttr('placeholder', 'Exclude companyId (EG: 123, 412, 231)');
         }

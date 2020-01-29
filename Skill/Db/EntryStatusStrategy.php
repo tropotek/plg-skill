@@ -62,7 +62,7 @@ class EntryStatusStrategy extends \Uni\Db\StatusStrategyInterface
         $message->setFrom(\Tk\Mail\Message::joinEmail($status->getCourse()->getEmail(), $status->getSubjectName()));
 
         // Setup the message vars
-        \App\Util\StatusMessage::setStudent($message, $placement->getUser());
+        \App\Util\StatusMessage::setStudent($message, $placement->getAuthUser());
         \App\Util\StatusMessage::setSupervisor($message, $placement->getSupervisor());
         \App\Util\StatusMessage::setCompany($message, $placement->getCompany());
         \App\Util\StatusMessage::setPlacement($message, $placement);
@@ -82,8 +82,8 @@ class EntryStatusStrategy extends \Uni\Db\StatusStrategyInterface
 
         switch ($mailTemplate->getRecipient()) {
             case \App\Db\MailTemplate::RECIPIENT_STUDENT:
-                if ($placement->getUser()) {
-                    $message->addTo(\Tk\Mail\Message::joinEmail($placement->getUser()->getEmail(), $placement->getUser()->getName()));
+                if ($placement->getAuthUser()) {
+                    $message->addTo(\Tk\Mail\Message::joinEmail($placement->getAuthUser()->getEmail(), $placement->getAuthUser()->getName()));
                 }
                 break;
             case \App\Db\MailTemplate::RECIPIENT_COMPANY:
@@ -148,7 +148,7 @@ class EntryStatusStrategy extends \Uni\Db\StatusStrategyInterface
         $editUrl = \Uni\Uri::createSubjectUrl('/entryEdit.html')->set('entryId', $model->getId());
         $from = '';
 
-        $userName = $model->getPlacement()->getUser()->getName();
+        $userName = $model->getPlacement()->getAuthUser()->getName();
 //        $userName = 'Unknown';
 //        if (!$model->getUser()) {
 //            $userName = $model->getPlacement()->getUser()->getName();

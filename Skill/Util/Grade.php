@@ -111,7 +111,7 @@ class Grade implements \Serializable
     /**
      * @return null|\Uni\Db\User|\Tk\Db\Map\Model|\Tk\Db\ModelInterface
      */
-    public function getUser()
+    public function getAuthUser()
     {
         if (!$this->user) {
             try {
