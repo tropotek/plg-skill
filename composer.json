@@ -9,7 +9,7 @@
         "goals",
         "EMS"
     ],
-    "time": "2020-01-29",
+    "time": "2019-04-09",
     "license": "MIT",
     "authors":  [
          {
@@ -29,6 +29,5 @@
     },
     "require":  {
         "mpdf/mpdf": "~7.0"
-    },
-    "version": "3.0.56"
+    }
 }
