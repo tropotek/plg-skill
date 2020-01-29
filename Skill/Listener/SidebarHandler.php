@@ -55,7 +55,7 @@ class SidebarHandler implements Subscriber
         /** @var \App\Ui\Sidebar\Iface $sidebar */
         $sidebar = $event->get('sidebar');
         $subject = $this->controller->getConfig()->getSubject();
-        $user = $this->controller->getConfig()->getUser();
+        $user = $this->controller->getConfig()->getAuthUser();
         if (!$user || !$subject) return;
 
         if ($user->isStudent()) {

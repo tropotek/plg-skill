@@ -27,7 +27,7 @@ class EntryView extends \App\FormIface
      */
     public function init()
     {
-        $user = $this->getConfig()->getUser();
+        $user = $this->getConfig()->getAuthUser();
         $this->addCss('skill-entry-view');
         $this->addCss('form-horizontal');
 
