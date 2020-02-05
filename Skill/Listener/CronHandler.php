@@ -2,6 +2,7 @@
 namespace Skill\Listener;
 
 use Symfony\Component\Console\Output\Output;
+use Tk\ConfigTrait;
 use Tk\Event\Event;
 use Tk\Event\Subscriber;
 
@@ -16,6 +17,7 @@ use Tk\Event\Subscriber;
 class CronHandler implements Subscriber
 {
 
+    use ConfigTrait;
 
     /**
      * @param Event $event
@@ -28,9 +30,10 @@ class CronHandler implements Subscriber
         $cronConsole = $event->get('console');
 
         // TODO: Remove after Jan 2019
-        $this->fixCollectionIds($cronConsole);
+        //$this->fixCollectionIds($cronConsole);
 
-        $this->refreshGradeCache($cronConsole);
+        if (!$this->getConfig()->isDebug())
+            $this->refreshGradeCache($cronConsole);
 
     }
 
