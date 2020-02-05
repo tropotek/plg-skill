@@ -36,7 +36,7 @@ class Item extends \App\TableIface
         // TODO: this needs to be a nested sub level order system ???????
         //$this->appendCell(new \Tk\Table\Cell\OrderBy('orderBy'))->setIconOnly();
         $this->appendCell(new \Tk\Table\Cell\Checkbox('id'));
-        $this->appendCell(new \Tk\Table\Cell\Text('num'))->setLabel('#')->setOnPropertyValue(function ($cell, $obj, $value) {
+        $this->appendCell(new \Tk\Table\Cell\Text('num'))->setLabel('#')->addOnPropertyValue(function ($cell, $obj, $value) {
             /** @var \Tk\Table\Cell\Text $cell */
             /** @var \Skill\Db\Item $obj */
             $value = $cell->getTable()->getRenderer()->getRowId()+1;
@@ -45,13 +45,13 @@ class Item extends \App\TableIface
         $this->appendCell(new \Tk\Table\Cell\Text('question'))->addCss('key')->setUrl($this->getEditUrl());
         $domains = \Skill\Db\DomainMap::create()->findFiltered(array('collectionId' => $this->getCollectionObj()->getId()));
         if (count($domains)) {
-            $this->appendCell(new \Tk\Table\Cell\Text('domainId'))->setOnPropertyValue(function ($cell, $obj, $value) {
+            $this->appendCell(new \Tk\Table\Cell\Text('domainId'))->addOnPropertyValue(function ($cell, $obj, $value) {
                 /** @var \Skill\Db\Item $obj */
                 if ($obj->getDomain()) return $obj->getDomain()->name;
                 return 'None';
             });
         }
-        $this->appendCell(new \Tk\Table\Cell\Text('categoryId'))->setOnPropertyValue(function ($cell, $obj, $value) {
+        $this->appendCell(new \Tk\Table\Cell\Text('categoryId'))->addOnPropertyValue(function ($cell, $obj, $value) {
             /** @var \Skill\Db\Item $obj */
             if ($obj->getCategory()) return $obj->getCategory()->name;
             return $value;
@@ -60,7 +60,7 @@ class Item extends \App\TableIface
         $this->appendCell(new \Tk\Table\Cell\Date('modified'));
         $this->appendCell(new \Tk\Table\Cell\Text('uid'))->setLabel('UID');
 
-        $this->appendCell(new \Tk\Table\Cell\Text('values'))->setLabel('Val #')->setOnPropertyValue(function ($cell, $obj, $value) {
+        $this->appendCell(new \Tk\Table\Cell\Text('values'))->setLabel('Val #')->addOnPropertyValue(function ($cell, $obj, $value) {
             /** @var \Tk\Table\Cell\Text $cell */
             /** @var \Skill\Db\Item $obj */
             $sql = sprintf('SELECT a.id, a.question, COUNT(b.item_id) as \'count\'

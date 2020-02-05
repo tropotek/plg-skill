@@ -48,7 +48,7 @@ class CompanyAverage extends \Uni\TableIface
 
         $this->appendCell(new \Tk\Table\Cell\Text('company_id'));
         $this->appendCell(new \Tk\Table\Cell\Text('name'))->addCss('key')->setUrl(\Uni\Uri::create('#'))
-            ->setOnPropertyValue(function ($cell, $obj, $value) use ($collection) {
+            ->addOnPropertyValue(function ($cell, $obj, $value) use ($collection) {
                 /** @var $cell \Tk\Table\Cell\Text */
                 /** @var $obj \stdClass */
                 $config = \App\Config::getInstance();
@@ -67,7 +67,7 @@ class CompanyAverage extends \Uni\TableIface
 
                 return $value;
             })
-            ->setOnCellHtml(function ($cell, $obj, $html) use ($collection) {
+            ->addOnCellHtml(function ($cell, $obj, $html) use ($collection) {
                 /** @var $cell \Tk\Table\Cell\Text */
                 /** @var $obj \stdClass */
                 $config = \App\Config::getInstance();
@@ -85,7 +85,7 @@ class CompanyAverage extends \Uni\TableIface
                     $ttable->appendCell(\Tk\Table\Cell\Text::create('company_id'));
                     $ttable->appendCell(\Tk\Table\Cell\Text::create('placement_id'))->addCss('key')
                         ->setUrlProperty(null)
-                        ->setOnPropertyValue(function ($cell, $obj, $value) {
+                        ->addOnPropertyValue(function ($cell, $obj, $value) {
                             /** @var $cell \Tk\Table\Cell\Text */
                             /** @var $obj \stdClass */
                             /** @var \App\Db\Placement $placement */
@@ -100,7 +100,7 @@ class CompanyAverage extends \Uni\TableIface
                                 return $placement->getTitle(true);
                             }
                             return $value;
-                        })->setOnCellHtml(function ($cell, $obj, $html) {
+                        })->addOnCellHtml(function ($cell, $obj, $html) {
                             /** @var $cell \Tk\Table\Cell\Text */
                             /** @var $obj \stdClass */
                             $value = $propValue = $cell->getPropertyValue($obj);
@@ -119,7 +119,7 @@ class CompanyAverage extends \Uni\TableIface
                             return $str;
                         });
                     $ttable->appendCell(\Tk\Table\Cell\Text::create('supervisor_id'))
-                        ->setOnPropertyValue(function ($cell, $obj, $value) {
+                        ->addOnPropertyValue(function ($cell, $obj, $value) {
                             /** @var $cell \Tk\Table\Cell\Text */
                             /** @var $obj \stdClass */
                             /** @var \App\Db\Supervisor $supervisor */
@@ -148,12 +148,12 @@ class CompanyAverage extends \Uni\TableIface
             });
         $this->appendCell(new \Tk\Table\Cell\Text('graph'))
             ->setOrderProperty('avg')
-            ->setOnPropertyValue(function ($cell, $obj, $value) {
+            ->addOnPropertyValue(function ($cell, $obj, $value) {
                 $list = $cell->getRow()->get('cellList');
                 $value = implode('; ', $list->toArray('pct'));
                 return $value;
             })
-            ->setOnCellHtml(function ($cell, $obj, $html) {
+            ->addOnCellHtml(function ($cell, $obj, $html) {
               /** @var $cell \Tk\Table\Cell\Text */
               /** @var $obj \stdClass */
               $cell->setAttr('title', '');

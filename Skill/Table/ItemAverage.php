@@ -48,7 +48,7 @@ class ItemAverage extends \Uni\TableIface
         $this->setStaticOrderBy('');
 
         //$this->appendCell(new \Tk\Table\Cell\Checkbox('id'));
-        $this->appendCell(new \Tk\Table\Cell\Text('num'))->setLabel('#')->setOnPropertyValue(function ($cell, $obj, $value) {
+        $this->appendCell(new \Tk\Table\Cell\Text('num'))->setLabel('#')->addOnPropertyValue(function ($cell, $obj, $value) {
             /** @var $cell \Tk\Table\Cell\Text */
             $value = $cell->getTable()->getRenderer()->getRowId()+1;
             return $value;

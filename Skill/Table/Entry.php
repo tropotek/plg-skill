@@ -35,7 +35,7 @@ class Entry extends \App\TableIface
         $this->appendCell(new \Tk\Table\Cell\Text('title'))->addCss('key')->setUrl($this->getEditUrl());
         $this->appendCell(new \Tk\Table\Cell\Text('average'));
         $this->appendCell(new \Tk\Table\Cell\Text('status'));
-        $this->appendCell(new \Tk\Table\Cell\Text('userId'))->setOnPropertyValue(function ($cell, $obj) {
+        $this->appendCell(new \Tk\Table\Cell\Text('userId'))->addOnPropertyValue(function ($cell, $obj) {
             /** @var \Tk\Table\Cell\Text $cell */
             /** @var \Skill\Db\Entry $obj */
             if ($obj->getUser()) {

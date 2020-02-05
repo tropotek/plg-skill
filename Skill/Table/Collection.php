@@ -45,7 +45,7 @@ class Collection extends \App\TableIface
         $this->appendCell(new \Tk\Table\Cell\Boolean('requirePlacement'));
         $this->appendCell(new \Tk\Table\Cell\Boolean('publish'));
         $this->appendCell(new \Tk\Table\Cell\Boolean('active'));
-        $this->appendCell(new \Tk\Table\Cell\Text('entries'))->setOnPropertyValue(function ($cell, $obj) {
+        $this->appendCell(new \Tk\Table\Cell\Text('entries'))->addOnPropertyValue(function ($cell, $obj) {
             /** @var \Skill\Db\Collection $obj */
             $filter = array('collectionId' => $obj->getId());
             return \Skill\Db\EntryMap::create()->findFiltered($filter)->count();

@@ -34,7 +34,7 @@ class CollectionReport extends \App\TableIface
     {
         $this->appendCell(new \Tk\Table\Cell\Text('uid'))->setLabel('studentNumber');
         $this->appendCell(new \Tk\Table\Cell\Text('name'))->addCss('key')->setUrl($this->getEditUrl())
-            ->setOnPropertyValue(function ($cell, $obj, $value) {
+            ->addOnPropertyValue(function ($cell, $obj, $value) {
                 /** @var \Tk\Table\Cell\Text $cell */
                 $cell->setUrl($cell->getUrl()->set('userId', $obj->getId()));
                 return $value;
@@ -65,7 +65,7 @@ class CollectionReport extends \App\TableIface
         //$domains = \Skill\Db\DomainMap::create()->findFiltered(array('collectionId'=>$this->collection->getId()));
         foreach ($domains as $domain) {
             $this->appendCell(new \Tk\Table\Cell\Text($domain->label))->setLabel($domain->label)->setOrderProperty('')
-                ->setOnPropertyValue(function ($cell, $obj, $value) use ($domain, $gradeList) {
+                ->addOnPropertyValue(function ($cell, $obj, $value) use ($domain, $gradeList) {
                     /** @var \Tk\Table\Cell\Text $cell */
                     /** @var \Uni\Db\User $obj */
                     if (isset($gradeList[$obj->getId()])) {
@@ -82,7 +82,7 @@ class CollectionReport extends \App\TableIface
         }
 
         $this->appendCell(new \Tk\Table\Cell\Text('total'))->setOrderProperty('')->setLabel('Total Avg.')
-            ->setOnPropertyValue(function ($cell, $obj, $value) use ($gradeList) {
+            ->addOnPropertyValue(function ($cell, $obj, $value) use ($gradeList) {
                 /** @var \Tk\Table\Cell\Text $cell */
                 /** @var \Uni\Db\User $obj */
                 $cell->addCss('total');
@@ -98,7 +98,7 @@ class CollectionReport extends \App\TableIface
 
         foreach ($domains as $domain) {
             $this->appendCell(new \Tk\Table\Cell\Text($domain->label.'Grade'))->setOrderProperty('')->setLabel($domain->label.' Grade')
-                ->setOnPropertyValue(function ($cell, $obj, $value) use ($domain, $gradeList) {
+                ->addOnPropertyValue(function ($cell, $obj, $value) use ($domain, $gradeList) {
                     /** @var \Tk\Table\Cell\Text $cell */
                     /** @var \Uni\Db\User $obj */
                     if (isset($gradeList[$obj->getId()])) {
@@ -114,7 +114,7 @@ class CollectionReport extends \App\TableIface
                 });
         };
         $this->appendCell(new \Tk\Table\Cell\Text('totalGrade'))->setOrderProperty('')
-            ->setOnPropertyValue(function ($cell, $obj, $value) use ($gradeList) {
+            ->addOnPropertyValue(function ($cell, $obj, $value) use ($gradeList) {
                 /** @var \Tk\Table\Cell\Text $cell */
                 /** @var \Uni\Db\User $obj */
                 $cell->addCss('total');
@@ -128,7 +128,7 @@ class CollectionReport extends \App\TableIface
                 return '0.00';
             });
         $this->appendCell(new \Tk\Table\Cell\Text('totalPct'))->setOrderProperty('')
-            ->setOnPropertyValue(function ($cell, $obj, $value) use ($gradeList) {
+            ->addOnPropertyValue(function ($cell, $obj, $value) use ($gradeList) {
                 /** @var \Tk\Table\Cell\Text $cell */
                 /** @var \Uni\Db\User $obj */
 

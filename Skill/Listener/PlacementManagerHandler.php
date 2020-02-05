@@ -117,7 +117,7 @@ class PlacementManagerHandler implements Subscriber
 
             $table = $event->getTable();
             $table->appendCell(\Tk\Table\Cell\Link::create('feedbackLinks'))->setLabel('Feedback Links')
-                ->setOnPropertyValue(function ($cell, $obj, $value) use ($collectionList) {
+                ->addOnPropertyValue(function ($cell, $obj, $value) use ($collectionList) {
                     /** @var \App\Db\Placement $obj */
                     $value = '';
                     /** @var \Skill\Db\Collection $collection */
@@ -131,7 +131,7 @@ class PlacementManagerHandler implements Subscriber
                     }
                     return $value;
                 })
-                ->setOnCellHtml(function ($cell, $obj, $html) use ($collectionList) {
+                ->addOnCellHtml(function ($cell, $obj, $html) use ($collectionList) {
                     /** @var \Tk\Table\Cell\Link $cell */
                     /** @var \App\Db\Placement $obj */
                     $html = '';
