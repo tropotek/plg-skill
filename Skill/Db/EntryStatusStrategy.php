@@ -82,18 +82,27 @@ class EntryStatusStrategy extends \Uni\Db\StatusStrategyInterface
 
         switch ($mailTemplate->getRecipient()) {
             case \App\Db\MailTemplate::RECIPIENT_STUDENT:
-                if ($placement->getAuthUser()) {
-                    $message->addTo(\Tk\Mail\Message::joinEmail($placement->getAuthUser()->getEmail(), $placement->getAuthUser()->getName()));
+                $student = $placement->getUser();
+                if ($student && $student->getEmail()) {
+                    $message->addTo(\Tk\Mail\Message::joinEmail($student->getEmail(), $student->getName()));
+                    $message->set('recipient::email', $student->getEmail());
+                    $message->set('recipient::name', $student->getName());
                 }
                 break;
             case \App\Db\MailTemplate::RECIPIENT_COMPANY:
-                if ($placement->getCompany()) {
-                    $message->addTo(\Tk\Mail\Message::joinEmail($placement->getCompany()->getEmail(), $placement->getCompany()->getName()));
+                $company = $placement->getCompany();
+                if ($company && $company->getEmail()) {
+                    $message->addTo(\Tk\Mail\Message::joinEmail($company->getEmail(), $company->getName()));
+                    $message->set('recipient::email', $company->getEmail());
+                    $message->set('recipient::name', $company->getName());
                 }
                 break;
             case \App\Db\MailTemplate::RECIPIENT_SUPERVISOR:
-                if ($placement->getSupervisor() && $placement->getSupervisor()->getEmail())
-                    $message->addTo(\Tk\Mail\Message::joinEmail($placement->getSupervisor()->getEmail(), $placement->getSupervisor()->getName()));
+                $supervisor = $placement->getSupervisor();
+                if ($supervisor && $supervisor->getEmail())
+                    $message->addTo(\Tk\Mail\Message::joinEmail($supervisor->getEmail(), $supervisor->getName()));
+                    $message->set('recipient::email', $supervisor->getEmail());
+                    $message->set('recipient::name', $supervisor->getName());
                 break;
             case \App\Db\MailTemplate::RECIPIENT_STAFF:
                 $staffList = $status->getSubject()->getCourse()->getUsers();
