@@ -35,7 +35,7 @@ class Edit extends AdminEditIface
     public function doDefault(Request $request)
     {
         $this->collection = new \Skill\Db\Collection();
-        $this->collection->subjectId = $this->getSubjectId();
+        $this->collection->subjectId = $this->getConfig()->getSubjectId();
         if ($request->get('collectionId')) {
             $this->collection = \Skill\Db\CollectionMap::create()->find($request->get('collectionId'));
         }

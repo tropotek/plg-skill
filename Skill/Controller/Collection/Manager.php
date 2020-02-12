@@ -31,7 +31,7 @@ class Manager extends AdminManagerIface
     {
 
         $this->setTable(\Skill\Table\Collection::create());
-        $this->getTable()->setEditUrl(\Uni\Uri::createHomeUrl('/skill/collectionEdit.html'));
+        $this->getTable()->setEditUrl(\Uni\Uri::createSubjectUrl('/collectionEdit.html'));
         $this->getTable()->init();
 
         $filter = array(
