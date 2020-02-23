@@ -22,11 +22,6 @@
             "Skill\\": ""
         }
     },
-    "extra":  {
-        "branch-alias":  {
-            "dev-master": "3.0.x-dev"
-        }
-    },
     "require":  {
         "mpdf/mpdf": "~7.0"
     }
