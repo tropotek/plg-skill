@@ -51,8 +51,8 @@ class Entry extends \App\FormIface
             $this->appendField(new Field\Html('average', sprintf('%.2f &nbsp; (%d%%)', $avg, $ratio)))->setFieldset('Entry Details');
         }
 
-        $urlRole = \Uni\Uri::create()->getRoleType($this->getConfig()->getAvailableUserRoleTypes());
-        if ($user && $user->isStaff() && $user->getRole()->hasType($urlRole)) {
+        $urlRole = \Uni\Uri::create()->getRoleType($this->getConfig()->getUserTypeList());
+        if ($user && $user->isStaff() && $user->hasType($urlRole)) {
             $this->appendField(new \App\Form\Field\StatusSelect('status', \Skill\Db\Entry::getStatusList()))
                 ->setRequired()->prependOption('-- Status --', '')->setNotes('Set the status. Use the checkbox to disable notification emails.')->setFieldset('Entry Details');
         } else {
@@ -78,7 +78,7 @@ class Entry extends \App\FormIface
             }
         }
 
-        if ($this->getEntry()->getCollection()->confirm) {
+        if ($this->getEntry()->getCollection()->getConfirm()) {
             $radioBtn = new \Tk\Form\Field\RadioButton('confirm', $this->getEntry()->getCollection()->confirm);
             $radioBtn->appendOption('Yes', '1', 'fa fa-check')->appendOption('No', '0', 'fa fa-ban');
             $this->appendField($radioBtn)->setLabel(null)->setFieldset('Confirmation')->setValue(true);
@@ -158,7 +158,7 @@ JS;
                 $form->addFieldError('status', 'Please Select a valid status');
             }
         } else {
-            $this->getEntry()->status = \Skill\Db\Entry::STATUS_PENDING;
+            $this->getEntry()->setStatus(\Skill\Db\Entry::STATUS_PENDING);
         }
 
         $hasValue = false;

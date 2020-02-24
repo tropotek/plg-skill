@@ -31,7 +31,7 @@ class StatusMailHandler implements Subscriber
                     $filter = array(
                         'active' => true,
                         'subjectId' => $message->get('placement::subjectId'),
-                        'role' => \Skill\Db\Collection::ROLE_COMPANY,
+                        'role' => \Skill\Db\Collection::TYPE_COMPANY,
                         'requirePlacement' => true,
                         'placementTypeId' => $placement->getPlacementTypeId()
                     );

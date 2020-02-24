@@ -94,22 +94,22 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     /**
      * @var Collection
      */
-    private $collection = null;
+    private $_collection = null;
 
     /**
      * @var \App\Db\Subject
      */
-    private $subject = null;
+    private $_subject = null;
 
     /**
      * @var \App\Db\User
      */
-    private $user = null;
+    private $_user = null;
 
     /**
      * @var \App\Db\Placement
      */
-    private $placement = null;
+    private $_placement = null;
 
 
 
@@ -134,7 +134,7 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     {
         $collection = $this->getCollection();
         if ($collection && !$collection->gradable && !$collection->requirePlacement &&
-            $collection->role == \Skill\Db\Collection::ROLE_STUDENT) {
+            $collection->role == \Skill\Db\Collection::TYPE_STUDENT) {
             return true;
         }
         return false;
@@ -175,10 +175,10 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
      */
     public function getCollection()
     {
-        if (!$this->collection) {
-            $this->collection = CollectionMap::create()->find($this->collectionId);
+        if (!$this->_collection) {
+            $this->_collection = CollectionMap::create()->find($this->collectionId);
         }
-        return $this->collection;
+        return $this->_collection;
     }
 
     /**
@@ -187,10 +187,10 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
      */
     public function getSubject()
     {
-        if (!$this->subject) {
-            $this->subject = \App\Db\SubjectMap::create()->find($this->subjectId);
+        if (!$this->_subject) {
+            $this->_subject = \App\Db\SubjectMap::create()->find($this->subjectId);
         }
-        return $this->subject;
+        return $this->_subject;
     }
 
     /**
@@ -199,10 +199,10 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
      */
     public function getUser()
     {
-        if (!$this->user) {
-            $this->user = \App\Db\UserMap::create()->find($this->userId);
+        if (!$this->_user) {
+            $this->_user = \App\Db\UserMap::create()->find($this->userId);
         }
-        return $this->user;
+        return $this->_user;
     }
 
     /**
@@ -211,10 +211,10 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
      */
     public function getPlacement()
     {
-        if (!$this->placement) {
-            $this->placement = \App\Db\PlacementMap::create()->find($this->placementId);
+        if (!$this->_placement) {
+            $this->_placement = \App\Db\PlacementMap::create()->find($this->placementId);
         }
-        return $this->placement;
+        return $this->_placement;
     }
 
     /**

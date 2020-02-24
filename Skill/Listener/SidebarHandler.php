@@ -74,7 +74,7 @@ class SidebarHandler implements Subscriber
                             htmlentities(\Uni\Uri::createSubjectUrl('/entryResults.html')->set('collectionId', $collection->getId())->toString()),
                             $collection->name, $collection->icon, $collection->name);
                     }
-                } else if ($collection->role == \Skill\Db\Collection::ROLE_STUDENT) {
+                } else if ($collection->role == \Skill\Db\Collection::TYPE_STUDENT) {
                     /** @var \Skill\Db\Entry $e */
                     $e = \Skill\Db\EntryMap::create()->findFiltered(array(
                                     'collectionId' => $collection->getId(),

@@ -17,9 +17,9 @@ class Collection extends \Tk\Db\Map\Model
     use SubjectTrait;
     use TimestampTrait;
 
-    const ROLE_STAFF    = 'staff';
-    const ROLE_STUDENT  = 'student';
-    const ROLE_COMPANY  = 'company';
+    const TYPE_STAFF    = 'staff';
+    const TYPE_STUDENT  = 'student';
+    const TYPE_COMPANY  = 'company';
 
     const FIELD_ENABLE_RESULTS = 'skillResults';
 
