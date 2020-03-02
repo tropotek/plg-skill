@@ -55,7 +55,7 @@ class CollectionReport extends \App\Controller\AdminManagerIface
         $filter = array(
             'collectionId' => $this->collection->getId(),
             'subjectId' => $this->getConfig()->getSubjectId(),
-            'type' => \Uni\Db\Role::TYPE_STUDENT
+            'type' => \Uni\Db\User::TYPE_STUDENT
         );
         $this->getTable()->setList($this->getTable()->findList($filter));
 
