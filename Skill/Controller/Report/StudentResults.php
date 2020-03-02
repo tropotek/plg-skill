@@ -50,7 +50,7 @@ class StudentResults extends AdminIface
 
         $this->collection = \Skill\Db\CollectionMap::create()->find($request->get('collectionId'));
 
-        if (!$this->collection->active && !$this->getAuthUser()->isStaff()) {
+        if (!$this->collection->isActive() && !$this->getAuthUser()->isStaff()) {
             throw new \Tk\Exception('This page is not available.');
         }
     }
@@ -67,7 +67,7 @@ class StudentResults extends AdminIface
             $template->addCss('icon', $this->collection->icon);
         }
 
-        $panelTitle = sprintf('%s Results for `%s`', $this->collection->name, $this->user->name);
+        $panelTitle = sprintf('%s Results for `%s`', $this->collection->getName(), $this->user->getName());
         $template->insertText('panel-title', $panelTitle);
 
         $filter = array();
