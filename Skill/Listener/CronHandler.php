@@ -66,7 +66,7 @@ class CronHandler implements Subscriber
                     'subjectId' => $subject->getId())
             );
             foreach ($collections as $collection) {
-                $students = \App\Db\UserMap::create()->findFiltered(array('subjectId' => $subject->getId(), 'type' => \Uni\Db\User::TYPE_STUDENT));
+                $students = \App\Db\UserMap::create()->findFiltered(array('subjectId' => $subject->getId(), 'type' => \Skill\Db\Collection::TYPE_STUDENT));
                 $console->writeComment($subject->name . ' - ' . $collection->name, Output::VERBOSITY_VERY_VERBOSE);
                 $console->writeComment('  - Collection ID: ' . $collection->getId(), Output::VERBOSITY_VERY_VERBOSE);
                 $console->writeComment('  - Subject ID:    ' . $subject->getId(), Output::VERBOSITY_VERY_VERBOSE);
