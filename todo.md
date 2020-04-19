@@ -25,3 +25,6 @@ HOW TO CALCULATE GRADES (GOALS)
        each average domain value by the doamin.weight value.  
     4. Finally add all the domain values and divide by the number of domains to get the average grade. 
     5. Divide this value by the scale and multiply by 100 to get the percentage grade
+    
+    
+    
