@@ -44,7 +44,7 @@ class CronHandler implements Subscriber
     protected function fixCollectionIds($console)
     {
         $console->write(' - Checking and repairing old Entry collection_id and item_id values. (Remove After: Jan 2019)');
-        \Skill\Db\CollectionMap::create()->fixChangeoverEntries();
+        //\Skill\Db\CollectionMap::create()->fixChangeoverEntries();
     }
 
     /**
