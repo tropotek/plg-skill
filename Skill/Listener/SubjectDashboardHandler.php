@@ -48,7 +48,7 @@ class SubjectDashboardHandler implements Subscriber
         // STAFF Subject Dashboard
         if ($this->controller instanceof \App\Controller\Staff\SubjectDashboard) {
             $userList = $this->controller->getSubjectUserList();
-            $userList->setOnShowUser(function (\Dom\Template $template, \App\Db\User $user) use ($subject) {
+            $userList->addOnShowUser(function (\Dom\Template $template, \App\Db\User $user) use ($subject) {
                 $collectionList = \Skill\Db\CollectionMap::create()->findFiltered(
                     array('subjectId' => $subject->getId(), 'gradable' => true, 'requirePlacement' => true, 'active' => true));
                 /** @var \Skill\Db\Collection $collection */
@@ -62,7 +62,7 @@ class SubjectDashboardHandler implements Subscriber
                     ));
                     if (!$entryList->count()) continue;
 
-                    $btn = \Tk\Ui\Button::create($collection->name . ' Results', \Uni\Uri::createSubjectUrl('/entryResults.html')
+                    $btn = \Tk\Ui\Link::createBtn($collection->name . ' Results', \Uni\Uri::createSubjectUrl('/entryResults.html')
                         ->set('userId', $user->getId())->set('collectionId', $collection->getId()), $collection->icon);
                     $btn->addCss('btn-primary btn-xs');
                     $btn->setAttr('title', 'View Student ' . $collection->name . ' Results');
@@ -74,7 +74,7 @@ class SubjectDashboardHandler implements Subscriber
                 /** @var \Skill\Db\Collection $collection */
                 foreach ($collectionList as $collection) {
                     if (!$collection->isAvailable()) continue;
-                    $btn = \Tk\Ui\Button::create($collection->name, \Uni\Uri::createSubjectUrl('/entryEdit.html')
+                    $btn = \Tk\Ui\Link::createBtn($collection->name, \Uni\Uri::createSubjectUrl('/entryEdit.html')
                         ->set('userId', $user->getId())->set('collectionId', $collection->getId()), $collection->icon);
                     $entry = \Skill\Db\EntryMap::create()->findFiltered(
                         array(
