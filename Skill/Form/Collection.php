@@ -39,7 +39,8 @@ class Collection extends \App\FormIface
 
         $tab = 'Details';
         $this->appendField(new Field\Input('name'))->setTabGroup($tab)->setNotes('Create a label for this collection');
-        $list = \Tk\Form\Field\Select::arrayToSelectList(\Tk\ObjectUtil::getClassConstants('\Skill\Db\Collection', 'ROLE'));
+
+        $list = \Tk\Form\Field\Select::arrayToSelectList(\Tk\ObjectUtil::getClassConstants('\Skill\Db\Collection', 'TYPE'));
         $this->appendField(new Field\Select('role', $list))->setTabGroup($tab)->prependOption('-- Select --', '')
             ->setNotes('');
 
