@@ -48,7 +48,7 @@ class StudentManagerButtonHandler implements Subscriber
                 $url = \Uni\Uri::createSubjectUrl('/entryEdit.html')->set('collectionId', $collection->getId());
 
                 $actionsCell->addButton(\Tk\Table\Cell\ActionButton::create($collection->name, $url, $collection->icon))
-                    ->setOnShow(function ($cell, $obj, $button) use ($collection) {
+                    ->addOnShow(function ($cell, $obj, $button) use ($collection) {
                         /* @var $obj \App\Db\User */
                         /* @var $button \Tk\Table\Cell\ActionButton */
                         $button->getUrl()->set('userId', $obj->getId());

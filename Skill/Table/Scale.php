@@ -32,7 +32,7 @@ class Scale extends \App\TableIface
         $this->appendCell(new \Tk\Table\Cell\Text('name'))->addCss('key')->setUrl($this->getEditUrl());
         $this->appendCell(new \Tk\Table\Cell\Text('value'));
         //$this->appendCell(new \Tk\Table\Cell\Date('modified'));
-//        $this->appendCell(new \Tk\Table\Cell\OrderBy('orderBy'))->setOnUpdate(function ($orderBy) {
+//        $this->appendCell(new \Tk\Table\Cell\OrderBy('orderBy'))->addOnUpdate(function ($orderBy) {
 //            /** @var \Tk\Table\Cell\OrderBy $orderBy */
 //            \Skill\Db\Scale::recalculateValues($this->collection->getId());
 //        });

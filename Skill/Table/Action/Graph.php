@@ -68,7 +68,7 @@ class Graph extends \Tk\Table\Action\Link
         $this->dialog->setAttr('data-table-target', '#'.$this->getTable()->getId());
 
         if ($this->dialog) {
-            $this->dialog->setOnShow(function ($dialog) {
+            $this->dialog->addOnShow(function ($dialog) {
                 /** @var $dialog \Tk\Ui\DialogBox */
                 $template = $dialog->getTemplate();
 
