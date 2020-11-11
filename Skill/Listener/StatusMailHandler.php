@@ -82,7 +82,7 @@ class StatusMailHandler implements Subscriber
     public static function getSubscribedEvents()
     {
         return array(
-            \Uni\StatusEvents::STATUS_SEND_MESSAGES => array('onSendAllStatusMessages', 10)
+            \Bs\StatusEvents::STATUS_SEND_MESSAGES => array('onSendAllStatusMessages', 10)
         );
     }
     

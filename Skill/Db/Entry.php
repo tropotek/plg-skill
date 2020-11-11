@@ -2,6 +2,12 @@
 namespace Skill\Db;
 
 
+use App\Db\Traits\PlacementTrait;
+use Bs\Db\Traits\TimestampTrait;
+use Bs\Db\Traits\UserTrait;
+use Uni\Db\Traits\StatusTrait;
+use Uni\Db\Traits\SubjectTrait;
+
 /**
  * @author Michael Mifsud <info@tropotek.com>
  * @see http://www.tropotek.com/
@@ -9,6 +15,13 @@ namespace Skill\Db;
  */
 class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 {
+    use StatusTrait;
+    use PlacementTrait;
+    use SubjectTrait;
+    use UserTrait;
+    use TimestampTrait;
+
+
     const STATUS_PENDING = 'pending';
     const STATUS_APPROVED = 'approved';
     const STATUS_NOT_APPROVED = 'not approved';
@@ -96,21 +109,6 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
      */
     private $_collection = null;
 
-    /**
-     * @var \App\Db\Subject
-     */
-    private $_subject = null;
-
-    /**
-     * @var \App\Db\User
-     */
-    private $_user = null;
-
-    /**
-     * @var \App\Db\Placement
-     */
-    private $_placement = null;
-
 
 
     /**
@@ -118,8 +116,7 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
      */
     public function __construct()
     {
-        $this->modified = \Tk\Date::create();
-        $this->created = \Tk\Date::create();
+        $this->_TimestampTrait();
     }
 
 
@@ -179,69 +176,6 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
             $this->_collection = CollectionMap::create()->find($this->collectionId);
         }
         return $this->_collection;
-    }
-
-    /**
-     * @return \App\Db\Subject|null|\Tk\Db\Map\Model|\Tk\Db\ModelInterface
-     * @throws \Exception
-     */
-    public function getSubject()
-    {
-        if (!$this->_subject) {
-            $this->_subject = \App\Db\SubjectMap::create()->find($this->subjectId);
-        }
-        return $this->_subject;
-    }
-
-    /**
-     * @return \App\Db\User|null|\Tk\Db\Map\Model|\Tk\Db\ModelInterface
-     * @throws \Exception
-     */
-    public function getUser()
-    {
-        if (!$this->_user) {
-            $this->_user = \App\Db\UserMap::create()->find($this->userId);
-        }
-        return $this->_user;
-    }
-
-    /**
-     * @return \App\Db\Placement|null|\Tk\Db\Map\Model|\Tk\Db\ModelInterface
-     * @throws \Exception
-     */
-    public function getPlacement()
-    {
-        if (!$this->_placement) {
-            $this->_placement = \App\Db\PlacementMap::create()->find($this->placementId);
-        }
-        return $this->_placement;
-    }
-
-    /**
-     * @return string
-     */
-    public function getStatus()
-    {
-        return $this->status;
-    }
-
-    /**
-     * @param string $status
-     * @return Entry
-     */
-    public function setStatus(string $status)
-    {
-        $this->status = $status;
-        return $this;
-    }
-
-    /**
-     * return the status list for a select field
-     * @return array
-     */
-    public static function getStatusList()
-    {
-        return \Tk\Form\Field\Select::arrayToSelectList(\Tk\ObjectUtil::getClassConstants(__CLASS__, 'STATUS'));
     }
 
     /**

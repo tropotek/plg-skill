@@ -183,15 +183,16 @@ JS;
         }
 
         // TODO: Although this seems redundant, there was a bug where the getEntry()->userId == placement->id (try to trace?)
-        $this->getEntry()->userId = $this->getEntry()->getPlacement()->getUserId();
+        $this->getEntry()->setUserId($this->getEntry()->getPlacement()->getUserId());
+        $this->getEntry()->setStatusNotify(true);
         $this->getEntry()->save();
 
-        // Create status if changed and trigger notifications
-        if (!$this->isPublic() && $form->getField('status')) {
-            \Uni\Db\Status::createFromStatusSelect($this->getEntry(), $form->getField('status'));
-        } else {
-            \Uni\Db\Status::createFromTrait($this->getEntry());
-        }
+//        // Create status if changed and trigger notifications
+//        if (!$this->isPublic() && $form->getField('status')) {
+//            \Uni\Db\Status::createFromStatusSelect($this->getEntry(), $form->getField('status'));
+//        } else {
+//            \Uni\Db\Status::createFromTrait($this->getEntry());
+//        }
 
         \Tk\Alert::addSuccess('You response has been successfully submitted. Please return at any time to make changes while this Entry remains in the pending status.');
         $url = \Tk\Uri::create()->set('entryId', $this->getEntry()->getId());
