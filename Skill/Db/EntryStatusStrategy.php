@@ -60,7 +60,7 @@ class EntryStatusStrategy extends \Uni\Db\StatusStrategyInterface
 
         $message->setSubject('[#'.$model->getId().'] ' . $model->getCollection()->getName() . ' Entry ' .
             ucfirst($status->getName()) . ' for ' . $placement->getTitle(true) . ' ');
-        $message->setFrom(\Tk\Mail\Message::joinEmail($status->getCourse()->getEmail(), $status->getSubjectName()));
+        $message->setFrom(\Tk\Mail\Message::joinEmail(\Uni\Db\Status::getCourse($status)->getEmail(), $status->getSubjectName($status)));
 
         // Setup the message vars
         \App\Util\StatusMessage::setStudent($message, $placement->getAuthUser());
@@ -106,15 +106,16 @@ class EntryStatusStrategy extends \Uni\Db\StatusStrategyInterface
                     $message->set('recipient::name', $supervisor->getName());
                 break;
             case \App\Db\MailTemplate::RECIPIENT_STAFF:
-                $staffList = $status->getSubject()->getCourse()->getUsers();
+                $subject = \Uni\Db\Status::getSubject($status);
+                $staffList = $subject->getCourse()->getUsers();
                 if (count($staffList)) {
                     /** @var \App\Db\User $s */
                     foreach ($staffList as $s) {
                         $message->addBcc(\Tk\Mail\Message::joinEmail($s->getEmail(), $s->getName()));
                     }
-                    $message->addTo(\Tk\Mail\Message::joinEmail($status->getSubject()->getCourse()->getEmail(), $status->getSubjectName()));
-                    $message->set('recipient::email', $status->getSubject()->getCourse()->getEmail());
-                    $message->set('recipient::name', $status->getSubjectName());
+                    $message->addTo(\Tk\Mail\Message::joinEmail($subject->getCourse()->getEmail(), \Uni\Db\Status::getSubjectName($status)));
+                    $message->set('recipient::email', $subject->getCourse()->getEmail());
+                    $message->set('recipient::name', \Uni\Db\Status::getSubjectName($status));
                 }
                 break;
         }
