@@ -153,10 +153,10 @@ JS;
         \Skill\Db\EntryMap::create()->mapForm($form->getValues(), $this->getEntry());
 
         if (!$this->isPublic()) {
-            if ($form->getField('status') && (!$form->getFieldValue('status') || !in_array($form->getFieldValue('status'),
-                        \Tk\ObjectUtil::getClassConstants($this->getEntry(), 'STATUS')))) {
-                $form->addFieldError('status', 'Please Select a valid status');
-            }
+//            if ($form->getField('status') && (!$form->getFieldValue('status') || !in_array($form->getFieldValue('status'),
+//                        \Tk\ObjectUtil::getClassConstants($this->getEntry(), 'STATUS')))) {
+//                $form->addFieldError('status', 'Please Select a valid status');
+//            }
         } else {
             $this->getEntry()->setStatus(\Skill\Db\Entry::STATUS_PENDING);
         }
