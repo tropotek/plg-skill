@@ -9,6 +9,7 @@ use Tk\Mail\CurlyMessage;
  * @author Michael Mifsud <info@tropotek.com>
  * @see http://www.tropotek.com/
  * @license Copyright 2015 Michael Mifsud
+ * @deprecated
  */
 class EntryStatusStrategy extends \Uni\Db\StatusStrategyInterface
 {

@@ -5,7 +5,7 @@ namespace Skill\Db;
 use App\Db\Traits\PlacementTrait;
 use Bs\Db\Traits\TimestampTrait;
 use Bs\Db\Traits\UserTrait;
-use Uni\Db\Traits\StatusTrait;
+use Bs\Db\Traits\StatusTrait;
 use Uni\Db\Traits\SubjectTrait;
 
 /**
@@ -159,11 +159,11 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
         parent::save();
     }
 
-    public function delete()
-    {
-        \Uni\Db\StatusMap::create()->deleteByModel(get_class($this), $this->getId());
-        return parent::delete();
-    }
+//    public function delete()
+//    {
+//        \Bs\Db\StatusMap::create()->deleteByModel(get_class($this), $this->getId());
+//        return parent::delete();
+//    }
 
 
     /**
