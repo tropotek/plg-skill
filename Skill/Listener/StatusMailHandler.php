@@ -17,12 +17,12 @@ class StatusMailHandler implements Subscriber
      */
     public function onSendAllStatusMessages(\Bs\Event\StatusEvent $event)
     {
-        $course = \Uni\Db\Status::getCourse($event->getStatus());
+        $course = \Uni\Util\Status::getCourse($event->getStatus());
         if (!$event->getStatus()->isNotify() || ($course && !$course->getCourseProfile()->isNotifications())) {
             \Tk\Log::debug('Skill::onSendAllStatusMessages: Status Notification Disabled');
             return;
         }
-        $subject = \Uni\Db\Status::getSubject($event->getStatus());
+        $subject = \Uni\Util\Status::getSubject($event->getStatus());
 
         /** @var \Tk\Mail\CurlyMessage $message */
         foreach ($event->getMessageList() as $message) {

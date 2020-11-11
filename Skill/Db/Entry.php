@@ -416,7 +416,7 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
     }
 
     /**
-     * @param \Uni\Db\Status $status
+     * @param \Bs\Db\Status $status
      * @param CurlyMessage $message
      * @return null|\Tk\Mail\CurlyMessage
      * @throws \Exception
@@ -432,7 +432,7 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
 
         $message->setSubject('[#'.$model->getId().'] ' . $model->getCollection()->getName() . ' Entry ' .
             ucfirst($status->getName()) . ' for ' . $placement->getTitle(true) . ' ');
-        $message->setFrom(\Tk\Mail\Message::joinEmail(\Uni\Db\Status::getCourse($status)->getEmail(), $status->getSubjectName($status)));
+        $message->setFrom(\Tk\Mail\Message::joinEmail(\Uni\Util\Status::getCourse($status)->getEmail(), \Uni\Util\Status::getSubjectName($status)));
 
         // Setup the message vars
         \App\Util\StatusMessage::setStudent($message, $placement->getAuthUser());
@@ -478,16 +478,16 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
                 $message->set('recipient::name', $supervisor->getName());
                 break;
             case \App\Db\MailTemplate::RECIPIENT_STAFF:
-                $subject = \Uni\Db\Status::getSubject($status);
+                $subject = \Uni\Util\Status::getSubject($status);
                 $staffList = $subject->getCourse()->getUsers();
                 if (count($staffList)) {
                     /** @var \App\Db\User $s */
                     foreach ($staffList as $s) {
                         $message->addBcc(\Tk\Mail\Message::joinEmail($s->getEmail(), $s->getName()));
                     }
-                    $message->addTo(\Tk\Mail\Message::joinEmail($subject->getCourse()->getEmail(), \Uni\Db\Status::getSubjectName($status)));
+                    $message->addTo(\Tk\Mail\Message::joinEmail($subject->getCourse()->getEmail(), \Uni\Util\Status::getSubjectName($status)));
                     $message->set('recipient::email', $subject->getCourse()->getEmail());
-                    $message->set('recipient::name', \Uni\Db\Status::getSubjectName($status));
+                    $message->set('recipient::name', \Uni\Util\Status::getSubjectName($status));
                 }
                 break;
         }
