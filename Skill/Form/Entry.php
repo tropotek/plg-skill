@@ -123,7 +123,7 @@ CSS;
 
         $js = <<<JS
 jQuery(function ($) {
-  if (config.roleType === 'staff') {
+  if (config.roleType === 'staff' && $('fieldset.skill-group').length > 0) {
     $('.skill-entry-edit .tk-form-events').clone(true).appendTo($('.skill-entry-edit fieldset.EntryDetails'));
   }
 });
@@ -165,12 +165,16 @@ JS;
         foreach ($form->getValues('/^item\-/') as $name => $val) {
             if ($val > 0) $hasValue = true;
         }
+        $items = \Skill\Db\ItemMap::create()->findFiltered(array('collectionId' => $this->getEntry()->getCollection()->getId()),
+            \Tk\Db\Tool::create('category_id, order_by'));
+        if (!$items->count()) {
+            $hasValue = true;
+        }
         if (!$hasValue) {
             $form->addError('Use the slider at the end of the question to leave feedback.');
         }
 
         $form->addFieldErrors($this->getEntry()->validate());
-
         if ($form->hasErrors()) {
             return;
         }

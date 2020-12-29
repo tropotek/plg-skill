@@ -300,13 +300,16 @@ HTML;
 <div class="content EntryEdit">
   <div class="container">
     <div class="layout layout-stack-sm layout-main-left">
+    
       <div class="layout-main" choice="available">
         <div var="instructions"></div>
         <div var="panel"></div>
       </div>
+      
       <div class="layout-main" choice="not-available">
         <p>Please <a href="/contact.html?subjectId=0" var="contact">contact</a> the subject coordinator as this resource is no longer available.</p>
       </div>
+      
     </div>
   </div>
 </div>
