@@ -163,7 +163,7 @@ class CollectionReport extends \App\TableIface
      */
     public function findList($filter = array(), $tool = null)
     {
-        if (!$tool) $tool = $this->getTool('a.name', 0);
+        if (!$tool) $tool = $this->getTool('a.name_first', 0);
         $filter = array_merge($this->getFilterValues(), $filter);
         $list = $this->getConfig()->getUserMapper()->findFiltered($filter, $tool);
         return $list;

@@ -52,9 +52,9 @@ sd.id as 'domain_id', sd.name as 'domain_name',
 
 s.id as 'subject_id', s.name as 'subject_name',
 
-u.id as 'user_id', u.name as 'user_name', u.uid as 'user_uid', u.email as 'user_email',
+u.id as 'user_id', CONCAT(u.name_first, ' ', u.name_last) as 'user_name', u.uid as 'user_uid', u.email as 'user_email',
 
-p.id as 'placement_id', p.date_start as 'placement_dateStart', p.date_end as 'placement_dateEnd', CONCAT(u.name, '@', c.name) as 'placement_title',
+p.id as 'placement_id', p.date_start as 'placement_dateStart', p.date_end as 'placement_dateEnd', CONCAT(CONCAT(u.name_first, ' ', u.name_last), '@', c.name) as 'placement_title',
 
 pt.name as 'placement_type_name', 
 
