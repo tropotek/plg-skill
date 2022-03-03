@@ -26,7 +26,7 @@ Or add the following to your composer.json file:
 
 ```json
 {
-  "uom-plg/plg-skill": "~3.0"
+  "uom-plg/plg-skill": "~3.2"
 }
 ```
 
