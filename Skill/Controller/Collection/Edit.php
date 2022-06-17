@@ -108,7 +108,7 @@ class Edit extends AdminEditIface
 //        $this->form->appendField(new Field\Checkbox('gradable'))->setTabGroup($tab)
 //            ->setCheckboxLabel('If enabled (Requires Placement) then the student can view a summary of the results for this collection.');
 //
-//        $list = \App\Db\PlacementTypeMap::create()->findFiltered(array('subjectId' => $this->collection->getSubject()->getId()));
+//        $list = \App\Db\PlacementTypeMap::create()->findFiltered(array('subjectId' => $this->collection->getSubject()->getId(), 'active' => true));
 //        $ptiField = $this->form->appendField(new Field\Select('placementTypeId[]', \Tk\Form\Field\Option\ArrayObjectIterator::create($list)))
 //            ->setTabGroup($tab)->addCss('tk-dual-select')->setAttr('data-title', 'Placement Types')
 //            ->setNotes('Enable this collection for the selected placement types.');
