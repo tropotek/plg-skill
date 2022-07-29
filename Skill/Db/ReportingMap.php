@@ -175,7 +175,6 @@ SQL;
         }
 
         $res = $this->selectFromFilter($filter, $tool);
-        //vd($this->getDb()->getLastQuery());
         return $res;
     }
 
@@ -309,7 +308,6 @@ SQL;
         }
 
         $res = $this->selectFromFilter($filter, $tool);
-        //vd($this->getDb()->getLastQuery());
         return $res;
     }
 
@@ -438,11 +436,8 @@ SQL;
         }
 
         $res = $this->selectFromFilter($filter, $tool);
-        //vd($this->getDb()->getLastQuery());
         return $res;
     }
-
-
 
     /**
      * Find filtered records for graphing calculating the average values
@@ -538,7 +533,6 @@ SQL;
         }
 
         $res = $this->selectFromFilter($filter, $tool);
-        //vd($this->getDb()->getLastQuery());
         return $res;
     }
 
@@ -626,7 +620,6 @@ SQL;
         }
 
         $res = $this->selectFromFilter($filter, $tool);
-        //vd($this->getDb()->getLastQuery());
         return $res;
     }
 

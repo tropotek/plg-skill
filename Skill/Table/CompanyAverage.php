@@ -214,7 +214,6 @@ jQuery(function ($) {
     table.hide();
 
     trigger.on('click', function (e) {
-      console.log(e);
       if ($(e.target).is('a[target="_blank"], button')) return;
       if (table.isVisible()) {
         $(this).find('.fa.fa-caret-up').removeClass(dnIcon).addClass(upIcon);

@@ -216,7 +216,7 @@ class Entry extends \Tk\Db\Map\Model implements \Tk\ValidInterface
         if (!count($grades)) return 0;
         $avg = array_sum($avgs)/count($grades);
         if (!$weighted)
-            vd($grades, $avgs, array_sum($avgs) , count($grades), $avg);
+            \Tk\Log::debug($grades, $avgs, array_sum($avgs) , count($grades), $avg);
         return $avg;
     }
 
