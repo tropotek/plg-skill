@@ -1,6 +1,6 @@
 {
-    "name": "uom-plg/plg-skill",
-    "type": "uom-plugin",
+    "name": "ttek-plg/plg-skill",
+    "type": "ttek-plugin",
     "description": "EMS III Assessment plugin, Gives users the ability to fill in a questionnaire to assess students.",
     "keywords":  [
         "tropotek",

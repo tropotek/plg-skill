@@ -1,6 +1,6 @@
 # EMS Skill Plugin
 
-__Project:__ [uom-plg/plg-skill](http://packagist.org/packages/uom-plg/plg-skill)
+__Project:__ [ttek-plg/plg-skill](http://packagist.org/packages/ttek-plg/plg-skill)
 __Web:__ <http://www.tropotek.com/>  
 __Authors:__ Michael Mifsud <http://www.tropotek.com/>  
   
@@ -15,18 +15,18 @@ An plg-skill Plugin for the new EMS System.
 
 ## Installation
 
-Available on Packagist ([uom-plg/plg-skill](http://packagist.org/packages/uom-plg/plg-skill))
+Available on Packagist ([ttek-plg/plg-skill](http://packagist.org/packages/ttek-plg/plg-skill))
 and as such installable via [Composer](http://getcomposer.org/).
 
 ```bash
-# composer require uom-plg/plg-skill
+# composer require ttek-plg/plg-skill
 ```
 
 Or add the following to your composer.json file:
 
 ```json
 {
-  "uom-plg/plg-skill": "~3.2"
+  "ttek-plg/plg-skill": "~3.2"
 }
 ```
 
