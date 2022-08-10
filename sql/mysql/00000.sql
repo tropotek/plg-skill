@@ -1,5 +1,5 @@
 -- ---------------------------------
--- Author: Michael Mifsud <info@tropotek.com>
+-- Author: Michael Mifsud <http://www.tropotek.com/>
 -- ---------------------------------
 --
 -- For now we will be assuming all historical data will be

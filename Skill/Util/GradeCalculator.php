@@ -5,7 +5,7 @@ namespace Skill\Util;
 use Tk\ConfigTrait;
 
 /**
- * @author Tropotek <info@tropotek.com>
+ * @author Tropotek <http://www.tropotek.com/>
  * @created: 6/08/18
  * @link http://www.tropotek.com/
  * @license Copyright 2018 Tropotek
